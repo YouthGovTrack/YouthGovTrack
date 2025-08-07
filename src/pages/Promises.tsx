@@ -1,0 +1,17 @@
+import React from 'react';
+
+const Promises: React.FC = () => (
+  <main className="container mx-auto py-12 px-4">
+    <h1 className="text-3xl font-bold text-primary mb-6">Governor Promises</h1>
+    {/* FilterBar Placeholder */}
+    <div className="mb-6 bg-gray-50 p-4 rounded shadow-sm">FilterBar (TODO)</div>
+    {/* Promise Cards Grid */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="bg-white border rounded-lg shadow p-6 h-40 flex items-center justify-center text-gray-400">PromiseCard 1</div>
+      <div className="bg-white border rounded-lg shadow p-6 h-40 flex items-center justify-center text-gray-400">PromiseCard 2</div>
+      <div className="bg-white border rounded-lg shadow p-6 h-40 flex items-center justify-center text-gray-400">PromiseCard 3</div>
+    </div>
+  </main>
+);
+
+export default Promises; 

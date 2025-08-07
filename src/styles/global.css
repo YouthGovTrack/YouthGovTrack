@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* global.css - Basic reset and layout */
 * {
   margin: 0;
