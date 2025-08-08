@@ -35,23 +35,6 @@ A React application for tracking government activities that affect young people.
    npm install
    ```
 
-### Development
-
-Start the development server:
-```bash
-npm start
-```
-
-This will open the application in your browser at `http://localhost:3000` with hot reload enabled.
-
-### Building for Production
-
-Build the application for production:
-```bash
-npm run build
-```
-
-The built files will be in the `dist/` directory.
 
 ## Project Structure
 
@@ -81,7 +64,3 @@ YouthGovTrack/
 2. Create a feature branch
 3. Make your changes
 4. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License.

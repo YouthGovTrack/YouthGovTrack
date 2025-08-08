@@ -15,7 +15,14 @@ const Home: React.FC = () => {
                 Empowering citizens to monitor development projects, report issues, and access civic education materials for a more transparent governance.
               </p>
               <button className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition flex items-center">
-                <span className="mr-2">🇳🇬</span>
+                <img 
+                  src="/pin.svg" 
+                  alt="pin icon" 
+                  width={20} 
+                  height={20}
+                  className="mr-2"
+                  style={{ filter: 'invert(1) brightness(2)' }}
+                />
                 Track My LGA
               </button>
             </div>
@@ -52,22 +59,42 @@ const Home: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-xl shadow-sm text-center">
               <div className="flex justify-center mb-2">
-                <svg width={48} height={48} viewBox="0 0 57 57" className="text-blue-600" fill="currentColor" aria-hidden="true">
-                    <path d="M203 397 l-43 -21 0 -102 c0 -113 7 -125 56 -95 28 17 31 17 72 -3 l42 -20 45 22 45 22 0 100 c0 113 -6 123 -59 95 -29 -14 -33 -14 -71 5 -21 11 -41 20 -42 19 -2 0 -22 -10 -45 -22z m37 -95 c0 -85 -1 -89 -25 -100 -14 -7 -28 -12 -30 -12 -3 0 -5 39 -5 88 0 81 2 88 23 98 12 7 25 12 30 13 4 0 7 -39 7 -87z m80 -32 l0 -89 -30 17 c-30 17 -30 18 -30 105 l0 88 30 -16 c30 -15 30 -16 30 -105z m80 32 c0 -85 -1 -89 -25 -100 -14 -7 -28 -12 -30 -12 -3 0 -5 39 -5 88 0 81 2 88 23 98 12 7 25 12 30 13 4 0 7 -39 7 -87z" transform="translate(0,57) scale(0.1,-0.1)" />
-                </svg>
+                <img 
+                  src="/map.svg" 
+                  alt="Map icon" 
+                  width={48} 
+                  height={48}
+                  className="text-blue-600"
+                />
               </div>
               <div className="text-3xl font-bold text-gray-900">247</div>
-              <div className="text-gray-600">Total Projects</div>
+              <div className="text-gray-600">LGAs Covered</div>
             </div>
             <div className="bg-white p-8 rounded-xl shadow-sm text-center">
-              <div className="text-green-600 text-4xl mb-2">💰</div>
+              <div className="flex justify-center mb-2">
+                <img 
+                  src="/report.svg" 
+                  alt="Report icon" 
+                  width={48} 
+                  height={48}
+                  className="text-green-600"
+                />
+              </div>
               <div className="text-3xl font-bold text-gray-900">12,643</div>
-              <div className="text-gray-600">Budget Allocated</div>
+              <div className="text-gray-600">Report Submitted</div>
             </div>
             <div className="bg-white p-8 rounded-xl shadow-sm text-center">
-              <div className="text-yellow-600 text-4xl mb-2">👥</div>
+              <div className="flex justify-center mb-2">
+                <img 
+                  src="/citizen.svg" 
+                  alt="User icon" 
+                  width={48} 
+                  height={48}
+                  className="text-yellow-600"
+                />
+              </div>
               <div className="text-3xl font-bold text-gray-900">5,782</div>
-              <div className="text-gray-600">Active Citizens</div>
+              <div className="text-gray-600">Citizens Trained</div>
             </div>
           </div>
         </div>
