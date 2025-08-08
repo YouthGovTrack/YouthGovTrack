@@ -51,7 +51,11 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-xl shadow-sm text-center">
-              <div className="text-blue-600 text-4xl mb-2">🗺️</div>
+              <div className="flex justify-center mb-2">
+                <svg width={48} height={48} viewBox="0 0 57 57" className="text-blue-600" fill="currentColor" aria-hidden="true">
+                    <path d="M203 397 l-43 -21 0 -102 c0 -113 7 -125 56 -95 28 17 31 17 72 -3 l42 -20 45 22 45 22 0 100 c0 113 -6 123 -59 95 -29 -14 -33 -14 -71 5 -21 11 -41 20 -42 19 -2 0 -22 -10 -45 -22z m37 -95 c0 -85 -1 -89 -25 -100 -14 -7 -28 -12 -30 -12 -3 0 -5 39 -5 88 0 81 2 88 23 98 12 7 25 12 30 13 4 0 7 -39 7 -87z m80 -32 l0 -89 -30 17 c-30 17 -30 18 -30 105 l0 88 30 -16 c30 -15 30 -16 30 -105z m80 32 c0 -85 -1 -89 -25 -100 -14 -7 -28 -12 -30 -12 -3 0 -5 39 -5 88 0 81 2 88 23 98 12 7 25 12 30 13 4 0 7 -39 7 -87z" transform="translate(0,57) scale(0.1,-0.1)" />
+                </svg>
+              </div>
               <div className="text-3xl font-bold text-gray-900">247</div>
               <div className="text-gray-600">Total Projects</div>
             </div>
