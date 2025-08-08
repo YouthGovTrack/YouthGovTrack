@@ -1,19 +1,49 @@
 # Dependencies
 node_modules/
+package-lock.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+yarn.lock
+pnpm-lock.yaml
 
 # Production build
 dist/
 build/
+out/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
 
-# Environment variables
+# Environment variables & Secrets
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.*.local
+*.key
+*.pem
+*.p12
+*.pfx
+config.json
+secrets.json
+.secrets/
+
+# API Keys & Tokens (Security Critical)
+*.api-key
+*.token
+.firebase/
+.gcp/
+.aws/
+.azure/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
 
 # IDE/Editor files
 .vscode/
@@ -21,6 +51,9 @@ build/
 *.swp
 *.swo
 *~
+.sublime-project
+.sublime-workspace
+*.code-workspace
 
 # OS generated files
 .DS_Store
@@ -30,19 +63,75 @@ build/
 .Trashes
 ehthumbs.db
 Thumbs.db
+desktop.ini
 
 # Logs
-logs
+logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.npm/
 
 # Runtime data
-pids
+pids/
 *.pid
 *.seed
 *.pid.lock
 
 # Coverage directory used by tools like istanbul
 coverage/
+*.lcov
+.nyc_output/
 
-# nyc test coverage
-.nyc_output
+# Testing
+.jest/
+__tests__/coverage/
+test-results/
+junit.xml
+
+# TypeScript
+*.tsbuildinfo
+.tscache/
+
+# Webpack
+.webpack/
+webpack-stats.json
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Backup files
+*.bak
+*.backup
+*.orig
+
+# Security scan results
+.snyk
+security-scan-results.json
+
+# Local development
+.local/
+.cache/
+.temp/
+
+# Docker
+.dockerignore
+Dockerfile.local
+docker-compose.override.yml
+
+# Certificates & Security
+*.crt
+*.cert
+*.ca-bundle
+ssl/
+certs/
+
+# Source maps (can expose source code)
+*.map
+*.js.map
+*.css.map
