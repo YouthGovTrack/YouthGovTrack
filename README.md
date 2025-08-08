@@ -1,69 +1,87 @@
-# React + TypeScript + Vite
+# YouthGovTrack
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React application for tracking government activities that affect young people.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Policy Tracking**: Monitor policies that impact youth education, employment, and welfare
+- **Legislative Updates**: Stay informed about new legislation affecting young people
+- **Civic Engagement**: Find opportunities to participate in local government activities
 
-## Expanding the ESLint configuration
+## Technologies Used
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **React 18** - Modern React with hooks and functional components
+- **Webpack 5** - Module bundler with hot reload development server
+- **Tailwind CSS 3** - Utility-first CSS framework for rapid UI development
+- **Babel** - JavaScript transpiler for modern JS features
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Prerequisites
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Node.js (version 16 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd YouthGovTrack
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Development
+
+Start the development server:
+```bash
+npm start
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+This will open the application in your browser at `http://localhost:3000` with hot reload enabled.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Building for Production
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Build the application for production:
+```bash
+npm run build
 ```
+
+The built files will be in the `dist/` directory.
+
+## Project Structure
+
+```
+YouthGovTrack/
+├── public/
+│   └── index.html          # HTML template
+├── src/
+│   ├── App.js              # Main React component
+│   ├── index.js            # Entry point
+│   └── index.css           # Tailwind CSS imports
+├── webpack.config.js       # Webpack configuration
+├── tailwind.config.js      # Tailwind CSS configuration
+├── postcss.config.js       # PostCSS configuration
+└── package.json            # Project dependencies and scripts
+```
+
+## Available Scripts
+
+- `npm start` - Start development server
+- `npm run dev` - Start development server (alternative)
+- `npm run build` - Build for production
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.
