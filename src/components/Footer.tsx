@@ -1,4 +1,8 @@
 import React from 'react';
+import Instagram from './icons/Instagram';
+import Facebook from './icons/Facebook';
+import Twitter from './icons/Twitter';
+import LinkedIn from './icons/LinkedIn';
 
 const Footer: React.FC = () => {
   return (
@@ -12,10 +16,10 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="font-semibold mb-4">Quick Links</h4>
             <div className="space-y-2">
-              <a href="#" className="block text-gray-400 hover:text-white">About Us</a>
-              <a href="#" className="block text-gray-400 hover:text-white">How It Works</a>
-              <a href="#" className="block text-gray-400 hover:text-white">Projects</a>
-              <a href="#" className="block text-gray-400 hover:text-white">Reports</a>
+              <a href="/about" className="block text-gray-400 hover:text-white transition-colors">About Us</a>
+              <a href="/how-it-works" className="block text-gray-400 hover:text-white transition-colors">How It Works</a>
+              <a href="/projects" className="block text-gray-400 hover:text-white transition-colors">Projects</a>
+              <a href="/reports" className="block text-gray-400 hover:text-white transition-colors">Reports</a>
             </div>
           </div>
           <div>
@@ -27,22 +31,67 @@ const Footer: React.FC = () => {
             </div>
           </div>
           <div>
-            <h4 className="font-semibold mb-4">Newsletter</h4>
+            <h4 className="font-semibold mb-4">Connect With Us</h4>
             <p className="text-gray-400 mb-4">Subscribe to our newsletter for updates</p>
-            <div className="flex">
+            <div className="flex mb-4">
               <input 
                 type="email" 
                 placeholder="Enter email" 
-                className="flex-1 p-2 rounded-l-lg text-gray-900" 
+                className="flex-1 p-2 rounded-l-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" 
               />
-              <button className="bg-blue-600 px-4 py-2 rounded-r-lg hover:bg-blue-700 transition">
+              <button className="bg-blue-600 px-4 py-2 rounded-r-lg hover:bg-blue-700 transition-colors">
                 Subscribe
               </button>
             </div>
+            
+            {/* Social Media Links */}
+            <div className="flex space-x-4">
+              <a 
+                href="https://facebook.com/youthgovtrack" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors"
+                aria-label="Follow us on Facebook"
+              >
+                <Facebook size={24} />
+              </a>
+              <a 
+                href="https://twitter.com/youthgovtrack" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors"
+                aria-label="Follow us on Twitter"
+              >
+                <Twitter size={24} />
+              </a>
+              <a 
+                href="https://linkedin.com/company/youthgovtrack" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors"
+                aria-label="Follow us on LinkedIn"
+              >
+                <LinkedIn size={24} />
+              </a>
+              <a 
+                href="https://instagram.com/youthgovtrack" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors"
+                aria-label="Follow us on Instagram"
+              >
+                <Instagram size={24} />
+              </a>
+            </div>
           </div>
         </div>
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 YouthGovTrack. All rights reserved. | Privacy Policy | Terms of Service</p>
+        <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-400">
+          <p>&copy; 2025 YouthGovTrack. All rights reserved.</p>
+          <div className="flex space-x-6 mt-4 md:mt-0">
+            <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
+            <a href="/terms" className="hover:text-white transition-colors">Terms of Service</a>
+            <a href="/contact" className="hover:text-white transition-colors">Contact</a>
+          </div>
         </div>
       </div>
     </footer>

@@ -1,6 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
+import StateSelector from '../components/StateSelector';
 
 const Home: React.FC = () => {
+  const [selectedState, setSelectedState] = useState<string>('');
+  const [selectedLga, setSelectedLga] = useState<string>('');
+
+  const handleStateChange = (state: string) => {
+    setSelectedState(state);
+    console.log('Selected state:', state);
+  };
+
+  const handleLgaChange = (lga: string) => {
+    setSelectedLga(lga);
+    console.log('Selected LGA:', lga);
+  };
+
+  const handleContinue = () => {
+    if (selectedState && selectedLga) {
+      // Handle form submission
+      console.log('Proceeding with:', { state: selectedState, lga: selectedLga });
+      // You can navigate to another page or make an API call here
+    } else {
+      alert('Please select both state and LGA');
+    }
+  };
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -31,20 +54,14 @@ const Home: React.FC = () => {
             <div className="bg-blue-600 rounded-xl p-8 text-white">
               <h3 className="text-2xl font-bold mb-6">Quick Report</h3>
               <div className="space-y-4">
-                <div>
-                  <select className="w-full p-3 rounded-lg text-gray-900">
-                    <option>Select your state</option>
-                    <option>Lagos</option>
-                    <option>Abuja</option>
-                    <option>Kano</option>
-                  </select>
-                </div>
-                <div>
-                  <select className="w-full p-3 rounded-lg text-gray-900">
-                    <option>Select your LGA</option>
-                  </select>
-                </div>
-                <button className="w-full bg-yellow-400 text-gray-900 py-3 rounded-lg font-semibold hover:bg-yellow-500 transition">
+                <StateSelector 
+                  onStateChange={handleStateChange}
+                  onLgaChange={handleLgaChange}
+                />
+                <button 
+                  className="w-full bg-yellow-400 text-gray-900 py-3 rounded-lg font-semibold hover:bg-yellow-500 transition"
+                  onClick={handleContinue}
+                >
                   Continue
                 </button>
               </div>
