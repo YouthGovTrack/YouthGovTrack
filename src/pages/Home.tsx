@@ -126,8 +126,14 @@ const Home: React.FC = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              <div className="h-48 bg-blue-100"></div>
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div className="h-48 bg-gray-50 flex items-center justify-center p-6">
+                <img 
+                  src="/Healthcare.png" 
+                  alt="Healthcare Center" 
+                  className="w-full h-full object-cover rounded-lg"
+                />
+              </div>
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-2">Ikeja Primary Healthcare Center</h3>
                 <div className="flex items-center mb-2">
@@ -147,8 +153,14 @@ const Home: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              <div className="h-48 bg-red-100"></div>
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div className="h-48 bg-gray-50 flex items-center justify-center p-6">
+                <img 
+                  src="/infracture.png" 
+                  alt="Road Infrastructure" 
+                  className="w-full h-full object-cover rounded-lg"
+                />
+              </div>
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-2">Surulere Road Rehabilitation</h3>
                 <div className="flex items-center mb-2">
@@ -168,8 +180,14 @@ const Home: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              <div className="h-48 bg-yellow-100"></div>
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div className="h-48 bg-gray-50 flex items-center justify-center p-6">
+                <img 
+                  src="/Education.png" 
+                  alt="School Building" 
+                  className="w-full h-full object-cover rounded-lg"
+                />
+              </div>
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-2">Alimosho Public School Renovation</h3>
                 <div className="flex items-center mb-2">
