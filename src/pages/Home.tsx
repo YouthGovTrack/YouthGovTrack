@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import StateSelector from '../components/StateSelector';
+import LiveCivicAlerts from '../components/LiveCivicAlerts';
+import Sponsors from '../components/Sponsors';
 
 const Home: React.FC = () => {
   const [selectedState, setSelectedState] = useState<string>('');
@@ -215,6 +217,12 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Live Civic Alerts */}
+      <LiveCivicAlerts />
+
+      {/* Sponsors */}
+      <Sponsors />
     </div>
   );
 };
