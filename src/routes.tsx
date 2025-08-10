@@ -5,7 +5,6 @@ export interface Route {
   path: string;
   component: string;
   title: string;
-  protected?: boolean;
   exact?: boolean;
 }
 
@@ -18,15 +17,9 @@ export const routes: Route[] = [
     exact: true,
   },
   {
-    path: '/login',
-    component: 'Login',
-    title: 'Sign In - YouthGovTrack',
-  },
-  {
     path: '/dashboard',
     component: 'Dashboard',
     title: 'Dashboard - YouthGovTrack',
-    protected: true,
   },
   {
     path: '/projects',
@@ -42,13 +35,11 @@ export const routes: Route[] = [
     path: '/reports',
     component: 'Reports',
     title: 'Reports - YouthGovTrack',
-    protected: true,
   },
   {
     path: '/profile',
     component: 'Profile',
     title: 'Profile - YouthGovTrack',
-    protected: true,
   },
   {
     path: '/about',
@@ -67,7 +58,6 @@ export interface NavItem {
   label: string;
   path: string;
   icon?: string;
-  protected?: boolean;
   children?: NavItem[];
 }
 
@@ -86,13 +76,11 @@ export const navItems: NavItem[] = [
     label: 'Reports',
     path: '/reports',
     icon: '📊',
-    protected: true,
   },
   {
     label: 'Dashboard',
     path: '/dashboard',
     icon: '📈',
-    protected: true,
   },
   {
     label: 'About',
@@ -138,36 +126,9 @@ export const getRouteByPath = (path: string): Route | undefined => {
   return routes.find(route => route.path === path);
 };
 
-export const isProtectedRoute = (path: string): boolean => {
-  const route = getRouteByPath(path);
-  return route?.protected || false;
-};
-
 export const getPageTitle = (path: string): string => {
   const route = getRouteByPath(path);
   return route?.title || 'YouthGovTrack';
-};
-
-// Route guards and permissions
-export const canAccessRoute = (path: string, isAuthenticated: boolean): boolean => {
-  if (!isProtectedRoute(path)) {
-    return true;
-  }
-  
-  return isAuthenticated;
-};
-
-// Redirect logic
-export const getRedirectPath = (isAuthenticated: boolean, intendedPath?: string): string => {
-  if (!isAuthenticated) {
-    return '/login';
-  }
-  
-  if (intendedPath && canAccessRoute(intendedPath, isAuthenticated)) {
-    return intendedPath;
-  }
-  
-  return '/dashboard';
 };
 
 // Breadcrumb generation

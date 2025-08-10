@@ -3,32 +3,22 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Loader from './components/Loader';
 import Home from './pages/Home';
-import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import { getAuthState } from './utils/auth';
 import './styles/global.css';
 
 // Simple routing state management
-type Page = 'home' | 'login' | 'dashboard';
+type Page = 'home' | 'dashboard';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Initialize app and check authentication
+    // Initialize app
     const initializeApp = async () => {
       try {
-        const authState = getAuthState();
-        setIsAuthenticated(authState.isAuthenticated);
-        
-        // Set initial page based on auth state
-        if (authState.isAuthenticated) {
-          setCurrentPage('dashboard');
-        } else {
-          setCurrentPage('home');
-        }
+        // Just set initial page to home
+        setCurrentPage('home');
       } catch (error) {
         console.error('Failed to initialize app:', error);
       } finally {
@@ -44,18 +34,6 @@ const App: React.FC = () => {
     setCurrentPage(page);
   };
 
-  // Handle login success
-  const handleLoginSuccess = () => {
-    setIsAuthenticated(true);
-    navigateTo('dashboard');
-  };
-
-  // Handle logout
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    navigateTo('home');
-  };
-
   // Show loading screen during initialization
   if (isLoading) {
     return <Loader />;
@@ -66,10 +44,8 @@ const App: React.FC = () => {
     switch (currentPage) {
       case 'home':
         return <Home />;
-      case 'login':
-        return <Login onLoginSuccess={handleLoginSuccess} />;
       case 'dashboard':
-        return isAuthenticated ? <Dashboard /> : <Login onLoginSuccess={handleLoginSuccess} />;
+        return <Dashboard />;
       default:
         return <Home />;
     }
@@ -103,43 +79,17 @@ const App: React.FC = () => {
             <a href="#" className="text-gray-600 hover:text-blue-600 transition">Reports</a>
             <a href="#" className="text-gray-600 hover:text-blue-600 transition">Resources</a>
             <a href="#" className="text-gray-600 hover:text-blue-600 transition">About</a>
-            {isAuthenticated && (
-              <button 
-                onClick={() => navigateTo('dashboard')}
-                className={`font-medium transition ${
-                  currentPage === 'dashboard' 
-                    ? 'text-blue-600' 
-                    : 'text-gray-600 hover:text-blue-600'
-                }`}
-              >
-                Dashboard
-              </button>
-            )}
+            <button 
+              onClick={() => navigateTo('dashboard')}
+              className={`font-medium transition ${
+                currentPage === 'dashboard' 
+                  ? 'text-blue-600' 
+                  : 'text-gray-600 hover:text-blue-600'
+              }`}
+            >
+              Dashboard
+            </button>
           </nav>
-          <div className="flex items-center space-x-4">
-            {isAuthenticated ? (
-              <>
-                <span className="text-sm text-gray-600">Welcome back!</span>
-                <button 
-                  onClick={handleLogout}
-                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <button 
-                onClick={() => navigateTo('login')}
-                className={`px-4 py-2 rounded-lg transition ${
-                  currentPage === 'login'
-                    ? 'bg-blue-700 text-white'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`}
-              >
-                Sign In
-              </button>
-            )}
-          </div>
         </div>
       </div>
     </header>
