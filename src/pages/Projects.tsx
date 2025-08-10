@@ -1,6 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
+import SubmitReportModal from '../components/SubmitReportModal';
+import ViewCivicAlertsModal from '../components/ViewCivicAlertsModal';
 
-const Projects: React.FC = () => {
+interface ProjectsProps {
+  onNavigate?: (page: 'home' | 'projects' | 'browse-projects') => void;
+}
+
+const Projects: React.FC<ProjectsProps> = ({ onNavigate }) => {
+  const [isSubmitReportOpen, setIsSubmitReportOpen] = useState(false);
+  const [isViewAlertsOpen, setIsViewAlertsOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -118,16 +127,35 @@ const Projects: React.FC = () => {
 
         {/* Action Buttons */}
         <div className="mt-8 flex flex-wrap gap-4">
-          <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
-            Submit New Report
+          <button 
+            onClick={() => setIsSubmitReportOpen(true)}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+          >
+            📝 Submit New Report
           </button>
-          <button className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition">
-            Browse Projects
+          <button 
+            onClick={() => onNavigate && onNavigate('browse-projects')}
+            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition flex items-center gap-2"
+          >
+            🔍 Browse Projects
           </button>
-          <button className="bg-yellow-600 text-white px-6 py-3 rounded-lg hover:bg-yellow-700 transition">
-            View Civic Alerts
+          <button 
+            onClick={() => setIsViewAlertsOpen(true)}
+            className="bg-yellow-600 text-white px-6 py-3 rounded-lg hover:bg-yellow-700 transition flex items-center gap-2"
+          >
+            🚨 View Civic Alerts
           </button>
         </div>
+
+        {/* Modals */}
+        <SubmitReportModal 
+          isOpen={isSubmitReportOpen} 
+          onClose={() => setIsSubmitReportOpen(false)} 
+        />
+        <ViewCivicAlertsModal 
+          isOpen={isViewAlertsOpen} 
+          onClose={() => setIsViewAlertsOpen(false)} 
+        />
       </div>
     </div>
   );

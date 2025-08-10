@@ -4,10 +4,11 @@ import Footer from './components/Footer';
 import Loader from './components/Loader';
 import Home from './pages/Home';
 import Projects from './pages/Projects';
+import BrowseProjects from './pages/BrowseProjects';
 import './styles/global.css';
 
 // Simple routing state management
-type Page = 'home' | 'projects';
+type Page = 'home' | 'projects' | 'browse-projects';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -45,7 +46,9 @@ const App: React.FC = () => {
       case 'home':
         return <Home />;
       case 'projects':
-        return <Projects />;
+        return <Projects onNavigate={navigateTo} />;
+      case 'browse-projects':
+        return <BrowseProjects />;
       default:
         return <Home />;
     }
