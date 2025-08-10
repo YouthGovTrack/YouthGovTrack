@@ -18,8 +18,8 @@ export const routes: Route[] = [
   },
   {
     path: '/dashboard',
-    component: 'Dashboard',
-    title: 'Dashboard - YouthGovTrack',
+    component: 'Projects',
+    title: 'Projects - YouthGovTrack',
   },
   {
     path: '/projects',

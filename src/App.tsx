@@ -3,11 +3,11 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Loader from './components/Loader';
 import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
+import Projects from './pages/Projects';
 import './styles/global.css';
 
 // Simple routing state management
-type Page = 'home' | 'dashboard';
+type Page = 'home' | 'projects';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -44,8 +44,8 @@ const App: React.FC = () => {
     switch (currentPage) {
       case 'home':
         return <Home />;
-      case 'dashboard':
-        return <Dashboard />;
+      case 'projects':
+        return <Projects />;
       default:
         return <Home />;
     }
@@ -53,53 +53,17 @@ const App: React.FC = () => {
 
   // Update Navbar to handle navigation
   const NavbarWithNavigation: React.FC = () => (
-    <header className="bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
-          <div className="flex items-center">
-            <button 
-              onClick={() => navigateTo('home')}
-              className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition"
-            >
-              YouthGovTrack
-            </button>
-          </div>
-          <nav className="hidden md:flex space-x-8">
-            <button 
-              onClick={() => navigateTo('home')}
-              className={`font-medium transition ${
-                currentPage === 'home' 
-                  ? 'text-blue-600' 
-                  : 'text-gray-600 hover:text-blue-600'
-              }`}
-            >
-              Home
-            </button>
-            <a href="#" className="text-gray-600 hover:text-blue-600 transition">Projects</a>
-            <a href="#" className="text-gray-600 hover:text-blue-600 transition">Reports</a>
-            <a href="#" className="text-gray-600 hover:text-blue-600 transition">Resources</a>
-            <a href="#" className="text-gray-600 hover:text-blue-600 transition">About</a>
-            <button 
-              onClick={() => navigateTo('dashboard')}
-              className={`font-medium transition ${
-                currentPage === 'dashboard' 
-                  ? 'text-blue-600' 
-                  : 'text-gray-600 hover:text-blue-600'
-              }`}
-            >
-              Dashboard
-            </button>
-          </nav>
-        </div>
-      </div>
-    </header>
+    <Navbar 
+      currentPage={currentPage}
+      onNavigate={navigateTo}
+    />
   );
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <NavbarWithNavigation />
       
-      <main className="flex-1">
+      <main className="flex-1 pt-20">
         {renderPageContent()}
       </main>
       
