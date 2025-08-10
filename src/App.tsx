@@ -5,10 +5,12 @@ import Loader from './components/Loader';
 import Home from './pages/Home';
 import Projects from './pages/Projects';
 import BrowseProjects from './pages/BrowseProjects';
+import Reports from './pages/Reports';
+import Champions from './pages/Champions';
 import './styles/global.css';
 
 // Simple routing state management
-type Page = 'home' | 'projects' | 'browse-projects';
+type Page = 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -30,8 +32,18 @@ const App: React.FC = () => {
     initializeApp();
   }, []);
 
-  // Handle navigation
+  // Handle navigation with authentication check
   const navigateTo = (page: Page) => {
+    // Check if trying to access community features
+    if (page === 'reports' || page === 'champions') {
+      const userData = localStorage.getItem('currentUser');
+      if (!userData) {
+        // Redirect to home if not logged in
+        alert('Please sign in to access community features.');
+        setCurrentPage('home');
+        return;
+      }
+    }
     setCurrentPage(page);
   };
 
@@ -49,6 +61,10 @@ const App: React.FC = () => {
         return <Projects onNavigate={navigateTo} />;
       case 'browse-projects':
         return <BrowseProjects />;
+      case 'reports':
+        return <Reports />;
+      case 'champions':
+        return <Champions />;
       default:
         return <Home />;
     }
