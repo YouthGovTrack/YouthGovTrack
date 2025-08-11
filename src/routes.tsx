@@ -1,14 +1,4 @@
-// Route definitions for the application
-/  {
-    path: '/about',
-    component: 'About',
-    title: 'About - LocalGovTrack',
-  },
-  {
-    path: '/contact',
-    component: 'Contact',
-    title: 'Contact - LocalGovTrack',
-  },e contains route mappings and configurations
+import React from 'react';
 
 export interface Route {
   path: string;
@@ -17,7 +7,6 @@ export interface Route {
   exact?: boolean;
 }
 
-// Define application routes
 export const routes: Route[] = [
   {
     path: '/',
@@ -53,16 +42,15 @@ export const routes: Route[] = [
   {
     path: '/about',
     component: 'About',
-    title: 'About - YouthGovTrack',
+    title: 'About - LocalGovTrack',
   },
   {
     path: '/contact',
     component: 'Contact',
-    title: 'Contact - YouthGovTrack',
-  },
+    title: 'Contact - LocalGovTrack',
+  }
 ];
 
-// Navigation menu items
 export interface NavItem {
   label: string;
   path: string;
@@ -95,10 +83,9 @@ export const navItems: NavItem[] = [
     label: 'About',
     path: '/about',
     icon: 'ℹ️',
-  },
+  }
 ];
 
-// Footer navigation items
 export const footerNavItems: NavItem[] = [
   {
     label: 'About Us',
@@ -127,7 +114,7 @@ export const footerNavItems: NavItem[] = [
   {
     label: 'Terms of Service',
     path: '/terms',
-  },
+  }
 ];
 
 // Utility functions for routing
@@ -140,7 +127,6 @@ export const getPageTitle = (path: string): string => {
   return route?.title || 'LocalGovTrack';
 };
 
-// Breadcrumb generation
 export const generateBreadcrumbs = (path: string): Array<{ label: string; path: string }> => {
   const pathSegments = path.split('/').filter(segment => segment !== '');
   const breadcrumbs = [{ label: 'Home', path: '/' }];

@@ -1,17 +1,5 @@
-﻿import React from 'react';
-import Instagram fr            <div className="flex space-x-4">
-              <a 
-                href="https://facebook.com/localgovtrack" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label="Follow us on Facebook"
-              >
-                <Facebook size={24} />
-              </a>
-              <a 
-                href="https://twitter.com/localgovtrack" 
-                target="_blank"nstagram';
+import React from 'react';
+import Instagram from './icons/Instagram';
 import Facebook from './icons/Facebook';
 import Twitter from './icons/Twitter';
 import LinkedIn from './icons/LinkedIn';
@@ -59,7 +47,7 @@ const Footer: React.FC = () => {
             {/* Social Media Links */}
             <div className="flex space-x-4">
               <a 
-                href="https://facebook.com/youthgovtrack" 
+                href="https://facebook.com/localgovtrack" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
