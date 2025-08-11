@@ -8,7 +8,7 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-blue-600">YouthGovTrack</h1>
+              <h1 className="text-2xl font-bold text-blue-600">LocalGovTrack</h1>
             </div>
             <nav className="hidden md:flex space-x-8">
               <a href="#" className="text-gray-900 hover:text-blue-600 font-medium">Home</a>
@@ -235,12 +235,12 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Kind Words from Active Citizens</h2>
-            <p className="text-gray-600">Hear from Nigerians who are making a difference in their communities using YouthGovTrack</p>
+            <p className="text-gray-600">Hear from Nigerians who are making a difference in their communities using LocalGovTrack</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-gray-50 p-8 rounded-xl">
-              <p className="text-gray-600 mb-6 italic">"YouthGovTrack has empowered our community to hold local officials accountable. We've seen real change in how community projects are managed."</p>
+              <p className="text-gray-600 mb-6 italic">"LocalGovTrack has empowered our community to hold local officials accountable. We've seen real change in how community projects are managed."</p>
               <div className="flex items-center">
                 <div className="w-12 h-12 bg-blue-500 rounded-full mr-4"></div>
                 <div>
@@ -269,7 +269,7 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold mb-4">YouthGovTrack</h3>
+              <h3 className="text-xl font-bold mb-4">LocalGovTrack</h3>
               <p className="text-gray-400">Empowering citizens to track government projects and engage in civic activities.</p>
             </div>
             <div>
@@ -285,7 +285,7 @@ function App() {
               <h4 className="font-semibold mb-4">Contact Us</h4>
               <div className="space-y-2 text-gray-400">
                 <p>📞 +234 (0) 800 7890</p>
-                <p>📧 info@youthgovtrack.ng</p>
+                <p>📧 info@localgovtrack.ng</p>
                 <p>📍 123 BOVAS Office, Lagos</p>
               </div>
             </div>
@@ -299,7 +299,7 @@ function App() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 YouthGovTrack. All rights reserved. | Privacy Policy | Terms of Service</p>
+            <p>&copy; 2024 LocalGovTrack. All rights reserved. | Privacy Policy | Terms of Service</p>
           </div>
         </div>
       </footer>

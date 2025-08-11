@@ -118,7 +118,7 @@ const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
       // Store user data
       localStorage.setItem('currentUser', JSON.stringify(newUser));
       
-      alert(`Welcome to YouthGovTrack, ${formData.firstName}! Your account has been created successfully.`);
+      alert(`Welcome to LocalGovTrack, ${formData.firstName}! Your account has been created successfully.`);
       
       // Navigate to home page
       onNavigate('home');
@@ -140,7 +140,7 @@ const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
               onClick={() => onNavigate('home')}
               className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
             >
-              YouthGovTrack
+              LocalGovTrack
             </button>
             <div className="text-sm text-gray-600">
               Already have an account?{' '}
@@ -333,7 +333,7 @@ const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
                     className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <label htmlFor="agreeToTerms" className="ml-3 text-sm text-gray-700">
-                    By signing up you agree to YouthGovTrack{' '}
+                    By signing up you agree to LocalGovTrack{' '}
                     <a href="#terms" className="text-blue-600 hover:text-blue-700 underline">
                       terms of service
                     </a>
@@ -365,10 +365,10 @@ const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
             <div className="text-center lg:text-left order-1 lg:order-2">
               <div className="mb-8">
                 <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-                  Join YouthGovTrack to collaborate and share ideas on ongoing projects
+                  Join LocalGovTrack to collaborate and share ideas on ongoing projects
                 </h2>
                 <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                  Connect with like minds in the YouthGovTrack community to give feedback to government project implementations.
+                  Connect with like minds in the LocalGovTrack community to give feedback to government project implementations.
                 </p>
               </div>
 
@@ -385,7 +385,7 @@ const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
                   </div>
                 </div>
                 <p className="text-gray-600 text-sm">
-                  Join like minds in the YouthGovTrack society to give feedback to the community builders.
+                  Join like minds in the LocalGovTrack society to give feedback to the community builders.
                 </p>
               </div>
 

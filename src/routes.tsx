@@ -1,5 +1,14 @@
 // Route definitions for the application
-// This file contains route mappings and configurations
+/  {
+    path: '/about',
+    component: 'About',
+    title: 'About - LocalGovTrack',
+  },
+  {
+    path: '/contact',
+    component: 'Contact',
+    title: 'Contact - LocalGovTrack',
+  },e contains route mappings and configurations
 
 export interface Route {
   path: string;
@@ -13,33 +22,33 @@ export const routes: Route[] = [
   {
     path: '/',
     component: 'Home',
-    title: 'Home - YouthGovTrack',
+    title: 'Home - LocalGovTrack',
     exact: true,
   },
   {
     path: '/dashboard',
     component: 'Projects',
-    title: 'Projects - YouthGovTrack',
+    title: 'Projects - LocalGovTrack',
   },
   {
     path: '/projects',
     component: 'Projects',
-    title: 'Projects - YouthGovTrack',
+    title: 'Projects - LocalGovTrack',
   },
   {
     path: '/projects/:id',
     component: 'ProjectDetail',
-    title: 'Project Details - YouthGovTrack',
+    title: 'Project Details - LocalGovTrack',
   },
   {
     path: '/reports',
     component: 'Reports',
-    title: 'Reports - YouthGovTrack',
+    title: 'Reports - LocalGovTrack',
   },
   {
     path: '/profile',
     component: 'Profile',
-    title: 'Profile - YouthGovTrack',
+    title: 'Profile - LocalGovTrack',
   },
   {
     path: '/about',
@@ -128,7 +137,7 @@ export const getRouteByPath = (path: string): Route | undefined => {
 
 export const getPageTitle = (path: string): string => {
   const route = getRouteByPath(path);
-  return route?.title || 'YouthGovTrack';
+  return route?.title || 'LocalGovTrack';
 };
 
 // Breadcrumb generation
@@ -142,7 +151,7 @@ export const generateBreadcrumbs = (path: string): Array<{ label: string; path: 
     const route = getRouteByPath(currentPath);
     if (route) {
       breadcrumbs.push({
-        label: route.title.replace(' - YouthGovTrack', ''),
+        label: route.title.replace(' - LocalGovTrack', ''),
         path: currentPath,
       });
     }

@@ -1,4 +1,4 @@
-# YouthGovTrack
+# LocalGovTrack
 
 A React application for tracking government activities that affect young people.
 
@@ -27,7 +27,7 @@ A React application for tracking government activities that affect young people.
 1. Clone the repository:
    ```bash
    git clone <repository-url>
-   cd YouthGovTrack
+   cd LocalGovTrack
    ```
 
 2. Install dependencies:
@@ -39,7 +39,7 @@ A React application for tracking government activities that affect young people.
 ## Project Structure
 
 ```
-YouthGovTrack/
+LocalGovTrack/
 ├── public/
 │   └── index.html          # HTML template
 ├── src/

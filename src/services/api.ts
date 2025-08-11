@@ -67,7 +67,7 @@ export const mockApi = {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    if (credentials.email === 'demo@youthgovtrack.ng' && credentials.password === 'demo123') {
+    if (credentials.email === 'demo@localgovtrack.ng' && credentials.password === 'demo123') {
       return {
         data: {
           token: 'mock-jwt-token',

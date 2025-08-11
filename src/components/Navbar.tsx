@@ -96,7 +96,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 onClick={() => onNavigate('home')}
                 className="text-xl sm:text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
               >
-                YouthGovTrack
+                LocalGovTrack
               </button>
             </div>
 

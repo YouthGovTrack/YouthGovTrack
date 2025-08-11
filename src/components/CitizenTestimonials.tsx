@@ -18,7 +18,7 @@ const CitizenTestimonials: React.FC = () => {
       name: 'Adebayo Johnson',
       role: 'Community Advocate',
       location: 'Lagos State',
-      message: "YouthGovTrack has empowered our community to hold local officials accountable. We've seen real change in how projects are reported and tracked in our LGA.",
+      message: "LocalGovTrack has empowered our community to hold local officials accountable. We've seen real change in how projects are reported and tracked in our LGA.",
       image: '/citizen1.png'
     },
     {
@@ -42,7 +42,7 @@ const CitizenTestimonials: React.FC = () => {
       name: 'Fatima Bello',
       role: 'Youth Coordinator',
       location: 'Kaduna State',
-      message: "YouthGovTrack helped us monitor school renovation projects. The transparency has improved and our children now study in properly equipped schools.",
+      message: "LocalGovTrack helped us monitor school renovation projects. The transparency has improved and our children now study in properly equipped schools.",
       image: '/citizen1.png'
     }
   ];
@@ -78,7 +78,7 @@ const CitizenTestimonials: React.FC = () => {
             Kind Words from Active Citizens
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Hear from Nigerians making a difference in their communities using YouthGovTrack
+            Hear from Nigerians making a difference in their communities using LocalGovTrack
           </p>
         </div>
 

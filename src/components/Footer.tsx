@@ -1,5 +1,17 @@
-import React from 'react';
-import Instagram from './icons/Instagram';
+﻿import React from 'react';
+import Instagram fr            <div className="flex space-x-4">
+              <a 
+                href="https://facebook.com/localgovtrack" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors"
+                aria-label="Follow us on Facebook"
+              >
+                <Facebook size={24} />
+              </a>
+              <a 
+                href="https://twitter.com/localgovtrack" 
+                target="_blank"nstagram';
 import Facebook from './icons/Facebook';
 import Twitter from './icons/Twitter';
 import LinkedIn from './icons/LinkedIn';
@@ -10,7 +22,7 @@ const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">YouthGovTrack</h3>
+            <h3 className="text-xl font-bold mb-4">LocalGovTrack</h3>
             <p className="text-gray-400">Empowering citizens to track government projects and engage in civic activities.</p>
           </div>
           <div>
@@ -26,7 +38,7 @@ const Footer: React.FC = () => {
             <h4 className="font-semibold mb-4">Contact Us</h4>
             <div className="space-y-2 text-gray-400">
               <p>📞 +234 (0) 800 7890</p>
-              <p>📧 info@youthgovtrack.ng</p>
+              <p>📧 info@localgovtrack.ng</p>
               <p>📍 123 BOVAS Office, Lagos</p>
             </div>
           </div>
@@ -56,7 +68,7 @@ const Footer: React.FC = () => {
                 <Facebook size={24} />
               </a>
               <a 
-                href="https://twitter.com/youthgovtrack" 
+                href="https://twitter.com/localgovtrack" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
@@ -65,7 +77,7 @@ const Footer: React.FC = () => {
                 <Twitter size={24} />
               </a>
               <a 
-                href="https://linkedin.com/company/youthgovtrack" 
+                href="https://linkedin.com/company/localgovtrack" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
@@ -74,7 +86,7 @@ const Footer: React.FC = () => {
                 <LinkedIn size={24} />
               </a>
               <a 
-                href="https://instagram.com/youthgovtrack" 
+                href="https://instagram.com/localgovtrack" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
@@ -86,7 +98,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
         <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-400">
-          <p>&copy; 2025 YouthGovTrack. All rights reserved.</p>
+          <p>&copy; 2025 LocalGovTrack. All rights reserved.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="/terms" className="hover:text-white transition-colors">Terms of Service</a>
