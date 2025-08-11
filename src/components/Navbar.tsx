@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import AuthModal from './AuthModal';
 
 interface NavbarProps {
   currentPage: string;
-  onNavigate: (page: 'home' | 'projects' | 'reports' | 'champions') => void;
+  onNavigate: (page: 'home' | 'projects' | 'reports' | 'champions' | 'signup' | 'signin') => void;
 }
 
 interface User {
@@ -21,8 +20,6 @@ interface User {
 
 const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   // Check for logged-in user on component mount and localStorage changes
@@ -52,15 +49,18 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, [authModalOpen]); // Re-check when auth modal closes
+  }, []); // Remove authModalOpen dependency
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   const handleAuthClick = (mode: 'login' | 'register') => {
-    setAuthMode(mode);
-    setAuthModalOpen(true);
+    if (mode === 'login') {
+      onNavigate('signin');
+    } else {
+      onNavigate('signup');
+    }
   };
 
   const handleLogout = () => {
@@ -159,13 +159,13 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 ) : (
                   <>
                     <button
-                      onClick={() => handleAuthClick('login')}
+                      onClick={() => onNavigate('signin')}
                       className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200"
                     >
                       Sign In
                     </button>
                     <button
-                      onClick={() => handleAuthClick('register')}
+                      onClick={() => onNavigate('signup')}
                       className="px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
                     >
                       Join Community
@@ -210,7 +210,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 </div>
               ) : (
                 <button
-                  onClick={() => handleAuthClick('register')}
+                  onClick={() => onNavigate('signup')}
                   className="bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700 transition-colors font-medium text-sm"
                 >
                   Join
@@ -324,7 +324,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                     <>
                       <button
                         onClick={() => {
-                          handleAuthClick('login');
+                          onNavigate('signin');
                           setIsMobileMenuOpen(false);
                         }}
                         className="block w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 font-medium transition-colors"
@@ -333,7 +333,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                       </button>
                       <button
                         onClick={() => {
-                          handleAuthClick('register');
+                          onNavigate('signup');
                           setIsMobileMenuOpen(false);
                         }}
                         className="block w-full text-left px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
@@ -348,14 +348,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
           )}
         </div>
       </header>
-
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-        mode={authMode}
-        onModeChange={setAuthMode}
-      />
     </>
   );
 };

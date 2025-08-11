@@ -1,38 +1,27 @@
 import React, { useState, useEffect } from 'react';
+import { useProjects } from '../contexts/ProjectContext';
+import { Project, ProjectFilters } from '../services/mockApi';
 import CitizenReportsModal from '../components/CitizenReportsModal';
-
-interface Project {
-  id: number;
-  title: string;
-  lga: string;
-  state: string;
-  budget: number;
-  status: 'Completed' | 'Ongoing' | 'Abandoned';
-  sector: string;
-  description: string;
-  fullDescription: string;
-  startDate: string;
-  completionDate: string;
-  contractor: string;
-  imageUrl?: string;
-}
+import SubmitProjectModal from '../components/SubmitProjectModal';
 
 interface Filters {
   state: string;
   lga: string;
   status: string;
-  sector: string;
+  category: string;
   dateFrom: string;
   dateTo: string;
   searchQuery: string;
 }
 
 const BrowseProjects: React.FC = () => {
+  const { projects, loading, error, stats, total, fetchProjects, clearError } = useProjects();
+  
   const [filters, setFilters] = useState<Filters>({
     state: '',
     lga: '',
     status: '',
-    sector: '',
+    category: '',
     dateFrom: '',
     dateTo: '',
     searchQuery: ''
@@ -41,6 +30,7 @@ const BrowseProjects: React.FC = () => {
   const [lgaOptions, setLgaOptions] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showReportModal, setShowReportModal] = useState(false);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const nigeriaStates = [
@@ -66,150 +56,6 @@ const BrowseProjects: React.FC = () => {
     }
   ];
 
-  const projects: Project[] = [
-    {
-      id: 1,
-      title: "Community Health Center Renovation",
-      lga: "Ikeja",
-      state: "Lagos",
-      budget: 25000000,
-      status: "Completed",
-      sector: "Health",
-      description: "Renovation of the community health center to improve healthcare access.",
-      fullDescription: "Complete renovation of the community health center including new equipment, expanded capacity, and improved facilities for maternal care. The project has significantly improved healthcare access for over 10,000 residents.",
-      startDate: "2022-05-15",
-      completionDate: "2023-01-20",
-      contractor: "HealthBuild Nigeria Ltd",
-      imageUrl: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-    },
-    {
-      id: 2,
-      title: "Alimosho Road Expansion Project",
-      lga: "Alimosho",
-      state: "Lagos",
-      budget: 120000000,
-      status: "Ongoing",
-      sector: "Roads",
-      description: "Expansion of the main road connecting Alimosho to improve traffic flow.",
-      fullDescription: "Major expansion of the 12km road connecting Alimosho to neighboring areas, including drainage systems, street lights, and pedestrian walkways. Expected to reduce travel time by 45% and benefit over 500,000 residents.",
-      startDate: "2023-02-10",
-      completionDate: "2024-06-30",
-      contractor: "Lagos Roads Construction Company"
-    },
-    {
-      id: 3,
-      title: "Primary School Classroom Block",
-      lga: "Obio/Akpor",
-      state: "Rivers",
-      budget: 35000000,
-      status: "Completed",
-      sector: "Education",
-      description: "Construction of a new classroom block at the local primary school.",
-      fullDescription: "Construction of a modern 8-classroom block with administrative offices, library, and computer room. The project has increased school capacity by 320 students and improved learning conditions.",
-      startDate: "2022-03-01",
-      completionDate: "2022-11-15",
-      contractor: "EduBuild Construction Ltd"
-    },
-    {
-      id: 4,
-      title: "Borehole Water Project",
-      lga: "Dala",
-      state: "Kano",
-      budget: 8500000,
-      status: "Completed",
-      sector: "Water",
-      description: "Installation of boreholes to provide clean water access to the community.",
-      fullDescription: "Installation of 5 solar-powered boreholes with water treatment facilities and distribution points across the community. Now providing clean water to approximately 7,500 residents.",
-      startDate: "2023-01-05",
-      completionDate: "2023-04-20",
-      contractor: "AquaTech Solutions"
-    },
-    {
-      id: 5,
-      title: "Youth Skills Acquisition Center",
-      lga: "Aba South",
-      state: "Abia",
-      budget: 45000000,
-      status: "Ongoing",
-      sector: "Education",
-      description: "Construction and equipping of a skills acquisition center for youth training.",
-      fullDescription: "Development of a comprehensive skills acquisition center with facilities for digital skills, fashion design, carpentry, welding, and agricultural training. Expected to train 500 youths annually.",
-      startDate: "2023-06-12",
-      completionDate: "2024-03-30",
-      contractor: "BuildRight Construction Company"
-    },
-    {
-      id: 6,
-      title: "Rural Electrification Project",
-      lga: "Demsa",
-      state: "Adamawa",
-      budget: 75000000,
-      status: "Abandoned",
-      sector: "Power",
-      description: "Extension of power grid to rural communities in Demsa LGA.",
-      fullDescription: "Project aimed to extend the national power grid to 12 rural communities in Demsa LGA, benefiting approximately 25,000 residents. Project was abandoned after completing only 30% of the planned work due to funding issues.",
-      startDate: "2021-08-15",
-      completionDate: "2022-12-31",
-      contractor: "PowerGrid Solutions Ltd"
-    },
-    {
-      id: 7,
-      title: "Market Expansion and Modernization",
-      lga: "Port Harcourt",
-      state: "Rivers",
-      budget: 95000000,
-      status: "Ongoing",
-      sector: "Commerce",
-      description: "Expansion and modernization of the central market facilities.",
-      fullDescription: "Comprehensive expansion and modernization of the central market including 200 new stalls, improved drainage, waste management systems, and security infrastructure. Will benefit over 1,500 traders and improve commercial activities.",
-      startDate: "2023-04-20",
-      completionDate: "2024-05-15",
-      contractor: "Urban Development Consortium"
-    },
-    {
-      id: 8,
-      title: "Primary Healthcare Clinic",
-      lga: "Kosofe",
-      state: "Lagos",
-      budget: 32000000,
-      status: "Completed",
-      sector: "Health",
-      description: "Construction of a new primary healthcare clinic to serve the local community.",
-      fullDescription: "Construction of a fully equipped primary healthcare clinic with maternal care facilities, vaccination unit, laboratory, and pharmacy. Now serving approximately 15,000 residents with basic healthcare services.",
-      startDate: "2022-07-10",
-      completionDate: "2023-03-25",
-      contractor: "MedBuild Construction Nigeria"
-    },
-    {
-      id: 9,
-      title: "Irrigation System for Smallholder Farmers",
-      lga: "Garun Mallam",
-      state: "Kano",
-      budget: 55000000,
-      status: "Ongoing",
-      sector: "Agriculture",
-      description: "Development of irrigation infrastructure for small-scale farming communities.",
-      fullDescription: "Implementation of a modern irrigation system covering 500 hectares of farmland, benefiting approximately 350 smallholder farmers. Expected to increase agricultural productivity by up to 70% and enable year-round farming.",
-      startDate: "2023-01-15",
-      completionDate: "2024-02-28",
-      contractor: "AgroTech Development Ltd"
-    },
-    {
-      id: 10,
-      title: "Secondary School Science Laboratory",
-      lga: "Umuahia North",
-      state: "Abia",
-      budget: 28000000,
-      status: "Abandoned",
-      sector: "Education",
-      description: "Construction and equipping of science laboratories for secondary schools.",
-      fullDescription: "Project intended to build and equip modern science laboratories in 5 secondary schools across Umuahia North. Construction was abandoned after completing only 2 laboratories due to contractual disputes.",
-      startDate: "2022-02-20",
-      completionDate: "2022-10-30",
-      contractor: "EduInfra Solutions"
-    }
-  ];
-
   // Update LGA options when state changes
   useEffect(() => {
     if (selectedState) {
@@ -230,17 +76,29 @@ const BrowseProjects: React.FC = () => {
     }
   }, [selectedState]);
 
-  const filteredProjects = projects.filter(project => {
-    const stateMatch = !filters.state || project.state === filters.state;
-    const lgaMatch = !filters.lga || project.lga === filters.lga;
-    const statusMatch = !filters.status || project.status === filters.status;
-    const sectorMatch = !filters.sector || project.sector === filters.sector;
-    const searchMatch = !filters.searchQuery || 
-      project.title.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
-      project.description.toLowerCase().includes(filters.searchQuery.toLowerCase());
+  // Fetch projects when filters change
+  useEffect(() => {
+    const projectFilters: ProjectFilters = {
+      state: filters.state || undefined,
+      category: filters.category || undefined,
+      status: filters.status as any || undefined,
+      search: filters.searchQuery || undefined
+    };
     
-    return stateMatch && lgaMatch && statusMatch && sectorMatch && searchMatch;
-  });
+    fetchProjects(projectFilters);
+  }, [filters, fetchProjects]);
+
+  // Clear error when component unmounts or filters change
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        clearError();
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, clearError]);
+
+  const filteredProjects = projects;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilters({
@@ -263,7 +121,7 @@ const BrowseProjects: React.FC = () => {
       state: '',
       lga: '',
       status: '',
-      sector: '',
+      category: '',
       dateFrom: '',
       dateTo: '',
       searchQuery: ''
@@ -308,8 +166,22 @@ const BrowseProjects: React.FC = () => {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Browse Projects</h1>
               <p className="mt-2 text-gray-600">Explore government projects across all states and sectors</p>
+              {stats && (
+                <div className="mt-2 flex flex-wrap gap-4 text-sm text-gray-500">
+                  <span>Total: {stats.totalProjects}</span>
+                  <span>Completed: {stats.completedProjects}</span>
+                  <span>Ongoing: {stats.ongoingProjects}</span>
+                  <span>Budget: ₦{(stats.totalBudget / 1000000000).toFixed(1)}B</span>
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-4">
+              <button
+                onClick={() => setShowSubmitModal(true)}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium"
+              >
+                + Submit Project
+              </button>
               <div className="relative">
                 <input
                   type="text"
@@ -342,6 +214,21 @@ const BrowseProjects: React.FC = () => {
               </div>
             </div>
           </div>
+          
+          {/* Error Display */}
+          {error && (
+            <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+              <div className="flex items-center justify-between">
+                <span>{error}</span>
+                <button
+                  onClick={clearError}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -407,21 +294,23 @@ const BrowseProjects: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Sector</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                   <select
-                    name="sector"
-                    value={filters.sector}
+                    name="category"
+                    value={filters.category}
                     onChange={handleFilterChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
-                    <option value="">All Sectors</option>
-                    <option value="Health">Health</option>
+                    <option value="">All Categories</option>
+                    <option value="Infrastructure">Infrastructure</option>
+                    <option value="Healthcare">Healthcare</option>
                     <option value="Education">Education</option>
-                    <option value="Roads">Roads</option>
-                    <option value="Water">Water</option>
-                    <option value="Power">Power</option>
-                    <option value="Commerce">Commerce</option>
+                    <option value="Transportation">Transportation</option>
                     <option value="Agriculture">Agriculture</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Housing">Housing</option>
+                    <option value="Environment">Environment</option>
+                    <option value="Security">Security</option>
                   </select>
                 </div>
 
@@ -450,26 +339,33 @@ const BrowseProjects: React.FC = () => {
 
           {/* Projects Grid */}
           <div className="lg:w-3/4">
-            <div className="mb-4">
-              <p className="text-gray-600">
-                Showing {filteredProjects.length} of {projects.length} projects
-              </p>
-            </div>
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <span className="ml-3 text-gray-600">Loading projects...</span>
+              </div>
+            ) : (
+              <>
+                <div className="mb-4">
+                  <p className="text-gray-600">
+                    Showing {filteredProjects.length} of {total} projects
+                  </p>
+                </div>
 
             {viewMode === 'grid' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {filteredProjects.map((project) => (
                   <div key={project.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200">
-                    {project.imageUrl && (
+                    {project.images && project.images.length > 0 && (
                       <img 
-                        src={project.imageUrl} 
-                        alt={project.title}
+                        src={project.images[0]} 
+                        alt={project.name}
                         className="w-full h-48 object-cover"
                       />
                     )}
                     <div className="p-6">
                       <div className="flex justify-between items-start mb-4">
-                        <h3 className="text-lg font-semibold text-gray-900 leading-tight">{project.title}</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 leading-tight">{project.name}</h3>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
                           {project.status}
                         </span>
@@ -485,8 +381,8 @@ const BrowseProjects: React.FC = () => {
                           <span className="text-gray-900 font-medium">{project.lga}, {project.state}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-500">Sector:</span>
-                          <span className="text-gray-900 font-medium">{project.sector}</span>
+                          <span className="text-gray-500">Category:</span>
+                          <span className="text-gray-900 font-medium">{project.category}</span>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-500">Budget:</span>
@@ -500,6 +396,12 @@ const BrowseProjects: React.FC = () => {
                           <span className="text-gray-500">Start Date:</span>
                           <span className="text-gray-900 font-medium">{new Date(project.startDate).toLocaleDateString()}</span>
                         </div>
+                        {project.progress > 0 && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-500">Progress:</span>
+                            <span className="text-gray-900 font-medium">{project.progress}%</span>
+                          </div>
+                        )}
                       </div>
 
                       <div className="flex gap-2">
@@ -525,7 +427,7 @@ const BrowseProjects: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-4 mb-2">
-                          <h3 className="text-lg font-semibold text-gray-900">{project.title}</h3>
+                          <h3 className="text-lg font-semibold text-gray-900">{project.name}</h3>
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
                             {project.status}
                           </span>
@@ -537,8 +439,8 @@ const BrowseProjects: React.FC = () => {
                             <span className="text-gray-900 font-medium ml-1">{project.lga}, {project.state}</span>
                           </div>
                           <div>
-                            <span className="text-gray-500">Sector:</span>
-                            <span className="text-gray-900 font-medium ml-1">{project.sector}</span>
+                            <span className="text-gray-500">Category:</span>
+                            <span className="text-gray-900 font-medium ml-1">{project.category}</span>
                           </div>
                           <div>
                             <span className="text-gray-500">Budget:</span>
@@ -579,9 +481,17 @@ const BrowseProjects: React.FC = () => {
                 <p className="text-gray-500">Try adjusting your filters to see more projects.</p>
               </div>
             )}
+              </>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Submit Project Modal */}
+      <SubmitProjectModal
+        isOpen={showSubmitModal}
+        onClose={() => setShowSubmitModal(false)}
+      />
 
       {/* Citizen Report Modal */}
       <CitizenReportsModal
@@ -591,7 +501,7 @@ const BrowseProjects: React.FC = () => {
           setSelectedProject(null);
         }}
         projectId={selectedProject?.id.toString()}
-        projectTitle={selectedProject?.title}
+        projectTitle={selectedProject?.name}
       />
     </div>
   );

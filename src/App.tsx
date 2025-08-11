@@ -7,10 +7,13 @@ import Projects from './pages/Projects';
 import BrowseProjects from './pages/BrowseProjects';
 import Reports from './pages/Reports';
 import Champions from './pages/Champions';
+import SignUp from './pages/SignUp';
+import SignIn from './pages/SignIn';
+import { ProjectProvider } from './contexts/ProjectContext';
 import './styles/global.css';
 
 // Simple routing state management
-type Page = 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions';
+type Page = 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions' | 'signup' | 'signin';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -56,7 +59,7 @@ const App: React.FC = () => {
   const renderPageContent = () => {
     switch (currentPage) {
       case 'home':
-        return <Home />;
+        return <Home onNavigate={navigateTo} />;
       case 'projects':
         return <Projects onNavigate={navigateTo} />;
       case 'browse-projects':
@@ -65,8 +68,12 @@ const App: React.FC = () => {
         return <Reports />;
       case 'champions':
         return <Champions />;
+      case 'signup':
+        return <SignUp onNavigate={navigateTo} />;
+      case 'signin':
+        return <SignIn onNavigate={navigateTo} />;
       default:
-        return <Home />;
+        return <Home onNavigate={navigateTo} />;
     }
   };
 
@@ -78,16 +85,21 @@ const App: React.FC = () => {
     />
   );
 
+  // Check if current page is auth page
+  const isAuthPage = currentPage === 'signup' || currentPage === 'signin';
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <NavbarWithNavigation />
-      
-      <main className="flex-1 pt-20">
-        {renderPageContent()}
-      </main>
-      
-      <Footer />
-    </div>
+    <ProjectProvider>
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        {!isAuthPage && <NavbarWithNavigation />}
+        
+        <main className={`flex-1 ${!isAuthPage ? 'pt-20' : ''}`}>
+          {renderPageContent()}
+        </main>
+        
+        {!isAuthPage && <Footer />}
+      </div>
+    </ProjectProvider>
   );
 };
 

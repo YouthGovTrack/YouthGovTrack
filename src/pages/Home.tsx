@@ -4,7 +4,11 @@ import LiveCivicAlerts from '../components/LiveCivicAlerts';
 import Sponsors from '../components/Sponsors';
 import CitizenTestimonials from '../components/CitizenTestimonials';
 
-const Home: React.FC = () => {
+interface HomeProps {
+  onNavigate: (page: 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions' | 'signup' | 'signin') => void;
+}
+
+const Home: React.FC<HomeProps> = ({ onNavigate }) => {
   const [selectedState, setSelectedState] = useState<string>('');
   const [selectedLga, setSelectedLga] = useState<string>('');
 
@@ -22,7 +26,8 @@ const Home: React.FC = () => {
     if (selectedState && selectedLga) {
       // Handle form submission
       console.log('Proceeding with:', { state: selectedState, lga: selectedLga });
-      // You can navigate to another page or make an API call here
+      // Navigate to browse projects page
+      onNavigate('browse-projects');
     } else {
       alert('Please select both state and LGA');
     }
@@ -40,7 +45,10 @@ const Home: React.FC = () => {
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
                 Empowering citizens to monitor development projects, report issues, and access civic education materials for a more transparent governance.
               </p>
-              <button className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition flex items-center">
+              <button 
+                className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition flex items-center"
+                onClick={() => onNavigate('signup')}
+              >
                 <img 
                   src="/pin.svg" 
                   alt="pin icon" 
@@ -212,7 +220,10 @@ const Home: React.FC = () => {
           </div>
           
           <div className="text-center mt-8">
-            <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+            <button 
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+              onClick={() => onNavigate('browse-projects')}
+            >
               View All Projects
             </button>
           </div>
