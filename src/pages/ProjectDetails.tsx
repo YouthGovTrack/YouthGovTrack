@@ -1,0 +1,274 @@
+import React, { useState, useEffect } from 'react';
+import { useProjects } from '../contexts/ProjectContext';
+import { Project } from '../services/mockApi';
+import Loader from '../components/Loader';
+
+interface ProjectDetailsProps {
+  projectId: number | null;
+  onNavigate: (page: string) => void;
+}
+
+const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }) => {
+  const { projects, loading: projectsLoading } = useProjects();
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [relatedProjects, setRelatedProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    if (!projectId) return;
+
+    const fetchData = async () => {
+      try {
+        if (!projectsLoading) {
+          const foundProject = projects.find(p => p.id === projectId);
+          if (foundProject) {
+            setProject(foundProject);
+            
+            // Get related projects (same category, different project)
+            const related = projects
+              .filter(p => p.id !== projectId && p.category === foundProject.category)
+              .slice(0, 3);
+            setRelatedProjects(related);
+          } else {
+            setError('Project not found');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching project:', error);
+        setError('Failed to fetch project details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [projectId, projects, projectsLoading]);
+
+  // Update the formatImageUrl function
+  const formatImageUrl = (url: string) => {
+    if (!url) return '/citizen1.png';
+    console.log('Processing image URL:', url);
+    
+    // If it's already a full URL, return as is
+    if (url.startsWith('http')) return url;
+    
+    // If it's already a path starting with /, return as is
+    if (url.startsWith('/')) return url;
+    
+    // For relative paths, add the correct prefix
+    return `/uploads/${url}`;
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const suffix =
+        day % 10 === 1 && day !== 11
+            ? "st"
+            : day % 10 === 2 && day !== 12
+            ? "nd"
+            : day % 10 === 3 && day !== 13
+            ? "rd"
+            : "th";
+    const month = date.toLocaleString("en-US", { month: "long" });
+    const year = date.getFullYear();
+    return `${day}${suffix} ${month} ${year}`;
+  };
+
+  // If loading, error, or no project data, return early
+  if (loading) return <Loader />;
+  if (error) return <p>Error: {error}</p>;
+  if (!project) return <p>No project found</p>;
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header with Back Button */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <button
+            onClick={() => onNavigate('browse-projects')}
+            className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Projects
+          </button>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full h-[400px] mx-auto rounded-lg md:overflow-hidden flex items-center justify-center bg-gray-100">
+          <img
+            src={formatImageUrl(project.images && project.images.length > 0 ? project.images[0] : '')}
+            alt="Project banner"
+            className="w-full h-full object-contain rounded-lg"
+            onError={(e) => {
+              console.error('Error loading project image:', (e.target as HTMLImageElement).src);
+              (e.target as HTMLImageElement).src = '/citizen1.png';
+            }}
+          />
+        </div>
+
+        <main className='flex flex-col md:flex-row md:justify-between mainevent'>
+          <article className='flex flex-col'>
+            <h2 className='font-bold text-2xl mt-4'>{project.name}</h2>
+
+            <h2 className='font-bold text-2xl mt-6'>Description</h2>
+
+            <p className='mt-2 text-base'>{project.description}</p>
+
+            <h2 className='font-bold text-2xl mt-8'>Project Team</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+              <div className="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm">
+                <img
+                  src="/citizen1.png"
+                  alt="Contractor"
+                  className="w-24 h-24 rounded-full object-cover mb-3"
+                  onError={(e) => {
+                    console.error('Error loading contractor image:', (e.target as HTMLImageElement).src);
+                    (e.target as HTMLImageElement).src = '/citizen1.png';
+                  }}
+                />
+                <div className="text-center">
+                  <h3 className="font-bold text-lg">{project.contractor}</h3>
+                  <p className="text-gray-600 mt-1">Project Contractor</p>
+                </div>
+              </div>
+            </div>
+
+            <h2 className='font-bold text-2xl mt-8'>Date & Time</h2>
+
+            <div className='flex items-center mt-2'>
+              <img src='/Calendar.png' alt='Calendar' width={24} height={24} />
+              <p className='font-semibold ml-4'>
+                Start Date: {formatDate(project.startDate)}
+              </p>
+            </div>
+
+            <div className='flex items-center mt-2'>
+              <img src='/ClockAfternoon.png' alt='Clock' width={24} height={24} />
+              <p className='font-semibold ml-4'>
+                Expected Completion: {formatDate(project.expectedCompletion)}
+              </p>
+            </div>
+
+            {project.actualCompletion && (
+              <div className='flex items-center mt-2'>
+                <img src='/ClockAfternoon.png' alt='Clock' width={24} height={24} />
+                <p className='font-semibold ml-4 text-green-600'>
+                  Completed: {formatDate(project.actualCompletion)}
+                </p>
+              </div>
+            )}
+
+          </article>
+
+          <aside className='mt-10 md:mt-0 md:ml-10'>
+            <h2 className='font-bold text-2xl'>Project location</h2>
+
+            <div className="mt-4">
+              {project.location ? (
+                <>
+                  <div className="mt-4 rounded-lg overflow-hidden">
+                    <iframe
+                      width="100%"
+                      height="380"
+                      style={{ border: 0 }}
+                      src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(`${project.location}, ${project.lga}, ${project.state}`)}`}
+                      allowFullScreen
+                    />
+                  </div>
+                  <div className="mt-6 rounded-lg overflow-hidden">
+                    <p className='h2 text-lg font-bold mt-4'>{project.location}</p>
+                    <p className='text-lg font-medium text-gray-800 mt-2'>{project.lga}, {project.state}</p>
+                  </div>
+                </>
+              ) : (
+                <p className='font-semibold text-gray-500'>Location details not available</p>
+              )}
+            </div>
+
+            <h2 className='h2 mt-6' style={{fontWeight: 'bold', fontSize: '25px'}}>Project Details & Info</h2>
+
+            <p className='font-bold mt-4'>Status:</p>
+            <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium mt-2 ${
+              project.status === 'Completed' ? 'bg-green-100 text-green-800' :
+              project.status === 'Ongoing' ? 'bg-blue-100 text-blue-800' :
+              project.status === 'Planned' ? 'bg-yellow-100 text-yellow-800' :
+              'bg-red-100 text-red-800'
+            }`}>
+              {project.status}
+            </span>
+
+            <p className='font-bold mt-4'>Category:</p>
+            <p className='font-medium mt-1'>{project.category}</p>
+
+            <p className='font-bold mt-4'>Budget:</p>
+            <p className='font-bold mt-1 text-green-600'>₦{project.budget.toLocaleString()}</p>
+
+            <p className='font-bold mt-4'>Progress:</p>
+            <div className="mt-2">
+              <div className="w-full bg-gray-200 rounded-full h-4">
+                <div
+                  className="bg-blue-600 h-4 rounded-full transition-all duration-500"
+                  style={{ width: `${project.progress}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-600 mt-1">{project.progress}% Complete</p>
+            </div>
+
+            <p className='font-bold mt-4'>Beneficiaries:</p>
+            <p className='font-bold mt-1'>{project.beneficiaries.toLocaleString()} people</p>
+
+            <p className='font-bold mt-4 mb-8'>Last Updated: {formatDate(project.updatedAt)}</p>
+
+          </aside>
+        </main>
+
+        <main className='hidden md:flex flex-col' style={{width: '80%', margin: 'auto', marginTop: '3em'}}>
+          <h3 className='' style={{color: '#463A93', fontWeight: 'bold', fontSize: '2em'}}>Explore Related Projects</h3>
+
+          <section className='pastevents grid grid-cols-1 md:grid-cols-3 gap-8' style={{marginTop: '2em', marginBottom: '3em'}}>
+            {relatedProjects.length === 0 ? (
+              <p>No related projects found.</p>
+            ) : (
+              relatedProjects.map((relatedProject) => (
+                <div 
+                  key={relatedProject.id} 
+                  className='flex flex-col items-center m-2 cursor-pointer'
+                  onClick={() => {
+                    // Navigate to related project details
+                    window.location.reload(); // Simple reload for now
+                  }}
+                >
+                  <img 
+                    src={formatImageUrl(relatedProject.images && relatedProject.images.length > 0 ? relatedProject.images[0] : '')} 
+                    alt={relatedProject.name}
+                    style={{width: '350px', height: '200px', objectFit: 'cover', borderRadius: '20px'}}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/citizen1.png';
+                    }}
+                  />
+                  <p className='font-bold mt-2'>{relatedProject.name}</p>
+                  <p className='text-gray-600 text-sm mt-1'>{relatedProject.location}, {relatedProject.state}</p>
+                  <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-600 h-2 rounded-full"
+                      style={{ width: `${relatedProject.progress}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">{relatedProject.progress}% Complete</p>
+                </div>
+              ))
+            )}
+          </section>
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default ProjectDetails;

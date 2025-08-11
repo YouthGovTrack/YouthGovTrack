@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useProjects } from '../contexts/ProjectContext';
 import { Project } from '../services/mockApi';
+import { nigeriaStates } from '../data/nigeriaData';
 
 interface SubmitProjectModalProps {
   isOpen: boolean;
@@ -19,8 +20,12 @@ const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({ isOpen, onClose
     lga: '',
     budget: '',
     contractor: '',
+    startDate: '',
     expectedCompletion: ''
   });
+
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -29,13 +34,57 @@ const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({ isOpen, onClose
     'Agriculture', 'Technology', 'Housing', 'Environment', 'Security'
   ];
 
-  const nigerianStates = [
-    'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 
-    'Borno', 'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 
-    'FCT', 'Gombe', 'Imo', 'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 
-    'Kogi', 'Kwara', 'Lagos', 'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 
-    'Oyo', 'Plateau', 'Rivers', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara'
-  ];
+  // Get LGAs for the selected state
+  const getSelectedStateLGAs = () => {
+    const selectedState = nigeriaStates.find(state => state.name === formData.state);
+    return selectedState ? selectedState.lgas : [];
+  };
+
+  // Handle image file selection
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const maxImages = 5; // Limit to 5 images
+    
+    if (selectedImages.length + files.length > maxImages) {
+      alert(`You can only upload up to ${maxImages} images`);
+      return;
+    }
+
+    // Validate file types and sizes
+    const validFiles = files.filter(file => {
+      const isValidType = file.type.startsWith('image/');
+      const isValidSize = file.size <= 5 * 1024 * 1024; // 5MB max
+      
+      if (!isValidType) {
+        alert(`${file.name} is not a valid image file`);
+        return false;
+      }
+      if (!isValidSize) {
+        alert(`${file.name} is too large. Maximum size is 5MB`);
+        return false;
+      }
+      return true;
+    });
+
+    if (validFiles.length > 0) {
+      setSelectedImages(prev => [...prev, ...validFiles]);
+      
+      // Create preview URLs
+      validFiles.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setImagePreviewUrls(prev => [...prev, e.target?.result as string]);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  };
+
+  // Remove an image
+  const removeImage = (index: number) => {
+    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+    setImagePreviewUrls(prev => prev.filter((_, i) => i !== index));
+  };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -48,6 +97,7 @@ const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({ isOpen, onClose
     if (!formData.lga.trim()) newErrors.lga = 'LGA is required';
     if (!formData.budget.trim()) newErrors.budget = 'Budget is required';
     if (!formData.contractor.trim()) newErrors.contractor = 'Contractor is required';
+    if (!formData.startDate) newErrors.startDate = 'Start date is required';
     if (!formData.expectedCompletion) newErrors.expectedCompletion = 'Expected completion date is required';
 
     // Validate budget is a number
@@ -66,6 +116,12 @@ const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({ isOpen, onClose
 
     setLoading(true);
     try {
+      // Use local PNG files for newly submitted projects
+      const localImages = ["/citizen1.png", "/citizen2.png", "/citizen3.png", "/Education.png", "/Healthcare.png"];
+      const imageUrls = selectedImages.map((_, index) => 
+        localImages[index % localImages.length] // Cycle through available local images
+      );
+
       const newProject: Project = {
         id: Date.now(), // Simple ID generation for mock
         name: formData.name,
@@ -78,12 +134,12 @@ const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({ isOpen, onClose
         progress: 0,
         budget: Number(formData.budget),
         contractor: formData.contractor,
-        startDate: new Date().toISOString().split('T')[0],
+        startDate: formData.startDate,
         expectedCompletion: formData.expectedCompletion,
         actualCompletion: null,
         beneficiaries: 0,
         reports: [],
-        images: [],
+        images: imageUrls,
         tags: [formData.category.toLowerCase(), formData.state.toLowerCase()],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -101,8 +157,13 @@ const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({ isOpen, onClose
         lga: '',
         budget: '',
         contractor: '',
+        startDate: '',
         expectedCompletion: ''
       });
+      
+      // Reset images
+      setSelectedImages([]);
+      setImagePreviewUrls([]);
       
       // Close modal
       onClose();
@@ -120,11 +181,22 @@ const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({ isOpen, onClose
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => {
+      // Clear LGA when state changes
+      if (name === 'state') {
+        return { ...prev, [name]: value, lga: '' };
+      }
+      return { ...prev, [name]: value };
+    });
     
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+    
+    // Clear LGA error when state changes
+    if (name === 'state' && errors.lga) {
+      setErrors(prev => ({ ...prev, lga: '' }));
     }
   };
 
@@ -240,8 +312,8 @@ const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({ isOpen, onClose
                   disabled={loading}
                 >
                   <option value="">Select a state</option>
-                  {nigerianStates.map(state => (
-                    <option key={state} value={state}>{state}</option>
+                  {nigeriaStates.map(state => (
+                    <option key={state.code} value={state.name}>{state.name}</option>
                   ))}
                 </select>
                 {errors.state && <p className="text-red-500 text-sm mt-1">{errors.state}</p>}
@@ -254,18 +326,24 @@ const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({ isOpen, onClose
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Local Government Area *
                 </label>
-                <input
-                  type="text"
+                <select
                   name="lga"
                   value={formData.lga}
                   onChange={handleChange}
                   className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     errors.lga ? 'border-red-500' : 'border-gray-300'
                   }`}
-                  placeholder="Enter LGA"
-                  disabled={loading}
-                />
+                  disabled={loading || !formData.state}
+                >
+                  <option value="">Select an LGA</option>
+                  {getSelectedStateLGAs().map(lga => (
+                    <option key={lga} value={lga}>{lga}</option>
+                  ))}
+                </select>
                 {errors.lga && <p className="text-red-500 text-sm mt-1">{errors.lga}</p>}
+                {!formData.state && (
+                  <p className="text-gray-500 text-sm mt-1">Please select a state first</p>
+                )}
               </div>
 
               <div>
@@ -287,7 +365,7 @@ const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({ isOpen, onClose
               </div>
             </div>
 
-            {/* Contractor and Expected Completion Row */}
+            {/* Contractor and Start Date Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -309,19 +387,93 @@ const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({ isOpen, onClose
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Expected Completion *
+                  Start Date *
                 </label>
                 <input
                   type="date"
-                  name="expectedCompletion"
-                  value={formData.expectedCompletion}
+                  name="startDate"
+                  value={formData.startDate}
                   onChange={handleChange}
                   className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.expectedCompletion ? 'border-red-500' : 'border-gray-300'
+                    errors.startDate ? 'border-red-500' : 'border-gray-300'
                   }`}
                   disabled={loading}
                 />
-                {errors.expectedCompletion && <p className="text-red-500 text-sm mt-1">{errors.expectedCompletion}</p>}
+                {errors.startDate && <p className="text-red-500 text-sm mt-1">{errors.startDate}</p>}
+              </div>
+            </div>
+
+            {/* Expected Completion */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Expected Completion *
+              </label>
+              <input
+                type="date"
+                name="expectedCompletion"
+                value={formData.expectedCompletion}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.expectedCompletion ? 'border-red-500' : 'border-gray-300'
+                }`}
+                disabled={loading}
+              />
+              {errors.expectedCompletion && <p className="text-red-500 text-sm mt-1">{errors.expectedCompletion}</p>}
+            </div>
+
+            {/* Project Images */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Project Images (Optional)
+              </label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                <div className="text-center">
+                  <input
+                    type="file"
+                    id="images"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    className="hidden"
+                    disabled={loading}
+                  />
+                  <label
+                    htmlFor="images"
+                    className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Add Images
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 5MB each (max 5 images)</p>
+                </div>
+
+                {/* Image Previews */}
+                {imagePreviewUrls.length > 0 && (
+                  <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+                    {imagePreviewUrls.map((url, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={url}
+                          alt={`Preview ${index + 1}`}
+                          className="w-full h-20 object-cover rounded-md"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                          disabled={loading}
+                        >
+                          ×
+                        </button>
+                        <div className="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded">
+                          {selectedImages[index]?.name.slice(0, 8)}...
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 

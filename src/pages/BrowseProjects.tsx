@@ -14,7 +14,11 @@ interface Filters {
   searchQuery: string;
 }
 
-const BrowseProjects: React.FC = () => {
+interface BrowseProjectsProps {
+  onNavigate: (page: string, projectId?: number) => void;
+}
+
+const BrowseProjects: React.FC<BrowseProjectsProps> = ({ onNavigate }) => {
   const { projects, loading, error, stats, total, fetchProjects, clearError } = useProjects();
   
   const [filters, setFilters] = useState<Filters>({
@@ -405,15 +409,12 @@ const BrowseProjects: React.FC = () => {
                       </div>
 
                       <div className="flex gap-2">
-                        <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium">
-                          View Details
-                        </button>
                         <button
                           onClick={() => handleReportProject(project)}
-                          className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium"
+                          className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium"
                           title="Report project status"
                         >
-                          📝
+                          📝 Report Status
                         </button>
                       </div>
                     </div>
@@ -453,15 +454,12 @@ const BrowseProjects: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex gap-2 ml-6">
-                        <button className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium">
-                          View Details
-                        </button>
                         <button
                           onClick={() => handleReportProject(project)}
                           className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium"
                           title="Report project status"
                         >
-                          📝 Report
+                          📝 Report Status
                         </button>
                       </div>
                     </div>

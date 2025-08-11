@@ -7,13 +7,12 @@ import Projects from './pages/Projects';
 import BrowseProjects from './pages/BrowseProjects';
 import Reports from './pages/Reports';
 import Champions from './pages/Champions';
-import SignUp from './pages/SignUp';
-import SignIn from './pages/SignIn';
+import Register from './pages/Register';
 import { ProjectProvider } from './contexts/ProjectContext';
 import './styles/global.css';
 
 // Simple routing state management
-type Page = 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions' | 'signup' | 'signin';
+type Page = 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions' | 'register';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -36,9 +35,11 @@ const App: React.FC = () => {
   }, []);
 
   // Handle navigation with authentication check
-  const navigateTo = (page: Page) => {
+  const navigateTo = (page: Page | string) => {
+    const targetPage = page as Page;
+    
     // Check if trying to access community features
-    if (page === 'reports' || page === 'champions') {
+    if (targetPage === 'reports' || targetPage === 'champions') {
       const userData = localStorage.getItem('currentUser');
       if (!userData) {
         // Redirect to home if not logged in
@@ -47,7 +48,16 @@ const App: React.FC = () => {
         return;
       }
     }
-    setCurrentPage(page);
+    
+    // Only navigate to valid pages
+    if (['home', 'projects', 'browse-projects', 'reports', 'champions', 'register'].includes(targetPage)) {
+      setCurrentPage(targetPage);
+    }
+  };
+
+  // Navigation wrapper for string parameters
+  const navigateToString = (page: string) => {
+    navigateTo(page);
   };
 
   // Show loading screen during initialization
@@ -63,15 +73,13 @@ const App: React.FC = () => {
       case 'projects':
         return <Projects onNavigate={navigateTo} />;
       case 'browse-projects':
-        return <BrowseProjects />;
+        return <BrowseProjects onNavigate={navigateTo} />;
       case 'reports':
         return <Reports />;
       case 'champions':
         return <Champions />;
-      case 'signup':
-        return <SignUp onNavigate={navigateTo} />;
-      case 'signin':
-        return <SignIn onNavigate={navigateTo} />;
+      case 'register':
+        return <Register onNavigate={navigateTo} />;
       default:
         return <Home onNavigate={navigateTo} />;
     }
@@ -85,19 +93,19 @@ const App: React.FC = () => {
     />
   );
 
-  // Check if current page is auth page
-  const isAuthPage = currentPage === 'signup' || currentPage === 'signin';
+  // Check if current page needs special layout
+  const isRegisterPage = currentPage === 'register';
 
   return (
     <ProjectProvider>
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        {!isAuthPage && <NavbarWithNavigation />}
+        {!isRegisterPage && <NavbarWithNavigation />}
         
-        <main className={`flex-1 ${!isAuthPage ? 'pt-20' : ''}`}>
+        <main className={`flex-1 ${!isRegisterPage ? 'pt-20' : ''}`}>
           {renderPageContent()}
         </main>
         
-        {!isAuthPage && <Footer />}
+        {!isRegisterPage && <Footer />}
       </div>
     </ProjectProvider>
   );

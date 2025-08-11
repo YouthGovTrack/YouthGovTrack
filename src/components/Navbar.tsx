@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import AuthModal from './AuthModal';
 
 interface NavbarProps {
   currentPage: string;
-  onNavigate: (page: 'home' | 'projects' | 'reports' | 'champions' | 'signup' | 'signin') => void;
+  onNavigate: (page: 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions' | 'register') => void;
 }
 
 interface User {
@@ -21,6 +22,7 @@ interface User {
 const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // Check for logged-in user on component mount and localStorage changes
   useEffect(() => {
@@ -49,17 +51,26 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, []); // Remove authModalOpen dependency
+  }, []);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const handleAuthClick = (mode: 'login' | 'register') => {
-    if (mode === 'login') {
-      onNavigate('signin');
-    } else {
-      onNavigate('signup');
+  const openLoginModal = () => {
+    setIsAuthModalOpen(true);
+  };
+
+  const closeAuthModal = () => {
+    setIsAuthModalOpen(false);
+  };
+
+  const handleAuthSuccess = () => {
+    setIsAuthModalOpen(false);
+    // Refresh user state
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+      setCurrentUser(JSON.parse(userData));
     }
   };
 
@@ -159,13 +170,13 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 ) : (
                   <>
                     <button
-                      onClick={() => onNavigate('signin')}
+                      onClick={openLoginModal}
                       className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200"
                     >
                       Sign In
                     </button>
                     <button
-                      onClick={() => onNavigate('signup')}
+                      onClick={() => onNavigate('register')}
                       className="px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
                     >
                       Join Community
@@ -210,7 +221,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 </div>
               ) : (
                 <button
-                  onClick={() => onNavigate('signup')}
+                  onClick={() => onNavigate('register')}
                   className="bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700 transition-colors font-medium text-sm"
                 >
                   Join
@@ -324,7 +335,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                     <>
                       <button
                         onClick={() => {
-                          onNavigate('signin');
+                          openLoginModal();
                           setIsMobileMenuOpen(false);
                         }}
                         className="block w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 font-medium transition-colors"
@@ -333,7 +344,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                       </button>
                       <button
                         onClick={() => {
-                          onNavigate('signup');
+                          onNavigate('register');
                           setIsMobileMenuOpen(false);
                         }}
                         className="block w-full text-left px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
@@ -348,6 +359,14 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
           )}
         </div>
       </header>
+      
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={closeAuthModal}
+        onSuccess={handleAuthSuccess}
+        onRegisterClick={() => onNavigate('register')}
+      />
     </>
   );
 };
