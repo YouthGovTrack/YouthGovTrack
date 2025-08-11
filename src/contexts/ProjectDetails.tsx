@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useProjects } from '../contexts/ProjectContext';
+import { useProjects } from './ProjectContext';
 import { Project } from '../services/mockApi';
 import Loader from '../components/Loader';
 
@@ -45,7 +45,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }
     fetchData();
   }, [projectId, projects, projectsLoading]);
 
-  // Update the formatImageUrl function
+  // Format image URL function
   const formatImageUrl = (url: string) => {
     if (!url) return '/citizen1.png';
     console.log('Processing image URL:', url);
@@ -99,6 +99,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Project Banner Image */}
         <div className="w-full h-[400px] mx-auto rounded-lg md:overflow-hidden flex items-center justify-center bg-gray-100">
           <img
             src={formatImageUrl(project.images && project.images.length > 0 ? project.images[0] : '')}
@@ -116,11 +117,9 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }
             <h2 className='font-bold text-2xl mt-4'>{project.name}</h2>
 
             <h2 className='font-bold text-2xl mt-6'>Description</h2>
-
             <p className='mt-2 text-base'>{project.description}</p>
 
             <h2 className='font-bold text-2xl mt-8'>Project Team</h2>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               <div className="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm">
                 <img
@@ -140,7 +139,6 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }
             </div>
 
             <h2 className='font-bold text-2xl mt-8'>Date & Time</h2>
-
             <div className='flex items-center mt-2'>
               <img src='/Calendar.png' alt='Calendar' width={24} height={24} />
               <p className='font-semibold ml-4'>
@@ -163,11 +161,10 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }
                 </p>
               </div>
             )}
-
           </article>
 
           <aside className='mt-10 md:mt-0 md:ml-10'>
-            <h2 className='font-bold text-2xl'>Project location</h2>
+            <h2 className='font-bold text-2xl'>Project Location</h2>
 
             <div className="mt-4">
               {project.location ? (
@@ -223,11 +220,24 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }
             <p className='font-bold mt-4'>Beneficiaries:</p>
             <p className='font-bold mt-1'>{project.beneficiaries.toLocaleString()} people</p>
 
-            <p className='font-bold mt-4 mb-8'>Last Updated: {formatDate(project.updatedAt)}</p>
+            <p className='font-bold mt-4'>Contact Info:</p>
+            <p className='font-bold mt-4 p3'>{project.contractor || 'N/A'}</p>
 
+            <p className='font-bold mt-4 mb-8'>Last Updated: {formatDate(project.updatedAt)}</p>
           </aside>
         </main>
 
+        {/* Action Button */}
+        <div className='flex justify-center mt-8 mb-8'>
+          <button 
+            className='bg-blue-600 text-white px-8 py-3 rounded-full font-medium hover:bg-blue-700 transition-colors duration-300'
+            onClick={() => onNavigate('reports')}
+          >
+            Submit Report
+          </button>
+        </div>
+
+        {/* Related Projects Section */}
         <main className='hidden md:flex flex-col' style={{width: '80%', margin: 'auto', marginTop: '3em'}}>
           <h3 className='' style={{color: '#463A93', fontWeight: 'bold', fontSize: '2em'}}>Explore Related Projects</h3>
 
@@ -238,7 +248,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }
               relatedProjects.map((relatedProject) => (
                 <div 
                   key={relatedProject.id} 
-                  className='flex flex-col items-center m-2 cursor-pointer'
+                  className='flex flex-col items-center m-2 cursor-pointer hover:transform hover:scale-105 transition-all duration-300'
                   onClick={() => {
                     // Navigate to related project details
                     window.location.reload(); // Simple reload for now
@@ -252,11 +262,11 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }
                       (e.target as HTMLImageElement).src = '/citizen1.png';
                     }}
                   />
-                  <p className='font-bold mt-2'>{relatedProject.name}</p>
-                  <p className='text-gray-600 text-sm mt-1'>{relatedProject.location}, {relatedProject.state}</p>
+                  <p className='font-bold mt-2 text-center'>{relatedProject.name}</p>
+                  <p className='text-gray-600 text-sm mt-1 text-center'>{relatedProject.location}, {relatedProject.state}</p>
                   <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-blue-600 h-2 rounded-full"
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-500"
                       style={{ width: `${relatedProject.progress}%` }}
                     ></div>
                   </div>

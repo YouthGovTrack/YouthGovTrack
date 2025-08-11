@@ -410,6 +410,13 @@ const BrowseProjects: React.FC<BrowseProjectsProps> = ({ onNavigate }) => {
 
                       <div className="flex gap-2">
                         <button
+                          onClick={() => onNavigate('project-details', project.id)}
+                          className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
+                          title="View project details"
+                        >
+                          👁️ View Details
+                        </button>
+                        <button
                           onClick={() => handleReportProject(project)}
                           className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium"
                           title="Report project status"
@@ -454,6 +461,13 @@ const BrowseProjects: React.FC<BrowseProjectsProps> = ({ onNavigate }) => {
                         </div>
                       </div>
                       <div className="flex gap-2 ml-6">
+                        <button
+                          onClick={() => onNavigate('project-details', project.id)}
+                          className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
+                          title="View project details"
+                        >
+                          👁️ View Details
+                        </button>
                         <button
                           onClick={() => handleReportProject(project)}
                           className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium"

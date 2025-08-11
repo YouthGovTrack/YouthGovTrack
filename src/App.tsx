@@ -8,14 +8,16 @@ import BrowseProjects from './pages/BrowseProjects';
 import Reports from './pages/Reports';
 import Champions from './pages/Champions';
 import Register from './pages/Register';
+import ProjectDetails from './contexts/ProjectDetails';
 import { ProjectProvider } from './contexts/ProjectContext';
 import './styles/global.css';
 
 // Simple routing state management
-type Page = 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions' | 'register';
+type Page = 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions' | 'register' | 'project-details';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('home');
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -35,8 +37,15 @@ const App: React.FC = () => {
   }, []);
 
   // Handle navigation with authentication check
-  const navigateTo = (page: Page | string) => {
+  const navigateTo = (page: Page | string, projectId?: number) => {
     const targetPage = page as Page;
+    
+    // Handle project details navigation
+    if (targetPage === 'project-details' && projectId) {
+      setSelectedProjectId(projectId);
+      setCurrentPage('project-details');
+      return;
+    }
     
     // Check if trying to access community features
     if (targetPage === 'reports' || targetPage === 'champions') {
@@ -50,8 +59,11 @@ const App: React.FC = () => {
     }
     
     // Only navigate to valid pages
-    if (['home', 'projects', 'browse-projects', 'reports', 'champions', 'register'].includes(targetPage)) {
+    if (['home', 'projects', 'browse-projects', 'reports', 'champions', 'register', 'project-details'].includes(targetPage)) {
       setCurrentPage(targetPage);
+      if (targetPage !== 'project-details') {
+        setSelectedProjectId(null); // Clear project ID when navigating away
+      }
     }
   };
 
@@ -80,6 +92,8 @@ const App: React.FC = () => {
         return <Champions />;
       case 'register':
         return <Register onNavigate={navigateTo} />;
+      case 'project-details':
+        return <ProjectDetails projectId={selectedProjectId} onNavigate={navigateTo} />;
       default:
         return <Home onNavigate={navigateTo} />;
     }
@@ -94,18 +108,18 @@ const App: React.FC = () => {
   );
 
   // Check if current page needs special layout
-  const isRegisterPage = currentPage === 'register';
+  const isSpecialPage = currentPage === 'register' || currentPage === 'project-details';
 
   return (
     <ProjectProvider>
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        {!isRegisterPage && <NavbarWithNavigation />}
+        {!isSpecialPage && <NavbarWithNavigation />}
         
-        <main className={`flex-1 ${!isRegisterPage ? 'pt-20' : ''}`}>
+        <main className={`flex-1 ${!isSpecialPage ? 'pt-20' : ''}`}>
           {renderPageContent()}
         </main>
         
-        {!isRegisterPage && <Footer />}
+        {!isSpecialPage && <Footer />}
       </div>
     </ProjectProvider>
   );
