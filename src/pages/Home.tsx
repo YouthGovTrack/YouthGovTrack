@@ -3,14 +3,16 @@ import StateSelector from '../components/StateSelector';
 import LiveCivicAlerts from '../components/LiveCivicAlerts';
 import Sponsors from '../components/Sponsors';
 import CitizenTestimonials from '../components/CitizenTestimonials';
+import AuthModal from '../components/AuthModal';
 
 interface HomeProps {
-  onNavigate: (page: 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions' | 'signup' | 'signin') => void;
+  onNavigate: (page: string) => void;
 }
 
 const Home: React.FC<HomeProps> = ({ onNavigate }) => {
   const [selectedState, setSelectedState] = useState<string>('');
   const [selectedLga, setSelectedLga] = useState<string>('');
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
 
   const handleStateChange = (state: string) => {
     setSelectedState(state);
@@ -47,7 +49,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               </p>
               <button 
                 className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition flex items-center"
-                onClick={() => onNavigate('signup')}
+                onClick={() => setShowAuthModal(true)}
               >
                 <img 
                   src="/pin.svg" 
@@ -59,6 +61,13 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 />
                 Track My LGA
               </button>
+              
+              {showAuthModal && (
+                <AuthModal
+                  isOpen={showAuthModal}
+                  onClose={() => setShowAuthModal(false)}
+                />
+              )}
             </div>
             
             {/* Quick Report Form */}

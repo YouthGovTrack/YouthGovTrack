@@ -8,6 +8,7 @@ import BrowseProjects from './pages/BrowseProjects';
 import Reports from './pages/Reports';
 import Champions from './pages/Champions';
 import Register from './pages/Register';
+
 import ProjectDetails from './contexts/ProjectDetails';
 import { ProjectProvider } from './contexts/ProjectContext';
 import './styles/global.css';
