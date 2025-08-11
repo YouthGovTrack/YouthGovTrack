@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useProjects } from './ProjectContext';
 import { Project } from '../services/mockApi';
 import Loader from '../components/Loader';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 interface ProjectDetailsProps {
   projectId: number | null;
@@ -82,34 +84,79 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }
   if (!project) return <p>No project found</p>;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header with Back Button */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <button
-            onClick={() => onNavigate('browse-projects')}
-            className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Projects
-          </button>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Navbar */}
+      <Navbar currentPage="project-details" onNavigate={onNavigate} />
+
+      {/* Main Content */}
+      <div className="flex-1 pt-16">
+        {/* Back Button */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <button
+              onClick={() => onNavigate('browse-projects')}
+              className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to Projects
+            </button>
+          </div>
         </div>
-      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Project Banner Image */}
-        <div className="w-full h-[400px] mx-auto rounded-lg md:overflow-hidden flex items-center justify-center bg-gray-100">
-          <img
-            src={formatImageUrl(project.images && project.images.length > 0 ? project.images[0] : '')}
-            alt="Project banner"
-            className="w-full h-full object-contain rounded-lg"
-            onError={(e) => {
-              console.error('Error loading project image:', (e.target as HTMLImageElement).src);
-              (e.target as HTMLImageElement).src = '/citizen1.png';
-            }}
-          />
+        {/* Project Banner Section */}
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+          {/* Project Header */}
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h1 className="text-2xl font-semibold text-gray-900">{project.name}</h1>
+            <div className="flex items-center mt-2 text-gray-600">
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              </svg>
+              <span className="text-sm">{project.location}, {project.state}</span>
+            </div>
+          </div>
+          
+          {/* Project Image */}
+          <div className="relative h-[280px]">
+            <img
+              src={formatImageUrl(project.images && project.images.length > 0 ? project.images[0] : '')}
+              alt={`${project.name} visualization`}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                console.error('Error loading project image:', (e.target as HTMLImageElement).src);
+                (e.target as HTMLImageElement).src = '/citizen1.png';
+              }}
+            />
+            {/* Category Badge */}
+            <div className="absolute bottom-4 right-4">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/90 text-gray-700 shadow-sm">
+                {project.category}
+              </span>
+            </div>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-3 divide-x divide-gray-100 border-t border-gray-100">
+            <div className="px-4 py-3 text-center">
+              <div className="text-sm text-gray-500">Status</div>
+              <div className={`mt-1 font-medium ${
+                project.status === 'Completed' ? 'text-green-600' :
+                project.status === 'Ongoing' ? 'text-blue-600' :
+                'text-yellow-600'
+              }`}>{project.status}</div>
+            </div>
+            <div className="px-4 py-3 text-center">
+              <div className="text-sm text-gray-500">Progress</div>
+              <div className="mt-1 font-medium text-gray-900">{project.progress}%</div>
+            </div>
+            <div className="px-4 py-3 text-center">
+              <div className="text-sm text-gray-500">Budget</div>
+              <div className="mt-1 font-medium text-gray-900">₦{project.budget.toLocaleString()}</div>
+            </div>
+          </div>
         </div>
 
         <main className='flex flex-col md:flex-row md:justify-between mainevent'>
@@ -140,14 +187,18 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }
 
             <h2 className='font-bold text-2xl mt-8'>Date & Time</h2>
             <div className='flex items-center mt-2'>
-              <img src='/Calendar.png' alt='Calendar' width={24} height={24} />
+              <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
               <p className='font-semibold ml-4'>
                 Start Date: {formatDate(project.startDate)}
               </p>
             </div>
 
             <div className='flex items-center mt-2'>
-              <img src='/ClockAfternoon.png' alt='Clock' width={24} height={24} />
+              <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
               <p className='font-semibold ml-4'>
                 Expected Completion: {formatDate(project.expectedCompletion)}
               </p>
@@ -155,7 +206,9 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }
 
             {project.actualCompletion && (
               <div className='flex items-center mt-2'>
-                <img src='/ClockAfternoon.png' alt='Clock' width={24} height={24} />
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                 <p className='font-semibold ml-4 text-green-600'>
                   Completed: {formatDate(project.actualCompletion)}
                 </p>
@@ -276,7 +329,10 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }
             )}
           </section>
         </main>
+        </div>
       </div>
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
