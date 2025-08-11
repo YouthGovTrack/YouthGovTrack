@@ -3,7 +3,6 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Loader from './components/Loader';
 import Home from './pages/Home';
-import Projects from './pages/Projects';
 import BrowseProjects from './pages/BrowseProjects';
 import Reports from './pages/Reports';
 import Champions from './pages/Champions';
@@ -14,7 +13,7 @@ import { ProjectProvider } from './contexts/ProjectContext';
 import './styles/global.css';
 
 // Simple routing state management
-type Page = 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions' | 'register' | 'project-details';
+type Page = 'home' | 'browse-projects' | 'reports' | 'champions' | 'register' | 'project-details';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -60,7 +59,7 @@ const App: React.FC = () => {
     }
     
     // Only navigate to valid pages
-    if (['home', 'projects', 'browse-projects', 'reports', 'champions', 'register', 'project-details'].includes(targetPage)) {
+    if (['home', 'browse-projects', 'reports', 'champions', 'register', 'project-details'].includes(targetPage)) {
       setCurrentPage(targetPage);
       if (targetPage !== 'project-details') {
         setSelectedProjectId(null); // Clear project ID when navigating away
@@ -83,8 +82,6 @@ const App: React.FC = () => {
     switch (currentPage) {
       case 'home':
         return <Home onNavigate={navigateTo} />;
-      case 'projects':
-        return <Projects onNavigate={navigateTo} />;
       case 'browse-projects':
         return <BrowseProjects onNavigate={navigateTo} />;
       case 'reports':

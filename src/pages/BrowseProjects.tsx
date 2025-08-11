@@ -3,6 +3,8 @@ import { useProjects } from '../contexts/ProjectContext';
 import { Project, ProjectFilters } from '../services/mockApi';
 import CitizenReportsModal from '../components/CitizenReportsModal';
 import SubmitProjectModal from '../components/SubmitProjectModal';
+import { nigeriaStates } from '../data/nigeriaData';
+import ArrowLink from '../components/icons/ArrowLink';
 
 interface Filters {
   state: string;
@@ -37,28 +39,7 @@ const BrowseProjects: React.FC<BrowseProjectsProps> = ({ onNavigate }) => {
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-  const nigeriaStates = [
-    {
-      name: 'Abia',
-      lgas: ['Aba North', 'Aba South', 'Arochukwu', 'Bende', 'Ikwuano', 'Isiala Ngwa North', 'Isiala Ngwa South', 'Isuikwuato', 'Obi Ngwa', 'Ohafia', 'Osisioma', 'Ugwunagbo', 'Ukwa East', 'Ukwa West', 'Umuahia North', 'Umuahia South', 'Umu Nneochi']
-    },
-    {
-      name: 'Adamawa',
-      lgas: ['Demsa', 'Fufure', 'Ganye', 'Gayuk', 'Gombi', 'Grie', 'Hong', 'Jada', 'Lamurde', 'Madagali', 'Maiha', 'Mayo Belwa', 'Michika', 'Mubi North', 'Mubi South', 'Numan', 'Shelleng', 'Song', 'Toungo', 'Yola North', 'Yola South']
-    },
-    {
-      name: 'Lagos',
-      lgas: ['Agege', 'Ajeromi-Ifelodun', 'Alimosho', 'Amuwo-Odofin', 'Apapa', 'Badagry', 'Epe', 'Eti Osa', 'Ibeju-Lekki', 'Ifako-Ijaiye', 'Ikeja', 'Ikorodu', 'Kosofe', 'Lagos Island', 'Lagos Mainland', 'Mushin', 'Ojo', 'Oshodi-Isolo', 'Shomolu', 'Surulere']
-    },
-    {
-      name: 'Rivers',
-      lgas: ['Abua/Odual', 'Ahoada East', 'Ahoada West', 'Akuku-Toru', 'Andoni', 'Asari-Toru', 'Bonny', 'Degema', 'Eleme', 'Emuoha', 'Etche', 'Gokana', 'Ikwerre', 'Khana', 'Obio/Akpor', 'Ogba/Egbema/Ndoni', 'Ogu/Bolo', 'Okrika', 'Omuma', 'Opobo/Nkoro', 'Oyigbo', 'Port Harcourt', 'Tai']
-    },
-    {
-      name: 'Kano',
-      lgas: ['Ajingi', 'Albasu', 'Bagwai', 'Bebeji', 'Bichi', 'Bunkure', 'Dala', 'Dambatta', 'Dawakin Kudu', 'Dawakin Tofa', 'Doguwa', 'Fagge', 'Gabasawa', 'Garko', 'Garun Mallam', 'Gaya', 'Gezawa', 'Gwale', 'Gwarzo', 'Kabo', 'Kano Municipal', 'Karaye', 'Kibiya', 'Kiru', 'Kumbotso', 'Kunchi', 'Kura', 'Madobi', 'Makoda', 'Minjibir', 'Nassarawa', 'Rano', 'Rimin Gado', 'Rogo', 'Shanono', 'Sumaila', 'Takai', 'Tarauni', 'Tofa', 'Tsanyawa', 'Tudun Wada', 'Ungogo', 'Warawa', 'Wudil']
-    }
-  ];
+
 
   // Update LGA options when state changes
   useEffect(() => {
@@ -261,7 +242,7 @@ const BrowseProjects: React.FC<BrowseProjectsProps> = ({ onNavigate }) => {
                   >
                     <option value="">All States</option>
                     {nigeriaStates.map(state => (
-                      <option key={state.name} value={state.name}>{state.name}</option>
+                      <option key={state.code} value={state.name}>{state.name}</option>
                     ))}
                   </select>
                 </div>
@@ -408,21 +389,21 @@ const BrowseProjects: React.FC<BrowseProjectsProps> = ({ onNavigate }) => {
                         )}
                       </div>
 
-                      <div className="flex gap-2">
-                        <button
+                      <div className="flex gap-3 mt-6">
+                        <ArrowLink
                           onClick={() => onNavigate('project-details', project.id)}
-                          className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
-                          title="View project details"
+                          className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800"
+                          isLink={false}
                         >
-                          👁️ View Details
-                        </button>
-                        <button
+                          Explore Project
+                        </ArrowLink>
+                        <ArrowLink
                           onClick={() => handleReportProject(project)}
-                          className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium"
-                          title="Report project status"
+                          className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800"
+                          isLink={false}
                         >
-                          📝 Report Status
-                        </button>
+                          Submit Report
+                        </ArrowLink>
                       </div>
                     </div>
                   </div>
@@ -460,21 +441,21 @@ const BrowseProjects: React.FC<BrowseProjectsProps> = ({ onNavigate }) => {
                           </div>
                         </div>
                       </div>
-                      <div className="flex gap-2 ml-6">
-                        <button
+                      <div className="flex gap-3 ml-6">
+                        <ArrowLink
                           onClick={() => onNavigate('project-details', project.id)}
-                          className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
-                          title="View project details"
+                          className="bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800"
+                          isLink={false}
                         >
-                          👁️ View Details
-                        </button>
-                        <button
+                          Explore Project
+                        </ArrowLink>
+                        <ArrowLink
                           onClick={() => handleReportProject(project)}
-                          className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium"
-                          title="Report project status"
+                          className="bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800"
+                          isLink={false}
                         >
-                          📝 Report Status
-                        </button>
+                          Submit Report
+                        </ArrowLink>
                       </div>
                     </div>
                   </div>
