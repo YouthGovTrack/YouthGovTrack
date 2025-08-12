@@ -135,3 +135,6 @@ certs/
 *.map
 *.js.map
 *.css.map
+
+# Backend documentation & sensitive project files
+BACKEND_PROJECT_SCHEMA.md
