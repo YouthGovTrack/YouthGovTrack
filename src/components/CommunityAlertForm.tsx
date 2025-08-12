@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNotifications } from '../contexts/NotificationContext';
+import { nigeriaStates } from '../data/nigeriaData';
 import { Plus, Send, AlertTriangle, MapPin } from 'react-feather';
 
 interface CommunityAlertFormProps {
@@ -18,6 +19,27 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
     source: ''
   });
 
+  // Initialize form with saved location data when modal opens
+  React.useEffect(() => {
+    if (isOpen) {
+      const savedLocation = localStorage.getItem('selectedLocation');
+      if (savedLocation) {
+        const locationData = JSON.parse(savedLocation);
+        setFormData(prev => ({
+          ...prev,
+          state: locationData.state || '',
+          lga: locationData.lga || ''
+        }));
+      }
+    }
+  }, [isOpen]);
+
+  // Get LGAs for the selected state
+  const selectedStateLGAs = useMemo(() => {
+    const selectedState = nigeriaStates.find(state => state.name === formData.state);
+    return selectedState ? selectedState.lgas : [];
+  }, [formData.state]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -26,9 +48,17 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
       return;
     }
 
-    // Get current user info if available
+    // Check if user is logged in
     const currentUser = localStorage.getItem('currentUser');
-    const userName = currentUser ? JSON.parse(currentUser).name : formData.source || 'Community Member';
+    if (!currentUser) {
+      alert('⚠️ You must be logged in to submit community alerts.\n\nPlease sign in to continue.');
+      onClose(); // Close the modal so user can go to login
+      return;
+    }
+
+    // Get current user info
+    const userData = JSON.parse(currentUser);
+    const userName = userData.name || formData.source || 'Community Member';
 
     // Add the notification to the bell icon
     addNotification({
@@ -62,7 +92,9 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
+      // Reset LGA when state changes
+      ...(name === 'state' && { lga: '' })
     }));
   };
 
@@ -78,11 +110,11 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
       }}
     >
       <div 
-        className="bg-white rounded-2xl max-w-2xl w-full max-h-[95vh] overflow-hidden shadow-2xl border border-gray-100"
+        className="bg-white rounded-2xl max-w-2xl w-full max-h-[95vh] overflow-hidden shadow-2xl border border-gray-100 flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white p-6">
+        <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white p-6 flex-shrink-0">
           <div className="flex items-center space-x-3 mb-3">
             <div className="p-2 bg-white/20 rounded-xl">
               <Plus size={24} />
@@ -92,10 +124,20 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
           <p className="text-green-50">
             Report important information or issues in your community to help keep everyone informed.
           </p>
+          {!localStorage.getItem('currentUser') && (
+            <div className="mt-4 p-3 bg-yellow-500/20 border border-yellow-300/30 rounded-lg">
+              <p className="text-yellow-100 text-sm flex items-center">
+                <AlertTriangle size={16} className="mr-2" />
+                You must be logged in to submit community alerts
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        {/* Scrollable Form Container */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Alert Title *
@@ -171,43 +213,11 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Select State</option>
-                <option value="Abia">Abia</option>
-                <option value="Adamawa">Adamawa</option>
-                <option value="Akwa Ibom">Akwa Ibom</option>
-                <option value="Anambra">Anambra</option>
-                <option value="Bauchi">Bauchi</option>
-                <option value="Bayelsa">Bayelsa</option>
-                <option value="Benue">Benue</option>
-                <option value="Borno">Borno</option>
-                <option value="Cross River">Cross River</option>
-                <option value="Delta">Delta</option>
-                <option value="Ebonyi">Ebonyi</option>
-                <option value="Edo">Edo</option>
-                <option value="Ekiti">Ekiti</option>
-                <option value="Enugu">Enugu</option>
-                <option value="FCT">FCT (Abuja)</option>
-                <option value="Gombe">Gombe</option>
-                <option value="Imo">Imo</option>
-                <option value="Jigawa">Jigawa</option>
-                <option value="Kaduna">Kaduna</option>
-                <option value="Kano">Kano</option>
-                <option value="Katsina">Katsina</option>
-                <option value="Kebbi">Kebbi</option>
-                <option value="Kogi">Kogi</option>
-                <option value="Kwara">Kwara</option>
-                <option value="Lagos">Lagos</option>
-                <option value="Nasarawa">Nasarawa</option>
-                <option value="Niger">Niger</option>
-                <option value="Ogun">Ogun</option>
-                <option value="Ondo">Ondo</option>
-                <option value="Osun">Osun</option>
-                <option value="Oyo">Oyo</option>
-                <option value="Plateau">Plateau</option>
-                <option value="Rivers">Rivers</option>
-                <option value="Sokoto">Sokoto</option>
-                <option value="Taraba">Taraba</option>
-                <option value="Yobe">Yobe</option>
-                <option value="Zamfara">Zamfara</option>
+                {nigeriaStates.map((state) => (
+                  <option key={state.code} value={state.name}>
+                    {state.name}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -215,19 +225,27 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Local Government Area
               </label>
-              <input
-                type="text"
+              <select
                 name="lga"
                 value={formData.lga}
                 onChange={handleInputChange}
-                placeholder="e.g., Ikeja, Abuja Municipal"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+                disabled={!formData.state}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              >
+                <option value="">
+                  {!formData.state ? 'Select State First' : 'Select LGA'}
+                </option>
+                {selectedStateLGAs.map((lga) => (
+                  <option key={lga} value={lga}>
+                    {lga}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+          <div className="flex justify-end space-x-4 pt-6 pb-2 border-t border-gray-200">
             <button
               type="button"
               onClick={onClose}
@@ -237,13 +255,19 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
             </button>
             <button
               type="submit"
-              className="px-6 py-3 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg hover:from-green-700 hover:to-blue-700 transition-all duration-200 font-medium inline-flex items-center space-x-2"
+              disabled={!localStorage.getItem('currentUser')}
+              className={`px-6 py-3 rounded-lg transition-all duration-200 font-medium inline-flex items-center space-x-2 ${
+                localStorage.getItem('currentUser')
+                  ? 'bg-gradient-to-r from-green-600 to-blue-600 text-white hover:from-green-700 hover:to-blue-700'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
             >
               <Send size={18} />
-              <span>Submit Alert</span>
+              <span>{localStorage.getItem('currentUser') ? 'Submit Alert' : 'Login Required'}</span>
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

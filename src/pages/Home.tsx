@@ -4,6 +4,7 @@ import LiveCivicAlerts from '../components/LiveCivicAlerts';
 import Sponsors from '../components/Sponsors';
 import CitizenTestimonials from '../components/CitizenTestimonials';
 import AuthModal from '../components/AuthModal';
+import CommunityAlertForm from '../components/CommunityAlertForm';
 import ArrowLink from '../components/icons/ArrowLink';
 import { useProjects } from '../contexts/ProjectContext';
 
@@ -15,6 +16,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
   const [selectedState, setSelectedState] = useState<string>('');
   const [selectedLga, setSelectedLga] = useState<string>('');
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const [showCommunityAlertForm, setShowCommunityAlertForm] = useState<boolean>(false);
   const { projects, loading } = useProjects();
   const [currentBackground, setCurrentBackground] = useState<1 | 2>(1);
 
@@ -37,10 +39,18 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
   const handleContinue = () => {
     if (selectedState && selectedLga) {
-      // Handle form submission
-      console.log('Proceeding with:', { state: selectedState, lga: selectedLga });
-      // Navigate to browse projects page
-      onNavigate('browse-projects');
+      // Save the selected state and LGA to localStorage
+      const locationData = {
+        state: selectedState,
+        lga: selectedLga,
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem('selectedLocation', JSON.stringify(locationData));
+      
+      console.log('Location saved:', locationData);
+      
+      // Open the Community Alert Form
+      setShowCommunityAlertForm(true);
     } else {
       alert('Please select both state and LGA');
     }
@@ -238,6 +248,12 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
       {/* Sponsors */}
       <Sponsors />
+
+      {/* Community Alert Form Modal */}
+      <CommunityAlertForm
+        isOpen={showCommunityAlertForm}
+        onClose={() => setShowCommunityAlertForm(false)}
+      />
     </div>
   );
 };
