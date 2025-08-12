@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Loader from './components/Loader';
+import CommunityAlertForm from './components/CommunityAlertForm';
 import Home from './pages/Home';
 import BrowseProjects from './pages/BrowseProjects';
 import Reports from './pages/Reports';
@@ -10,6 +11,8 @@ import Register from './pages/Register';
 
 import ProjectDetails from './contexts/ProjectDetails';
 import { ProjectProvider } from './contexts/ProjectContext';
+import { NotificationProvider } from './contexts/NotificationContext';
+import { Plus } from 'react-feather';
 import './styles/global.css';
 
 // Simple routing state management
@@ -19,6 +22,7 @@ const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAlertFormOpen, setIsAlertFormOpen] = useState(false);
 
   useEffect(() => {
     // Initialize app
@@ -109,17 +113,36 @@ const App: React.FC = () => {
   const isSpecialPage = currentPage === 'register' || currentPage === 'project-details';
 
   return (
-    <ProjectProvider>
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        {!isSpecialPage && <NavbarWithNavigation />}
-        
-        <main className={`flex-1 ${!isSpecialPage ? 'pt-20' : ''}`}>
-          {renderPageContent()}
-        </main>
-        
-        {!isSpecialPage && <Footer />}
-      </div>
-    </ProjectProvider>
+    <NotificationProvider>
+      <ProjectProvider>
+        <div className="min-h-screen bg-gray-50 flex flex-col">
+          {!isSpecialPage && <NavbarWithNavigation />}
+          
+          <main className={`flex-1 ${!isSpecialPage ? 'pt-20' : ''}`}>
+            {renderPageContent()}
+          </main>
+          
+          {!isSpecialPage && <Footer />}
+
+          {/* Floating Action Button for Community Alerts */}
+          {!isSpecialPage && (
+            <button
+              onClick={() => setIsAlertFormOpen(true)}
+              className="fixed bottom-6 right-6 bg-gradient-to-r from-green-500 to-blue-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 z-40 group"
+              title="Submit Community Alert"
+            >
+              <Plus size={24} className="transition-transform group-hover:rotate-180" />
+            </button>
+          )}
+
+          {/* Community Alert Form Modal */}
+          <CommunityAlertForm
+            isOpen={isAlertFormOpen}
+            onClose={() => setIsAlertFormOpen(false)}
+          />
+        </div>
+      </ProjectProvider>
+    </NotificationProvider>
   );
 };
 

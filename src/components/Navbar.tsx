@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Bell } from 'react-feather';
 import AuthModal from './AuthModal';
+import ViewCivicAlertsModal from './ViewCivicAlertsModal';
+import { useNotifications } from '../contexts/NotificationContext';
 
 interface NavbarProps {
   currentPage: string;
@@ -23,6 +26,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isCivicAlertsModalOpen, setIsCivicAlertsModalOpen] = useState(false);
+  const { unreadCount, getCivicAlertsCount } = useNotifications();
 
   // Check for logged-in user on component mount and localStorage changes
   useEffect(() => {
@@ -63,6 +68,14 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
 
   const closeAuthModal = () => {
     setIsAuthModalOpen(false);
+  };
+
+  const openCivicAlertsModal = () => {
+    setIsCivicAlertsModalOpen(true);
+  };
+
+  const closeCivicAlertsModal = () => {
+    setIsCivicAlertsModalOpen(false);
   };
 
   const handleAuthSuccess = () => {
@@ -155,6 +168,22 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               
               {/* Auth Buttons / User Menu */}
               <div className="flex items-center space-x-3 ml-4">
+                {/* Civic Alerts Bell Icon */}
+                <button
+                  onClick={openCivicAlertsModal}
+                  className="relative p-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
+                  aria-label="View civic alerts"
+                  title="Civic Alerts & Notifications"
+                >
+                  <Bell size={20} className="transition-transform group-hover:scale-110" />
+                  {/* Dynamic Notification Badge */}
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-[20px] h-5 rounded-full flex items-center justify-center font-medium animate-pulse">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+
                 {isLoggedIn ? (
                   <div className="flex items-center space-x-3">
                     <span className="text-sm text-gray-700">
@@ -207,6 +236,20 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 }`}
               >
                 Projects
+              </button>
+
+              {/* Civic Alerts Bell Icon for Tablet */}
+              <button
+                onClick={openCivicAlertsModal}
+                className="relative p-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                aria-label="View civic alerts"
+              >
+                <Bell size={18} />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-[16px] h-4 rounded-full flex items-center justify-center font-medium">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
               </button>
               
               {isLoggedIn ? (
@@ -313,6 +356,24 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 <a href="#about" className="block px-4 py-3 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 font-medium transition-colors">
                   ℹ️ About
                 </a>
+
+                {/* Civic Alerts in Mobile Menu */}
+                <button
+                  onClick={() => {
+                    openCivicAlertsModal();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 font-medium transition-colors"
+                >
+                  <div className="flex items-center justify-between">
+                    <span>🔔 Civic Alerts</span>
+                    {unreadCount > 0 && (
+                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full min-w-[24px] text-center">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
+                  </div>
+                </button>
                 
                 {/* Mobile Auth Section */}
                 <div className="border-t border-gray-200 pt-3 mt-3 space-y-2">
@@ -366,6 +427,12 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
         onClose={closeAuthModal}
         onSuccess={handleAuthSuccess}
         onRegisterClick={() => onNavigate('register')}
+      />
+
+      {/* Civic Alerts Modal */}
+      <ViewCivicAlertsModal
+        isOpen={isCivicAlertsModalOpen}
+        onClose={closeCivicAlertsModal}
       />
     </>
   );

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNotifications } from '../contexts/NotificationContext';
 
 interface CitizenReport {
   id: string;
@@ -33,6 +34,7 @@ const CitizenReportsModal: React.FC<CitizenReportsModalProps> = ({
   projectId, 
   projectTitle 
 }) => {
+  const { addNotification } = useNotifications();
   const [reportData, setReportData] = useState({
     reporterName: '',
     reporterEmail: '',
@@ -104,6 +106,116 @@ const CitizenReportsModal: React.FC<CitizenReportsModalProps> = ({
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
       
+      // Get current user info for location
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      const userState = currentUser.state || 'Lagos';
+      const userLGA = currentUser.lga || 'Ikeja';
+      
+      const reporterName = reportData.anonymous ? 'Anonymous Citizen' : reportData.reporterName;
+      const priorityMap: { [key: string]: 'low' | 'medium' | 'high' | 'urgent' } = {
+        progress_update: 'medium',
+        issue: 'high',
+        completion: 'low',
+        abandonment: 'urgent',
+        quality_concern: 'high'
+      };
+      
+      const priority = priorityMap[reportData.reportType] || 'medium';
+      
+      // Create main notification for the report submission
+      addNotification({
+        type: 'community_alert',
+        title: `New ${reportTypes.find(t => t.value === reportData.reportType)?.label}: ${projectTitle || 'Community Issue'}`,
+        message: `${reporterName} submitted a ${reportData.reportType.replace('_', ' ')} report${projectTitle ? ` for ${projectTitle}` : ''}. ${reportData.description.substring(0, 120)}${reportData.description.length > 120 ? '...' : ''}`,
+        priority: priority,
+        source: reporterName,
+        state: userState,
+        lga: userLGA,
+        relatedId: projectId
+      });
+
+      // Create additional notifications based on report type
+      if (reportData.reportType === 'abandonment') {
+        addNotification({
+          type: 'civic_alert',
+          title: `🚨 Project Abandonment Alert`,
+          message: `A community member has reported that a project${projectTitle ? ` (${projectTitle})` : ''} in ${userLGA}, ${userState} appears to be abandoned. Authorities have been notified for investigation.`,
+          priority: 'urgent',
+          source: 'Community Oversight System',
+          state: userState,
+          lga: userLGA,
+          relatedId: projectId
+        });
+      } else if (reportData.reportType === 'quality_concern') {
+        addNotification({
+          type: 'civic_alert',
+          title: `⚠️ Quality Concern Reported`,
+          message: `Safety and quality concerns have been raised about a project${projectTitle ? ` (${projectTitle})` : ''} in ${userLGA}, ${userState}. Review and inspection scheduled.`,
+          priority: 'high',
+          source: 'Quality Assurance Team',
+          state: userState,
+          lga: userLGA,
+          relatedId: projectId
+        });
+      } else if (reportData.reportType === 'completion') {
+        addNotification({
+          type: 'project_update',
+          title: `✅ Project Completion Reported`,
+          message: `Great news! A community member has reported the completion of${projectTitle ? ` ${projectTitle}` : ' a project'} in ${userLGA}, ${userState}. This will be verified shortly.`,
+          priority: 'low',
+          source: 'Community Verification',
+          state: userState,
+          lga: userLGA,
+          relatedId: projectId
+        });
+      }
+
+      // Simulate champion assignment and review process
+      setTimeout(() => {
+        const champions = [
+          'Champion Sarah Abubakar',
+          'Champion Emeka Okafor', 
+          'Champion Adebayo Ogundimu',
+          'Champion Fatima Hassan',
+          'Champion John Okwu'
+        ];
+        const randomChampion = champions[Math.floor(Math.random() * champions.length)];
+        
+        addNotification({
+          type: 'report_status',
+          title: 'Report Assigned for Review',
+          message: `Your report about "${projectTitle || 'Community Issue'}" has been assigned to ${randomChampion} for verification and follow-up action.`,
+          priority: 'medium',
+          source: randomChampion,
+          state: userState,
+          lga: userLGA,
+          relatedId: projectId
+        });
+      }, Math.random() * 3000 + 2000); // 2-5 seconds delay
+
+      // Simulate verification completion
+      setTimeout(() => {
+        const champions = [
+          'Champion Sarah Abubakar',
+          'Champion Emeka Okafor', 
+          'Champion Adebayo Ogundimu',
+          'Champion Fatima Hassan',
+          'Champion John Okwu'
+        ];
+        const randomChampion = champions[Math.floor(Math.random() * champions.length)];
+        
+        addNotification({
+          type: 'report_status',
+          title: 'Report Verified & Escalated ✅',
+          message: `Your report has been verified by ${randomChampion}. ${reportData.reportType === 'issue' || reportData.reportType === 'quality_concern' ? 'The issue has been escalated to relevant authorities for resolution.' : 'Thank you for helping keep our community informed!'}`,
+          priority: 'low',
+          source: randomChampion,
+          state: userState,
+          lga: userLGA,
+          relatedId: projectId
+        });
+      }, Math.random() * 10000 + 15000); // 15-25 seconds delay
+
       const newReport: CitizenReport = {
         id: Date.now().toString(),
         projectId: projectId || '',
@@ -114,8 +226,8 @@ const CitizenReportsModal: React.FC<CitizenReportsModalProps> = ({
         description: reportData.description,
         images: reportData.images.map(file => URL.createObjectURL(file)),
         location: {
-          state: 'Lagos', // This would come from user data or be selectable
-          lga: 'Ikeja',
+          state: userState,
+          lga: userLGA,
           address: reportData.address
         },
         status: 'pending',
@@ -126,7 +238,7 @@ const CitizenReportsModal: React.FC<CitizenReportsModalProps> = ({
       const existingReports = JSON.parse(localStorage.getItem('citizenReports') || '[]');
       localStorage.setItem('citizenReports', JSON.stringify([...existingReports, newReport]));
 
-      alert('Report submitted successfully! Thank you for your contribution to the community.');
+      alert('Report submitted successfully! You will receive notifications about the verification process and any follow-up actions.');
       onClose();
       
       // Reset form

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNotifications } from '../contexts/NotificationContext';
 
 interface SubmitReportModalProps {
   isOpen: boolean;
@@ -6,6 +7,7 @@ interface SubmitReportModalProps {
 }
 
 const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }) => {
+  const { addNotification } = useNotifications();
   const [formData, setFormData] = useState({
     title: '',
     category: '',
@@ -17,10 +19,90 @@ const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
+    
+    // Get current user info
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const userName = currentUser.firstName && currentUser.lastName 
+      ? `${currentUser.firstName} ${currentUser.lastName}` 
+      : 'Anonymous Citizen';
+
+    // Extract state and LGA from location
+    const locationParts = formData.location.split(',').map(part => part.trim());
+    const state = locationParts.length >= 2 ? locationParts[locationParts.length - 1] : 'Unknown State';
+    const lga = locationParts.length >= 2 ? locationParts[locationParts.length - 2] : 'Unknown LGA';
+
+    // Create notification for the report submission
+    addNotification({
+      type: 'community_alert',
+      title: `New Report: ${formData.title}`,
+      message: `${userName} submitted a report about ${formData.category.toLowerCase()} in ${formData.location}. ${formData.description.substring(0, 100)}${formData.description.length > 100 ? '...' : ''}`,
+      priority: formData.priority as 'low' | 'medium' | 'high' | 'urgent',
+      source: userName,
+      state: state,
+      lga: lga
+    });
+
+    // If it's urgent priority, create an additional civic alert
+    if (formData.priority === 'urgent') {
+      addNotification({
+        type: 'civic_alert',
+        title: `🚨 Urgent: ${formData.title}`,
+        message: `URGENT REPORT: ${formData.description.substring(0, 150)}${formData.description.length > 150 ? '...' : ''} - Immediate attention required.`,
+        priority: 'urgent',
+        source: `Community Report via ${userName}`,
+        state: state,
+        lga: lga
+      });
+    }
+
+    // Simulate champion verification notification (after 2-5 seconds)
+    setTimeout(() => {
+      const champions = [
+        'Champion Sarah Abubakar',
+        'Champion Emeka Okafor', 
+        'Champion Adebayo Ogundimu',
+        'Champion Fatima Hassan',
+        'Champion John Okwu'
+      ];
+      const randomChampion = champions[Math.floor(Math.random() * champions.length)];
+      
+      addNotification({
+        type: 'report_status',
+        title: 'Report Under Review',
+        message: `Your report "${formData.title}" is now under review by ${randomChampion}. You will be notified once verification is complete.`,
+        priority: 'medium',
+        source: randomChampion,
+        state: state,
+        lga: lga
+      });
+    }, Math.random() * 3000 + 2000); // 2-5 seconds delay
+
+    // Simulate verification completion (after 10-20 seconds)
+    setTimeout(() => {
+      const champions = [
+        'Champion Sarah Abubakar',
+        'Champion Emeka Okafor', 
+        'Champion Adebayo Ogundimu',
+        'Champion Fatima Hassan',
+        'Champion John Okwu'
+      ];
+      const randomChampion = champions[Math.floor(Math.random() * champions.length)];
+      
+      addNotification({
+        type: 'report_status',
+        title: 'Report Verified ✅',
+        message: `Your report "${formData.title}" has been verified by ${randomChampion}. It will now be escalated to relevant authorities for action.`,
+        priority: 'low',
+        source: randomChampion,
+        state: state,
+        lga: lga
+      });
+    }, Math.random() * 10000 + 10000); // 10-20 seconds delay
+
     console.log('Report submitted:', formData);
-    alert('Report submitted successfully!');
+    alert('Report submitted successfully! You will receive notifications about its progress.');
     onClose();
+    
     // Reset form
     setFormData({
       title: '',
