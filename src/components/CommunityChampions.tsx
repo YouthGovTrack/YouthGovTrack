@@ -1,4 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Dialog, Transition } from '@headlessui/react';
+import { 
+  CheckBadgeIcon, 
+  ClockIcon, 
+  EnvelopeIcon, 
+  PhoneIcon,
+  XMarkIcon,
+  UserPlusIcon,
+  MapPinIcon
+} from '@heroicons/react/24/outline';
+import { CheckBadgeIcon as CheckBadgeIconSolid } from '@heroicons/react/24/solid';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/Card';
+import { Badge } from './ui/Badge';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
+import { cn } from '../utils/cn';
 
 interface Champion {
   id: string;
@@ -20,9 +37,18 @@ interface Champion {
 interface CommunityChampionsProps {
   selectedState?: string;
   selectedLGA?: string;
+  onChampionSelect?: React.Dispatch<React.SetStateAction<number | null>>;
+  searchQuery?: string;
+  activeTab?: 'All' | 'Projects' | 'Community Posts';
 }
 
-const CommunityChampions: React.FC<CommunityChampionsProps> = ({ selectedState, selectedLGA }) => {
+const CommunityChampions: React.FC<CommunityChampionsProps> = ({ 
+  selectedState, 
+  selectedLGA, 
+  onChampionSelect,
+  searchQuery = '',
+  activeTab = 'All'
+}) => {
   const [champions] = useState<Champion[]>([
     {
       id: '1',
@@ -130,11 +156,26 @@ const CommunityChampions: React.FC<CommunityChampionsProps> = ({ selectedState, 
     availability: ''
   });
 
-  const filteredChampions = champions.filter(champion => {
-    if (selectedState && champion.state !== selectedState) return false;
-    if (selectedLGA && champion.lga !== selectedLGA) return false;
-    return true;
-  });
+  const filteredChampions = useMemo(() => {
+    return champions.filter(champion => {
+      // Filter by selected state/LGA
+      if (selectedState && champion.state !== selectedState) return false;
+      if (selectedLGA && champion.lga !== selectedLGA) return false;
+      
+      // Filter by search query
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        return (
+          champion.name.toLowerCase().includes(query) ||
+          champion.state.toLowerCase().includes(query) ||
+          champion.lga.toLowerCase().includes(query) ||
+          champion.bio.toLowerCase().includes(query)
+        );
+      }
+      
+      return true;
+    });
+  }, [champions, selectedState, selectedLGA, searchQuery]);
 
   const handleApplicationSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,306 +201,400 @@ const CommunityChampions: React.FC<CommunityChampionsProps> = ({ selectedState, 
   const getVerificationBadge = (verified: boolean) => {
     if (verified) {
       return (
-        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-          <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
+        <Badge variant="success" className="inline-flex items-center gap-1">
+          <CheckBadgeIconSolid className="w-3 h-3" />
           Verified
-        </span>
+        </Badge>
       );
     }
     return (
-      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+      <Badge variant="warning" className="inline-flex items-center gap-1">
+        <ClockIcon className="w-3 h-3" />
         Pending
-      </span>
+      </Badge>
     );
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.4
+      }
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Community Champions</h2>
-          <p className="text-gray-600 mt-1">
-            Local leaders verifying and tracking projects in their communities
-          </p>
-        </div>
-        <button
-          onClick={() => setShowApplicationForm(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
-        >
-          Become a Champion
-        </button>
-      </div>
-
-      {/* Champions Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredChampions.map((champion) => (
-          <div key={champion.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
-            <div className="flex items-start space-x-4">
-              <img
-                src={champion.avatar}
-                alt={champion.name}
-                className="w-16 h-16 rounded-full object-cover"
-              />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900 truncate">
-                    {champion.name}
-                  </h3>
-                  {getVerificationBadge(champion.verified)}
-                </div>
-                <p className="text-sm text-gray-600 mb-2">
-                  📍 {champion.lga}, {champion.state}
-                </p>
-                <p className="text-sm text-gray-700 mb-3 line-clamp-2">
-                  {champion.bio}
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="text-center p-2 bg-blue-50 rounded-lg">
-                <div className="text-lg font-bold text-blue-600">{champion.projectsTracked}</div>
-                <div className="text-xs text-blue-800">Projects Tracked</div>
-              </div>
-              <div className="text-center p-2 bg-green-50 rounded-lg">
-                <div className="text-lg font-bold text-green-600">{champion.reportsSubmitted}</div>
-                <div className="text-xs text-green-800">Reports Submitted</div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500">
-                Joined {new Date(champion.joinDate).toLocaleDateString()}
-              </span>
-              <div className="flex space-x-2">
-                {champion.contactInfo.email && (
-                  <a
-                    href={`mailto:${champion.contactInfo.email}`}
-                    className="text-blue-600 hover:text-blue-800"
-                    title="Send email"
-                  >
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                    </svg>
-                  </a>
-                )}
-                {champion.contactInfo.phone && (
-                  <a
-                    href={`tel:${champion.contactInfo.phone}`}
-                    className="text-green-600 hover:text-green-800"
-                    title="Call"
-                  >
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                    </svg>
-                  </a>
-                )}
-              </div>
-            </div>
+    <Card variant="elevated" className="animate-fade-in">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-2xl">Community Champions</CardTitle>
+            <p className="text-gray-600 mt-2">
+              Local leaders verifying and tracking projects in their communities
+            </p>
           </div>
-        ))}
-      </div>
-
-      {filteredChampions.length === 0 && (
-        <div className="text-center py-12">
-          <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No champions found</h3>
-          <p className="text-gray-500 mb-4">Be the first champion in your area!</p>
-          <button
+          <Button 
             onClick={() => setShowApplicationForm(true)}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
+            className="bg-primary-600 hover:bg-primary-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
+            size="lg"
           >
+            <UserPlusIcon className="w-5 h-5 mr-2" />
             Become a Champion
-          </button>
+          </Button>
         </div>
-      )}
+      </CardHeader>
+
+      <CardContent>
+        {/* Champions Grid */}
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {filteredChampions.map((champion) => (
+            <motion.div
+              key={champion.id}
+              variants={itemVariants}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="group"
+            >
+              <Card 
+                variant="default"
+                className={cn(
+                  "cursor-pointer transition-all duration-300 border-gray-200 hover:border-primary-300 hover:shadow-lg",
+                  "group-hover:shadow-xl"
+                )}
+                onClick={() => onChampionSelect && onChampionSelect(parseInt(champion.id))}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-4 mb-4">
+                    <div className="relative">
+                      <img
+                        src={champion.avatar}
+                        alt={champion.name}
+                        className="w-16 h-16 rounded-full object-cover ring-2 ring-gray-100 group-hover:ring-primary-200 transition-all duration-300"
+                      />
+                      {champion.verified && (
+                        <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1">
+                          <CheckBadgeIconSolid className="w-5 h-5 text-primary-500" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-lg font-semibold text-gray-900 truncate group-hover:text-primary-700 transition-colors">
+                          {champion.name}
+                        </h3>
+                        {getVerificationBadge(champion.verified)}
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600 mb-2">
+                        <MapPinIcon className="w-4 h-4 mr-1" />
+                        {champion.lga}, {champion.state}
+                      </div>
+                      <p className="text-sm text-gray-700 mb-3 line-clamp-2">
+                        {champion.bio}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="text-center p-3 bg-primary-50 rounded-lg border border-primary-100">
+                      <div className="text-lg font-bold text-primary-700">{champion.projectsTracked}</div>
+                      <div className="text-xs text-primary-600 font-medium">Projects Tracked</div>
+                    </div>
+                    <div className="text-center p-3 bg-green-50 rounded-lg border border-green-100">
+                      <div className="text-lg font-bold text-green-700">{champion.reportsSubmitted}</div>
+                      <div className="text-xs text-green-600 font-medium">Reports Submitted</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500 flex items-center">
+                      <ClockIcon className="w-3 h-3 mr-1" />
+                      Joined {new Date(champion.joinDate).toLocaleDateString()}
+                    </span>
+                    <div className="flex space-x-2">
+                      {champion.contactInfo.email && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          asChild
+                          className="h-8 w-8 text-primary-600 hover:text-primary-700 hover:bg-primary-50"
+                        >
+                          <a
+                            href={`mailto:${champion.contactInfo.email}`}
+                            title="Send email"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <EnvelopeIcon className="w-4 h-4" />
+                          </a>
+                        </Button>
+                      )}
+                      {champion.contactInfo.phone && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          asChild
+                          className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50"
+                        >
+                          <a
+                            href={`tel:${champion.contactInfo.phone}`}
+                            title="Call"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <PhoneIcon className="w-4 h-4" />
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Empty State */}
+        {filteredChampions.length === 0 && (
+          <motion.div 
+            className="text-center py-12"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <UserPlusIcon className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No champions found</h3>
+            <p className="text-gray-500 mb-4">
+              {searchQuery ? 'Try adjusting your search terms' : 'Be the first champion in your area!'}
+            </p>
+            <Button 
+              onClick={() => setShowApplicationForm(true)}
+              className="bg-primary-600 hover:bg-primary-700"
+            >
+              <UserPlusIcon className="w-5 h-5 mr-2" />
+              Become a Champion
+            </Button>
+          </motion.div>
+        )}
+      </CardContent>
 
       {/* Application Form Modal */}
-      {showApplicationForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-gray-900">Become a Community Champion</h3>
-                <button
-                  onClick={() => setShowApplicationForm(false)}
-                  className="text-gray-400 hover:text-gray-600 text-2xl"
-                >
-                  ×
-                </button>
-              </div>
+      <Transition appear show={showApplicationForm} as={React.Fragment}>
+        <Dialog as="div" className="relative z-50" onClose={setShowApplicationForm}>
+          <Transition.Child
+            as={React.Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
 
-              <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                <h4 className="font-medium text-blue-900 mb-2">What is a Community Champion?</h4>
-                <p className="text-sm text-blue-800">
-                  Community Champions are verified local leaders who help track and verify government projects 
-                  in their communities. They serve as the bridge between citizens and our platform, ensuring 
-                  accurate and timely project updates.
-                </p>
-              </div>
-
-              <form onSubmit={handleApplicationSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="fullName"
-                      value={applicationData.fullName}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Your full name"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={applicationData.email}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="your.email@example.com"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Phone Number *
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={applicationData.phone}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="+234 xxx xxx xxxx"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      State *
-                    </label>
-                    <select
-                      name="state"
-                      value={applicationData.state}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={React.Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Title as="h3" className="text-2xl font-bold text-gray-900 mb-6 flex items-center justify-between">
+                    Become a Community Champion
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setShowApplicationForm(false)}
+                      className="text-gray-400 hover:text-gray-600"
                     >
-                      <option value="">Select your state</option>
-                      <option value="Lagos">Lagos</option>
-                      <option value="Rivers">Rivers</option>
-                      <option value="Kano">Kano</option>
-                      <option value="Abia">Abia</option>
-                      <option value="Adamawa">Adamawa</option>
-                    </select>
+                      <XMarkIcon className="w-6 h-6" />
+                    </Button>
+                  </Dialog.Title>
+
+                  <div className="mb-6 p-4 bg-primary-50 rounded-lg border border-primary-100">
+                    <h4 className="font-medium text-primary-900 mb-2">What is a Community Champion?</h4>
+                    <p className="text-sm text-primary-800">
+                      Community Champions are verified local leaders who help track and verify government projects 
+                      in their communities. They serve as the bridge between citizens and our platform, ensuring 
+                      accurate and timely project updates.
+                    </p>
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Local Government Area *
-                  </label>
-                  <input
-                    type="text"
-                    name="lga"
-                    value={applicationData.lga}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Your LGA"
-                  />
-                </div>
+                  <form onSubmit={handleApplicationSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Full Name *
+                        </label>
+                        <Input
+                          type="text"
+                          name="fullName"
+                          value={applicationData.fullName}
+                          onChange={handleInputChange}
+                          required
+                          placeholder="Your full name"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Email Address *
+                        </label>
+                        <Input
+                          type="email"
+                          name="email"
+                          value={applicationData.email}
+                          onChange={handleInputChange}
+                          required
+                          placeholder="your.email@example.com"
+                        />
+                      </div>
+                    </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Relevant Experience *
-                  </label>
-                  <textarea
-                    name="experience"
-                    value={applicationData.experience}
-                    onChange={handleInputChange}
-                    required
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Describe your experience in community leadership, project management, or civic engagement..."
-                  />
-                </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Phone Number *
+                        </label>
+                        <Input
+                          type="tel"
+                          name="phone"
+                          value={applicationData.phone}
+                          onChange={handleInputChange}
+                          required
+                          placeholder="+234 xxx xxx xxxx"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          State *
+                        </label>
+                        <select
+                          name="state"
+                          value={applicationData.state}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                        >
+                          <option value="">Select your state</option>
+                          <option value="Lagos">Lagos</option>
+                          <option value="Rivers">Rivers</option>
+                          <option value="Kano">Kano</option>
+                          <option value="Abia">Abia</option>
+                          <option value="Adamawa">Adamawa</option>
+                        </select>
+                      </div>
+                    </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Why do you want to be a Champion? *
-                  </label>
-                  <textarea
-                    name="motivation"
-                    value={applicationData.motivation}
-                    onChange={handleInputChange}
-                    required
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Tell us your motivation for becoming a Community Champion..."
-                  />
-                </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Local Government Area *
+                      </label>
+                      <Input
+                        type="text"
+                        name="lga"
+                        value={applicationData.lga}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="Your LGA"
+                      />
+                    </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Time Availability *
-                  </label>
-                  <select
-                    name="availability"
-                    value={applicationData.availability}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">Select your availability</option>
-                    <option value="5-10 hours/week">5-10 hours per week</option>
-                    <option value="10-15 hours/week">10-15 hours per week</option>
-                    <option value="15+ hours/week">15+ hours per week</option>
-                    <option value="As needed">As needed basis</option>
-                  </select>
-                </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Relevant Experience *
+                      </label>
+                      <textarea
+                        name="experience"
+                        value={applicationData.experience}
+                        onChange={handleInputChange}
+                        required
+                        rows={3}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                        placeholder="Describe your experience in community leadership, project management, or civic engagement..."
+                      />
+                    </div>
 
-                <div className="flex justify-end space-x-4 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowApplicationForm(false)}
-                    className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
-                  >
-                    Submit Application
-                  </button>
-                </div>
-              </form>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Why do you want to be a Champion? *
+                      </label>
+                      <textarea
+                        name="motivation"
+                        value={applicationData.motivation}
+                        onChange={handleInputChange}
+                        required
+                        rows={3}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                        placeholder="Tell us your motivation for becoming a Community Champion..."
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Time Availability *
+                      </label>
+                      <select
+                        name="availability"
+                        value={applicationData.availability}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                      >
+                        <option value="">Select your availability</option>
+                        <option value="5-10 hours/week">5-10 hours per week</option>
+                        <option value="10-15 hours/week">10-15 hours per week</option>
+                        <option value="15+ hours/week">15+ hours per week</option>
+                        <option value="As needed">As needed basis</option>
+                      </select>
+                    </div>
+
+                    <div className="flex justify-end space-x-4 pt-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setShowApplicationForm(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        className="bg-primary-600 hover:bg-primary-700"
+                      >
+                        Submit Application
+                      </Button>
+                    </div>
+                  </form>
+                </Dialog.Panel>
+              </Transition.Child>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        </Dialog>
+      </Transition>
+    </Card>
   );
 };
 
