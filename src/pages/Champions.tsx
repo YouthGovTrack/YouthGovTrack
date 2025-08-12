@@ -5,6 +5,7 @@ import CommunityChampions from '../components/CommunityChampions';
 import { ChampionSidebar } from '../contexts/ChampionSidebar';
 import { Input } from '../components/ui/Input';
 import { cn } from '../utils/cn';
+import ArrowLink from '../components/icons/ArrowLink';
 
 interface ChampionsProps {
   onNavigate: (page: string, projectId?: number) => void;
@@ -108,7 +109,7 @@ const Champions: React.FC<ChampionsProps> = ({ onNavigate }) => {
             <div className="border-b border-gray-200 bg-white rounded-lg shadow-sm p-1">
               <nav className="flex space-x-1">
                 {tabOptions.map((tab) => (
-                  <button
+                  <ArrowLink
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={cn(
@@ -117,6 +118,7 @@ const Champions: React.FC<ChampionsProps> = ({ onNavigate }) => {
                         ? 'text-primary-700 bg-primary-50'
                         : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                     )}
+                    isLink={false}
                   >
                     {tab === activeTab && (
                       <motion.div
@@ -127,7 +129,7 @@ const Champions: React.FC<ChampionsProps> = ({ onNavigate }) => {
                       />
                     )}
                     <span className="relative z-10">{tab}</span>
-                  </button>
+                  </ArrowLink>
                 ))}
               </nav>
             </div>

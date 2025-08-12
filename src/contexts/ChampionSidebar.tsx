@@ -10,11 +10,11 @@ import {
   Squares2X2Icon
 } from '@heroicons/react/24/outline';
 import SubmitReportModal from '../components/SubmitReportModal';
-import ViewCivicAlertsModal from '../components/ViewCivicAlertsModal';
 import Loader from '../components/Loader';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { cn } from '../utils/cn';
+import ArrowLink from '../components/icons/ArrowLink';
 
 interface Project {
   id: string;
@@ -72,7 +72,6 @@ const sidebarItems: SidebarItem[] = [
 
 const ChampionSidebar: React.FC<ChampionSidebarProps> = ({ projectId, onNavigate }) => {
   const [isSubmitReportOpen, setIsSubmitReportOpen] = useState(false);
-  const [isViewAlertsOpen, setIsViewAlertsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [project, setProject] = useState<Project | null>(null);
@@ -135,7 +134,6 @@ const ChampionSidebar: React.FC<ChampionSidebarProps> = ({ projectId, onNavigate
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 text-gray-500 hover:text-primary-600 hover:bg-primary-50"
-                  onClick={() => setIsViewAlertsOpen(true)}
                 >
                   <BellIcon className="h-4 w-4" />
                 </Button>
@@ -148,13 +146,13 @@ const ChampionSidebar: React.FC<ChampionSidebarProps> = ({ projectId, onNavigate
                 </Button>
               </div>
             </div>
-            <Button
+            <ArrowLink
               onClick={() => setIsSubmitReportOpen(true)}
               className="mt-4 w-full bg-primary-600 hover:bg-primary-700 text-white shadow-sm"
-              size="sm"
+              isLink={false}
             >
               Submit Report
-            </Button>
+            </ArrowLink>
           </div>
         </motion.div>
 
@@ -208,13 +206,13 @@ const ChampionSidebar: React.FC<ChampionSidebarProps> = ({ projectId, onNavigate
             Projects around you
           </h3>
           <div className="space-y-2">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-left p-3 h-auto text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+            <ArrowLink
+              className="w-full justify-start text-left text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+              isLink={false}
             >
               <MapIcon className="w-4 h-4 mr-3 flex-shrink-0" />
               <span>View larger map</span>
-            </Button>
+            </ArrowLink>
           </div>
         </motion.div>
 
@@ -227,52 +225,33 @@ const ChampionSidebar: React.FC<ChampionSidebarProps> = ({ projectId, onNavigate
         >
           <div className="flex flex-wrap gap-2">
             {['Kano state', 'Lagos state', 'Ogun state'].map((state, index) => (
-              <motion.button
+              <motion.div
                 key={state}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3, delay: 0.1 * index }}
-                className={cn(
-                  "px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200",
-                  "bg-gray-100 text-gray-600 hover:bg-primary-100 hover:text-primary-700",
-                  "border border-gray-200 hover:border-primary-300"
-                )}
               >
-                {state}
-              </motion.button>
+                <ArrowLink
+                  className={cn(
+                    "px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200",
+                    "bg-gray-100 text-gray-600 hover:bg-primary-100 hover:text-primary-700",
+                    "border border-gray-200 hover:border-primary-300"
+                  )}
+                  isLink={false}
+                >
+                  {state}
+                </ArrowLink>
+              </motion.div>
             ))}
           </div>
         </motion.div>
       </div>
     
       {/* Modals */}
-      {(isSubmitReportOpen || isViewAlertsOpen) && (
-        <div className="fixed inset-0 z-[100]">
-          <div 
-            className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-            onClick={() => {
-              setIsSubmitReportOpen(false);
-              setIsViewAlertsOpen(false);
-            }}
-          />
-          <div className="fixed inset-0 z-10">
-            <div className="flex min-h-full items-center justify-center p-4">
-              {isSubmitReportOpen && (
-                <SubmitReportModal
-                  isOpen={isSubmitReportOpen}
-                  onClose={() => setIsSubmitReportOpen(false)}
-                />
-              )}
-              {isViewAlertsOpen && (
-                <ViewCivicAlertsModal
-                  isOpen={isViewAlertsOpen}
-                  onClose={() => setIsViewAlertsOpen(false)}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <SubmitReportModal
+        isOpen={isSubmitReportOpen}
+        onClose={() => setIsSubmitReportOpen(false)}
+      />
     </div>
   );
 };

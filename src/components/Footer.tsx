@@ -3,6 +3,7 @@ import Instagram from './icons/Instagram';
 import Facebook from './icons/Facebook';
 import Twitter from './icons/Twitter';
 import LinkedIn from './icons/LinkedIn';
+import ArrowLink from './icons/ArrowLink';
 
 const Footer: React.FC = () => {
   return (
@@ -39,9 +40,12 @@ const Footer: React.FC = () => {
                 placeholder="Enter email" 
                 className="flex-1 p-2 rounded-l-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" 
               />
-              <button className="bg-blue-600 px-4 py-2 rounded-r-lg hover:bg-blue-700 transition-colors">
+              <ArrowLink 
+                className="bg-blue-600 hover:bg-blue-700 transition-colors rounded-r-lg px-4"
+                isLink={false}
+              >
                 Subscribe
-              </button>
+              </ArrowLink>
             </div>
             
             {/* Social Media Links */}

@@ -4,6 +4,7 @@ import LiveCivicAlerts from '../components/LiveCivicAlerts';
 import Sponsors from '../components/Sponsors';
 import CitizenTestimonials from '../components/CitizenTestimonials';
 import AuthModal from '../components/AuthModal';
+import ArrowLink from '../components/icons/ArrowLink';
 import { useProjects } from '../contexts/ProjectContext';
 
 interface HomeProps {
@@ -64,9 +65,10 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               <p className="text-xl text-white mb-8 leading-relaxed opacity-90">
                 Empowering citizens to monitor development projects, report issues, and access civic education materials for a more transparent governance.
               </p>
-              <button 
-                className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition flex items-center"
+              <ArrowLink 
+                className="bg-green-500 text-white hover:bg-green-600 transition shadow-lg"
                 onClick={() => setShowAuthModal(true)}
+                isLink={false}
               >
                 <img 
                   src="/pin.svg" 
@@ -77,7 +79,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                   style={{ filter: 'invert(1) brightness(2)' }}
                 />
                 Track My LGA
-              </button>
+              </ArrowLink>
               
               {showAuthModal && (
                 <AuthModal
@@ -95,12 +97,13 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                   onStateChange={handleStateChange}
                   onLgaChange={handleLgaChange}
                 />
-                <button 
-                  className="w-full bg-yellow-400 text-gray-900 py-3 rounded-lg font-semibold hover:bg-yellow-500 transition"
+                <ArrowLink 
+                  className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition font-semibold"
                   onClick={handleContinue}
+                  isLink={false}
                 >
                   Continue
-                </button>
+                </ArrowLink>
               </div>
             </div>
           </div>
@@ -216,12 +219,13 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           </div>
           
           <div className="text-center mt-8">
-            <button 
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+            <ArrowLink 
+              className="bg-blue-600 text-white hover:bg-blue-700 transition shadow-lg"
               onClick={() => onNavigate('browse-projects')}
+              isLink={false}
             >
               View All Projects
-            </button>
+            </ArrowLink>
           </div>
         </div>
       </section>

@@ -87,7 +87,7 @@ const App: React.FC = () => {
       case 'reports':
         return <Reports />;
       case 'champions':
-        return <Champions />;
+        return <Champions onNavigate={navigateTo} />;
       case 'register':
         return <Register onNavigate={navigateTo} />;
       case 'project-details':

@@ -161,12 +161,13 @@ const BrowseProjects: React.FC<BrowseProjectsProps> = ({ onNavigate }) => {
               )}
             </div>
             <div className="flex items-center gap-4">
-              <button
+              <ArrowLink
                 onClick={() => setShowSubmitModal(true)}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium"
+                className="bg-green-600 text-white hover:bg-green-700 transition-colors duration-200 font-medium"
+                isLink={false}
               >
                 + Submit Project
-              </button>
+              </ArrowLink>
               <div className="relative">
                 <input
                   type="text"

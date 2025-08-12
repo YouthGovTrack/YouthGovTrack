@@ -1,4 +1,5 @@
 import React from 'react';
+import ArrowLink from './icons/ArrowLink';
 
 interface Alert {
   id: string;
@@ -115,9 +116,12 @@ const LiveCivicAlerts: React.FC = () => {
         </div>
 
         <div className="text-center mt-8">
-          <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+          <ArrowLink 
+            className="bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+            isLink={false}
+          >
             View All Alerts
-          </button>
+          </ArrowLink>
         </div>
       </div>
     </section>

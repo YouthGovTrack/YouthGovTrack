@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { nigeriaStates } from '../data/nigeriaData';
+import ArrowLink from '../components/icons/ArrowLink';
 
 interface RegisterProps {
   onNavigate: (page: 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions') => void;
@@ -136,20 +137,22 @@ const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <button 
+            <ArrowLink 
               onClick={() => onNavigate('home')}
               className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
+              isLink={false}
             >
               LocalGovTrack
-            </button>
+            </ArrowLink>
             <div className="text-sm text-gray-600">
               Already have an account?{' '}
-              <button 
+              <ArrowLink 
                 onClick={() => onNavigate('home')} // Will trigger login modal from navbar
                 className="text-blue-600 hover:text-blue-700 font-medium"
+                isLink={false}
               >
                 Sign in
-              </button>
+              </ArrowLink>
             </div>
           </div>
         </div>
@@ -341,10 +344,11 @@ const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
                 </div>
                 {errors.agreeToTerms && <p className="text-red-500 text-sm">{errors.agreeToTerms}</p>}
 
-                <button
+                <ArrowLink
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  isLink={false}
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center">
@@ -357,7 +361,7 @@ const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
                   ) : (
                     'Sign Up'
                   )}
-                </button>
+                </ArrowLink>
               </form>
             </div>
 

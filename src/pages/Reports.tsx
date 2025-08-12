@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ReportsDashboard from '../components/ReportsDashboard';
 import CitizenReportsModal from '../components/CitizenReportsModal';
+import ArrowLink from '../components/icons/ArrowLink';
 
 const Reports: React.FC = () => {
   const [showReportModal, setShowReportModal] = useState(false);
@@ -17,15 +18,16 @@ const Reports: React.FC = () => {
                 Track community-submitted reports and project updates from across Nigeria
               </p>
             </div>
-            <button
+            <ArrowLink
               onClick={() => setShowReportModal(true)}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium flex items-center gap-2"
+              className="bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 font-medium"
+              isLink={false}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               Submit Report
-            </button>
+            </ArrowLink>
           </div>
         </div>
       </div>
