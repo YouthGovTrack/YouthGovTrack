@@ -6,6 +6,7 @@ import CitizenTestimonials from '../components/CitizenTestimonials';
 import AuthModal from '../components/AuthModal';
 import CommunityAlertForm from '../components/CommunityAlertForm';
 import ArrowLink from '../components/icons/ArrowLink';
+import LazyImage from '../components/LazyImage';
 import { useProjects } from '../contexts/ProjectContext';
 
 interface HomeProps {
@@ -80,7 +81,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 onClick={() => setShowAuthModal(true)}
                 isLink={false}
               >
-                <img 
+                <LazyImage 
                   src="/pin.svg" 
                   alt="pin icon" 
                   width={20} 
@@ -126,7 +127,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-xl shadow-sm text-center">
               <div className="flex justify-center mb-2">
-                <img 
+                <LazyImage 
                   src="/map.svg" 
                   alt="Map icon" 
                   width={48} 
@@ -139,7 +140,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             </div>
             <div className="bg-white p-8 rounded-xl shadow-sm text-center">
               <div className="flex justify-center mb-2">
-                <img 
+                <LazyImage 
                   src="/report.svg" 
                   alt="Report icon" 
                   width={48} 
@@ -152,7 +153,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             </div>
             <div className="bg-white p-8 rounded-xl shadow-sm text-center">
               <div className="flex justify-center mb-2">
-                <img 
+                <LazyImage 
                   src="/citizen.svg" 
                   alt="User icon" 
                   width={48} 

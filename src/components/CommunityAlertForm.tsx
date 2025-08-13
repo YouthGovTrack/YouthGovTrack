@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNotifications } from '../contexts/NotificationContext';
 import { nigeriaStates } from '../data/nigeriaData';
-import { Plus, Send, AlertTriangle, MapPin } from 'react-feather';
+import OptimizedIcon from './OptimizedIcon';
 import AuthModal from './AuthModal';
 
 interface CommunityAlertFormProps {
@@ -159,7 +159,7 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
         <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white p-6 flex-shrink-0">
           <div className="flex items-center space-x-3 mb-3">
             <div className="p-2 bg-white/20 rounded-xl">
-              <Plus size={24} />
+              <OptimizedIcon name="plus" size={24} />
             </div>
             <h2 className="text-2xl font-bold">Submit Community Alert</h2>
           </div>
@@ -169,7 +169,7 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
           {!localStorage.getItem('currentUser') && (
             <div className="mt-4 p-3 bg-yellow-500/20 border border-yellow-300/30 rounded-lg">
               <p className="text-yellow-100 text-sm flex items-center">
-                <AlertTriangle size={16} className="mr-2" />
+                <OptimizedIcon name="alertTriangle" size={16} className="mr-2" />
                 You must be logged in to submit community alerts
               </p>
             </div>
@@ -299,7 +299,7 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
               type="submit"
               className="px-6 py-3 rounded-lg transition-all duration-200 font-medium inline-flex items-center space-x-2 bg-gradient-to-r from-green-600 to-blue-600 text-white hover:from-green-700 hover:to-blue-700"
             >
-              <Send size={18} />
+              <OptimizedIcon name="send" size={18} />
               <span>Submit Alert</span>
             </button>
           </div>

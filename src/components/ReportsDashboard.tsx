@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import LazyImage from './LazyImage';
 
 interface CitizenReport {
   id: string;
@@ -34,104 +35,129 @@ const ReportsDashboard: React.FC = () => {
 
   // Sample data - in real app, this would come from API
   useEffect(() => {
-    const sampleReports: CitizenReport[] = [
-      {
-        id: '1',
-        projectId: '1',
-        projectTitle: 'Community Health Center Renovation',
-        reporterName: 'Anonymous',
-        reporterEmail: 'reporter1@email.com',
-        reportType: 'progress_update',
-        description: 'The health center renovation is progressing well. New windows have been installed and the roof repairs are almost complete. Expected completion in 2 weeks.',
-        images: [],
-        location: {
-          state: 'Lagos',
-          lga: 'Ikeja',
-          address: 'Behind Local Government Secretariat'
+    const loadReports = () => {
+      // Load from localStorage first
+      const storedReports: CitizenReport[] = JSON.parse(localStorage.getItem('citizenReports') || '[]');
+      
+      const sampleReports: CitizenReport[] = [
+        {
+          id: '1',
+          projectId: '1',
+          projectTitle: 'Community Health Center Renovation',
+          reporterName: 'Anonymous',
+          reporterEmail: 'reporter1@email.com',
+          reportType: 'progress_update',
+          description: 'The health center renovation is progressing well. New windows have been installed and the roof repairs are almost complete. Expected completion in 2 weeks.',
+          images: [],
+          location: {
+            state: 'Lagos',
+            lga: 'Ikeja',
+            address: 'Behind Local Government Secretariat'
+          },
+          status: 'verified',
+          submitDate: '2025-08-05T10:30:00Z',
+          verifiedBy: 'Adebayo Olamide',
+          championNotes: 'Confirmed during site visit. Progress matches reported status.'
         },
-        status: 'verified',
-        submitDate: '2025-08-05T10:30:00Z',
-        verifiedBy: 'Adebayo Olamide',
-        championNotes: 'Confirmed during site visit. Progress matches reported status.'
-      },
-      {
-        id: '2',
-        projectId: '2',
-        projectTitle: 'Alimosho Road Expansion Project',
-        reporterName: 'Mrs. Sarah Johnson',
-        reporterEmail: 'sarah.j@email.com',
-        reportType: 'issue',
-        description: 'The road construction equipment has been sitting idle for the past 3 weeks. Workers mentioned they are waiting for materials but no official update has been provided.',
-        images: [],
-        location: {
-          state: 'Lagos',
-          lga: 'Alimosho',
-          address: 'Akowonjo Junction area'
+        {
+          id: '2',
+          projectId: '2',
+          projectTitle: 'Alimosho Road Expansion Project',
+          reporterName: 'Mrs. Sarah Johnson',
+          reporterEmail: 'sarah.j@email.com',
+          reportType: 'issue',
+          description: 'The road construction equipment has been sitting idle for the past 3 weeks. Workers mentioned they are waiting for materials but no official update has been provided.',
+          images: [],
+          location: {
+            state: 'Lagos',
+            lga: 'Alimosho',
+            address: 'Akowonjo Junction area'
+          },
+          status: 'investigating',
+          submitDate: '2025-08-03T14:15:00Z',
+          verifiedBy: 'David Okafor',
+          championNotes: 'Investigating with contractor. Material delivery delayed due to supply chain issues.'
         },
-        status: 'investigating',
-        submitDate: '2025-08-03T14:15:00Z',
-        verifiedBy: 'David Okafor',
-        championNotes: 'Investigating with contractor. Material delivery delayed due to supply chain issues.'
-      },
-      {
-        id: '3',
-        projectId: '4',
-        projectTitle: 'Borehole Water Project',
-        reporterName: 'Ibrahim Musa',
-        reporterEmail: 'ibrahim.m@email.com',
-        reportType: 'completion',
-        description: 'The borehole project has been completed and is now providing clean water to our community. The installation was done professionally and the water quality is excellent.',
-        images: [],
-        location: {
-          state: 'Kano',
-          lga: 'Dala',
-          address: 'Central Market Area'
+        {
+          id: '3',
+          projectId: '4',
+          projectTitle: 'Borehole Water Project',
+          reporterName: 'Ibrahim Musa',
+          reporterEmail: 'ibrahim.m@email.com',
+          reportType: 'completion',
+          description: 'The borehole project has been completed and is now providing clean water to our community. The installation was done professionally and the water quality is excellent.',
+          images: [],
+          location: {
+            state: 'Kano',
+            lga: 'Dala',
+            address: 'Central Market Area'
+          },
+          status: 'verified',
+          submitDate: '2025-08-01T09:20:00Z',
+          verifiedBy: 'Fatima Ibrahim',
+          championNotes: 'Project completion confirmed. Water quality tested and approved.'
         },
-        status: 'verified',
-        submitDate: '2025-08-01T09:20:00Z',
-        verifiedBy: 'Fatima Ibrahim',
-        championNotes: 'Project completion confirmed. Water quality tested and approved.'
-      },
-      {
-        id: '4',
-        projectId: '10',
-        projectTitle: 'Secondary School Science Laboratory',
-        reporterName: 'Anonymous',
-        reporterEmail: 'concerned.parent@email.com',
-        reportType: 'abandonment',
-        description: 'The science laboratory construction at Government Secondary School has been abandoned for over 6 months. The building is half-completed and materials are being stolen.',
-        images: [],
-        location: {
-          state: 'Abia',
-          lga: 'Umuahia North',
-          address: 'Government Secondary School, Umuahia'
+        {
+          id: '4',
+          projectId: '10',
+          projectTitle: 'Secondary School Science Laboratory',
+          reporterName: 'Anonymous',
+          reporterEmail: 'concerned.parent@email.com',
+          reportType: 'abandonment',
+          description: 'The science laboratory construction at Government Secondary School has been abandoned for over 6 months. The building is half-completed and materials are being stolen.',
+          images: [],
+          location: {
+            state: 'Abia',
+            lga: 'Umuahia North',
+            address: 'Government Secondary School, Umuahia'
+          },
+          status: 'pending',
+          submitDate: '2025-07-28T16:45:00Z'
         },
-        status: 'pending',
-        submitDate: '2025-07-28T16:45:00Z'
-      },
-      {
-        id: '5',
-        projectId: '3',
-        projectTitle: 'Primary School Classroom Block',
-        reporterName: 'Teacher Mary Okoro',
-        reporterEmail: 'mary.okoro@email.com',
-        reportType: 'quality_concern',
-        description: 'The newly completed classroom block has poor ventilation and the windows don\'t close properly. During rain, water enters the classrooms making them unusable.',
-        images: [],
-        location: {
-          state: 'Rivers',
-          lga: 'Obio/Akpor',
-          address: 'St. Patrick\'s Primary School'
-        },
-        status: 'investigating',
-        submitDate: '2025-07-25T11:30:00Z',
-        verifiedBy: 'Chuka Okonkwo',
-        championNotes: 'Scheduled site inspection for next week to assess quality issues.'
+        {
+          id: '5',
+          projectId: '3',
+          projectTitle: 'Primary School Classroom Block',
+          reporterName: 'Teacher Mary Okoro',
+          reporterEmail: 'mary.okoro@email.com',
+          reportType: 'quality_concern',
+          description: 'The newly completed classroom block has poor ventilation and the windows don\'t close properly. During rain, water enters the classrooms making them unusable.',
+          images: [],
+          location: {
+            state: 'Rivers',
+            lga: 'Obio/Akpor',
+            address: 'St. Patrick\'s Primary School'
+          },
+          status: 'investigating',
+          submitDate: '2025-07-25T11:30:00Z',
+          verifiedBy: 'Chuka Okonkwo',
+          championNotes: 'Scheduled site inspection for next week to assess quality issues.'
+        }
+      ];
+      
+      // Combine stored reports (newer ones first) with sample reports
+      const allReports = [...storedReports, ...sampleReports.filter((sample: CitizenReport) => 
+        !storedReports.some((stored: CitizenReport) => stored.id === sample.id)
+      )];
+      
+      setReports(allReports);
+      setFilteredReports(allReports);
+    };
+
+    loadReports();
+
+    // Listen for storage changes for real-time updates
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'citizenReports') {
+        loadReports();
       }
-    ];
+    };
+
+    window.addEventListener('storage', handleStorageChange);
     
-    setReports(sampleReports);
-    setFilteredReports(sampleReports);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -355,6 +381,25 @@ const ReportsDashboard: React.FC = () => {
                   
                   <p className="text-gray-700 text-sm line-clamp-2">{report.description}</p>
                   
+                  {/* Display images if any */}
+                  {report.images && report.images.length > 0 && (
+                    <div className="mt-2 flex space-x-2">
+                      {report.images.slice(0, 3).map((image, imgIndex) => (
+                        <LazyImage
+                          key={imgIndex}
+                          src={image}
+                          alt={`Report image ${imgIndex + 1}`}
+                          className="w-12 h-12 object-cover rounded border border-gray-200"
+                        />
+                      ))}
+                      {report.images.length > 3 && (
+                        <div className="w-12 h-12 bg-gray-100 rounded border border-gray-200 flex items-center justify-center text-xs text-gray-600">
+                          +{report.images.length - 3}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
                   {report.championNotes && (
                     <div className="mt-3 p-2 bg-blue-50 rounded-lg">
                       <div className="text-xs text-blue-800 font-medium">Champion Notes:</div>
@@ -444,6 +489,24 @@ const ReportsDashboard: React.FC = () => {
                   <h4 className="font-medium text-gray-900">Description</h4>
                   <p className="text-gray-700 whitespace-pre-wrap">{selectedReport.description}</p>
                 </div>
+
+                {/* Display images if any */}
+                {selectedReport.images && selectedReport.images.length > 0 && (
+                  <div>
+                    <h4 className="font-medium text-gray-900">Supporting Images</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+                      {selectedReport.images.map((image, index) => (
+                        <LazyImage
+                          key={index}
+                          src={image}
+                          alt={`Report image ${index + 1}`}
+                          className="w-full h-32 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-80"
+                          onClick={() => window.open(image, '_blank')}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {selectedReport.championNotes && (
                   <div>

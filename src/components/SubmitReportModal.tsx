@@ -14,7 +14,7 @@ const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }
     location: '',
     description: '',
     priority: 'medium',
-    images: null as FileList | null
+    images: [] as File[]
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -28,8 +28,39 @@ const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }
 
     // Extract state and LGA from location
     const locationParts = formData.location.split(',').map(part => part.trim());
-    const state = locationParts.length >= 2 ? locationParts[locationParts.length - 1] : 'Unknown State';
-    const lga = locationParts.length >= 2 ? locationParts[locationParts.length - 2] : 'Unknown LGA';
+    const state = locationParts.length >= 2 ? locationParts[locationParts.length - 1] : currentUser.state || 'Unknown State';
+    const lga = locationParts.length >= 2 ? locationParts[locationParts.length - 2] : currentUser.lga || 'Unknown LGA';
+
+    // Create new report object for instant display
+    const newReport = {
+      id: Date.now().toString(),
+      projectId: '',
+      projectTitle: formData.title,
+      reporterName: userName,
+      reporterEmail: currentUser.email || 'unknown@email.com',
+      reportType: 'issue' as const,
+      description: formData.description,
+      images: formData.images.map(file => URL.createObjectURL(file)),
+      location: {
+        state: state,
+        lga: lga,
+        address: formData.location
+      },
+      status: 'verified' as const, // Instant verification
+      submitDate: new Date().toISOString(),
+      verifiedBy: 'Auto-verified',
+      championNotes: `Report submitted via quick submit form. Category: ${formData.category}, Priority: ${formData.priority}`
+    };
+
+    // Save to localStorage for instant display on reports page
+    const existingReports = JSON.parse(localStorage.getItem('citizenReports') || '[]');
+    localStorage.setItem('citizenReports', JSON.stringify([newReport, ...existingReports]));
+
+    // Trigger storage event for real-time updates
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: 'citizenReports',
+      newValue: JSON.stringify([newReport, ...existingReports])
+    }));
 
     // Create notification for the report submission (personal notification)
     addNotification({
@@ -72,82 +103,8 @@ const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }
       });
     }
 
-    // Simulate champion verification notification (after 2-5 seconds)
-    setTimeout(() => {
-      const champions = [
-        'Champion Sarah Abubakar',
-        'Champion Emeka Okafor', 
-        'Champion Adebayo Ogundimu',
-        'Champion Fatima Hassan',
-        'Champion John Okwu'
-      ];
-      const randomChampion = champions[Math.floor(Math.random() * champions.length)];
-      
-      // Personal status update
-      addNotification({
-        type: 'report_status',
-        title: 'Report Under Review',
-        message: `Your report "${formData.title}" is now under review by ${randomChampion}. You will be notified once verification is complete.`,
-        priority: 'medium',
-        source: randomChampion,
-        state: state,
-        lga: lga
-      });
-
-      // Community champion activity notification
-      addGlobalNotification({
-        type: 'champion_activity',
-        title: `Champion Activity: ${randomChampion}`,
-        message: `${randomChampion} is now reviewing a ${formData.category.toLowerCase()} report in ${formData.location}. Community verification in progress.`,
-        priority: 'low',
-        source: randomChampion,
-        state: state,
-        lga: lga,
-        isGlobal: true,
-        targetAudience: 'lga',
-        category: formData.category
-      });
-    }, Math.random() * 3000 + 2000); // 2-5 seconds delay
-
-    // Simulate verification completion (after 10-20 seconds)
-    setTimeout(() => {
-      const champions = [
-        'Champion Sarah Abubakar',
-        'Champion Emeka Okafor', 
-        'Champion Adebayo Ogundimu',
-        'Champion Fatima Hassan',
-        'Champion John Okwu'
-      ];
-      const randomChampion = champions[Math.floor(Math.random() * champions.length)];
-      
-      // Personal verification notification
-      addNotification({
-        type: 'report_status',
-        title: 'Report Verified ✅',
-        message: `Your report "${formData.title}" has been verified by ${randomChampion}. It will now be escalated to relevant authorities for action.`,
-        priority: 'low',
-        source: randomChampion,
-        state: state,
-        lga: lga
-      });
-
-      // Community update about verified report
-      addGlobalNotification({
-        type: 'champion_activity',
-        title: `Report Verified: ${formData.title}`,
-        message: `${randomChampion} has verified a ${formData.category.toLowerCase()} report in ${formData.location}. The issue has been escalated to authorities for resolution.`,
-        priority: 'medium',
-        source: randomChampion,
-        state: state,
-        lga: lga,
-        isGlobal: true,
-        targetAudience: 'lga',
-        category: formData.category
-      });
-    }, Math.random() * 10000 + 10000); // 10-20 seconds delay
-
     console.log('Report submitted:', formData);
-    alert('Report submitted successfully! You will receive notifications about its progress.');
+    alert('Report submitted successfully and is now visible on the reports page!');
     onClose();
     
     // Reset form
@@ -157,7 +114,7 @@ const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }
       location: '',
       description: '',
       priority: 'medium',
-      images: null
+      images: []
     });
   };
 
@@ -170,9 +127,19 @@ const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newImages = Array.from(e.target.files).slice(0, 5); // Limit to 5 images
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, ...newImages].slice(0, 5)
+      }));
+    }
+  };
+
+  const removeImage = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      images: e.target.files
+      images: prev.images.filter((_, i) => i !== index)
     }));
   };
 
@@ -293,8 +260,30 @@ const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <p className="text-sm text-gray-500 mt-1">
-                You can upload multiple images to support your report
+                You can upload up to 5 images to support your report
               </p>
+              
+              {/* Image Previews */}
+              {formData.images.length > 0 && (
+                <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {formData.images.map((file, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`Upload ${index + 1}`}
+                        className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3 pt-4">

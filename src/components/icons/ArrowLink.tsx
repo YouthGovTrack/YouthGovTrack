@@ -1,6 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight } from 'react-feather';
+import OptimizedIcon from '../OptimizedIcon';
 
 interface ArrowLinkProps {
   children: React.ReactNode;
@@ -44,19 +43,7 @@ const ArrowLink: React.FC<ArrowLinkProps> = ({
         className={`transition-all duration-300 ml-2 transform group-hover:translate-x-1
           ${iconClass || 'text-current'}`}
       >
-        <ArrowRight className="w-5 h-5 group-hover:hidden" />
-        <svg
-          className="w-5 h-5 hidden group-hover:block"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
+        <OptimizedIcon name="arrowRight" className="w-5 h-5" />
       </span>
     </span>
   );
@@ -64,17 +51,6 @@ const ArrowLink: React.FC<ArrowLinkProps> = ({
   const hoverEffect = (
     <div className="absolute inset-0 rounded-lg bg-white/10 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
   );
-
-  if (isLink && to) {
-    return (
-      <Link to={to} className="no-underline">
-        <span className={baseClasses}>
-          {content()}
-          {hoverEffect}
-        </span>
-      </Link>
-    );
-  }
 
   if (isLink && href) {
     return (

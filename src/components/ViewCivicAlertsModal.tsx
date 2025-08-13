@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, X, AlertTriangle, Tool, Speaker, AlertCircle, MapPin, Clock, Filter, ExternalLink, Activity } from 'react-feather';
+import OptimizedIcon from './OptimizedIcon';
 import { useNotifications } from '../contexts/NotificationContext';
 
 interface ViewCivicAlertsModalProps {
@@ -108,18 +108,19 @@ const ViewCivicAlertsModal: React.FC<ViewCivicAlertsModalProps> = ({ isOpen, onC
   });
 
   const getTypeIcon = (type: string) => {
-    const iconProps = { size: 20, className: "flex-shrink-0" };
+    const iconSize = 20;
+    const iconClass = "flex-shrink-0";
     switch (type) {
       case 'emergency':
-        return <AlertTriangle {...iconProps} className="text-red-600" />;
+        return <OptimizedIcon name="alertTriangle" size={iconSize} className={`${iconClass} text-red-600`} />;
       case 'maintenance':
-        return <Tool {...iconProps} className="text-blue-600" />;
+        return <OptimizedIcon name="tool" size={iconSize} className={`${iconClass} text-blue-600`} />;
       case 'announcement':
-        return <Speaker {...iconProps} className="text-green-600" />;
+        return <OptimizedIcon name="speaker" size={iconSize} className={`${iconClass} text-green-600`} />;
       case 'warning':
-        return <AlertCircle {...iconProps} className="text-yellow-600" />;
+        return <OptimizedIcon name="alertCircle" size={iconSize} className={`${iconClass} text-yellow-600`} />;
       default:
-        return <Activity {...iconProps} className="text-gray-600" />;
+        return <OptimizedIcon name="activity" size={iconSize} className={`${iconClass} text-gray-600`} />;
     }
   };
 
@@ -174,7 +175,7 @@ const ViewCivicAlertsModal: React.FC<ViewCivicAlertsModalProps> = ({ isOpen, onC
           <div className="flex justify-between items-start mb-4">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm relative">
-                <Bell size={24} className="text-white" />
+                <OptimizedIcon name="bell" size={24} className="text-white" />
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-[16px] h-4 rounded-full flex items-center justify-center font-bold">
                     {unreadCount > 99 ? '99+' : unreadCount}
@@ -202,7 +203,7 @@ const ViewCivicAlertsModal: React.FC<ViewCivicAlertsModalProps> = ({ isOpen, onC
                 className="text-white/80 hover:text-white hover:bg-white/20 p-2 rounded-lg transition-all duration-200"
                 aria-label="Close modal"
               >
-                <X size={20} />
+                <OptimizedIcon name="x" size={20} />
               </button>
             </div>
           </div>
@@ -216,7 +217,7 @@ const ViewCivicAlertsModal: React.FC<ViewCivicAlertsModalProps> = ({ isOpen, onC
           {/* Filters */}
           <div className="bg-gray-50 rounded-xl p-4 mb-6">
             <div className="flex items-center space-x-2 mb-3">
-              <Filter size={16} className="text-gray-600" />
+              <OptimizedIcon name="filter" size={16} className="text-gray-600" />
               <h3 className="text-sm font-medium text-gray-900">Filter Alerts</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -261,28 +262,28 @@ const ViewCivicAlertsModal: React.FC<ViewCivicAlertsModalProps> = ({ isOpen, onC
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
               <div className="flex items-center justify-center mb-2">
-                <AlertTriangle size={20} className="text-red-600" />
+                <OptimizedIcon name="alertTriangle" size={20} className="text-red-600" />
               </div>
               <p className="text-2xl font-bold text-red-600">{alerts.filter(a => a.type === 'emergency' && a.isActive).length}</p>
               <p className="text-sm text-red-700">Emergency</p>
             </div>
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
               <div className="flex items-center justify-center mb-2">
-                <Tool size={20} className="text-blue-600" />
+                <OptimizedIcon name="tool" size={20} className="text-blue-600" />
               </div>
               <p className="text-2xl font-bold text-blue-600">{alerts.filter(a => a.type === 'maintenance' && a.isActive).length}</p>
               <p className="text-sm text-blue-700">Maintenance</p>
             </div>
             <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
               <div className="flex items-center justify-center mb-2">
-                <Speaker size={20} className="text-green-600" />
+                <OptimizedIcon name="speaker" size={20} className="text-green-600" />
               </div>
               <p className="text-2xl font-bold text-green-600">{alerts.filter(a => a.type === 'announcement' && a.isActive).length}</p>
               <p className="text-sm text-green-700">Announcements</p>
             </div>
             <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-center">
               <div className="flex items-center justify-center mb-2">
-                <AlertCircle size={20} className="text-yellow-600" />
+                <OptimizedIcon name="alertCircle" size={20} className="text-yellow-600" />
               </div>
               <p className="text-2xl font-bold text-yellow-600">{alerts.filter(a => a.type === 'warning' && a.isActive).length}</p>
               <p className="text-sm text-yellow-700">Warnings</p>
@@ -318,11 +319,11 @@ const ViewCivicAlertsModal: React.FC<ViewCivicAlertsModalProps> = ({ isOpen, onC
                       </div>
                       <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
                         <div className="flex items-center space-x-1">
-                          <MapPin size={14} />
+                          <OptimizedIcon name="mapPin" size={14} />
                           <span>{alert.location}, {alert.lga}, {alert.state}</span>
                         </div>
                         <div className="flex items-center space-x-1">
-                          <Clock size={14} />
+                          <OptimizedIcon name="clock" size={14} />
                           <span>{alert.timestamp}</span>
                         </div>
                       </div>
@@ -348,14 +349,14 @@ const ViewCivicAlertsModal: React.FC<ViewCivicAlertsModalProps> = ({ isOpen, onC
                       className="inline-flex items-center space-x-1 text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <ExternalLink size={14} />
+                      <OptimizedIcon name="externalLink" size={14} />
                       <span>Share</span>
                     </button>
                     <button 
                       className="inline-flex items-center space-x-1 text-green-600 hover:text-green-800 text-sm font-medium transition-colors"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <Bell size={14} />
+                      <OptimizedIcon name="bell" size={14} />
                       <span>Follow</span>
                     </button>
                   </div>
@@ -367,7 +368,7 @@ const ViewCivicAlertsModal: React.FC<ViewCivicAlertsModalProps> = ({ isOpen, onC
           {filteredAlerts.length === 0 && (
             <div className="text-center py-12">
               <div className="mb-4">
-                <Bell size={48} className="text-gray-300 mx-auto" />
+                <OptimizedIcon name="bell" size={48} className="text-gray-300 mx-auto" />
               </div>
               <p className="text-gray-500 text-lg">No alerts found matching your criteria.</p>
               <p className="text-gray-400 text-sm mt-2">Try adjusting your filters or check back later.</p>

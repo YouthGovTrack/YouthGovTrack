@@ -104,7 +104,7 @@ const CitizenReportsModal: React.FC<CitizenReportsModalProps> = ({
 
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Get current user info for location
       const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
@@ -121,6 +121,36 @@ const CitizenReportsModal: React.FC<CitizenReportsModalProps> = ({
       };
       
       const priority = priorityMap[reportData.reportType] || 'medium';
+
+      const newReport: CitizenReport = {
+        id: Date.now().toString(),
+        projectId: projectId || '',
+        projectTitle: projectTitle || 'Community Issue',
+        reporterName: reportData.anonymous ? 'Anonymous' : reportData.reporterName,
+        reporterEmail: reportData.reporterEmail,
+        reportType: reportData.reportType as CitizenReport['reportType'],
+        description: reportData.description,
+        images: reportData.images.map(file => URL.createObjectURL(file)),
+        location: {
+          state: userState,
+          lga: userLGA,
+          address: reportData.address
+        },
+        status: 'verified', // Instant verification - no delays
+        submitDate: new Date().toISOString(),
+        verifiedBy: 'Auto-verified',
+        championNotes: `Report submitted via citizen portal. Priority: ${priority}`
+      };
+
+      // Store report for instant display
+      const existingReports = JSON.parse(localStorage.getItem('citizenReports') || '[]');
+      localStorage.setItem('citizenReports', JSON.stringify([newReport, ...existingReports]));
+
+      // Trigger storage event for real-time updates
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'citizenReports',
+        newValue: JSON.stringify([newReport, ...existingReports])
+      }));
       
       // Create main notification for the report submission
       addNotification({
@@ -170,75 +200,7 @@ const CitizenReportsModal: React.FC<CitizenReportsModalProps> = ({
         });
       }
 
-      // Simulate champion assignment and review process
-      setTimeout(() => {
-        const champions = [
-          'Champion Sarah Abubakar',
-          'Champion Emeka Okafor', 
-          'Champion Adebayo Ogundimu',
-          'Champion Fatima Hassan',
-          'Champion John Okwu'
-        ];
-        const randomChampion = champions[Math.floor(Math.random() * champions.length)];
-        
-        addNotification({
-          type: 'report_status',
-          title: 'Report Assigned for Review',
-          message: `Your report about "${projectTitle || 'Community Issue'}" has been assigned to ${randomChampion} for verification and follow-up action.`,
-          priority: 'medium',
-          source: randomChampion,
-          state: userState,
-          lga: userLGA,
-          relatedId: projectId
-        });
-      }, Math.random() * 3000 + 2000); // 2-5 seconds delay
-
-      // Simulate verification completion
-      setTimeout(() => {
-        const champions = [
-          'Champion Sarah Abubakar',
-          'Champion Emeka Okafor', 
-          'Champion Adebayo Ogundimu',
-          'Champion Fatima Hassan',
-          'Champion John Okwu'
-        ];
-        const randomChampion = champions[Math.floor(Math.random() * champions.length)];
-        
-        addNotification({
-          type: 'report_status',
-          title: 'Report Verified & Escalated ✅',
-          message: `Your report has been verified by ${randomChampion}. ${reportData.reportType === 'issue' || reportData.reportType === 'quality_concern' ? 'The issue has been escalated to relevant authorities for resolution.' : 'Thank you for helping keep our community informed!'}`,
-          priority: 'low',
-          source: randomChampion,
-          state: userState,
-          lga: userLGA,
-          relatedId: projectId
-        });
-      }, Math.random() * 10000 + 15000); // 15-25 seconds delay
-
-      const newReport: CitizenReport = {
-        id: Date.now().toString(),
-        projectId: projectId || '',
-        projectTitle: projectTitle || '',
-        reporterName: reportData.anonymous ? 'Anonymous' : reportData.reporterName,
-        reporterEmail: reportData.reporterEmail,
-        reportType: reportData.reportType as CitizenReport['reportType'],
-        description: reportData.description,
-        images: reportData.images.map(file => URL.createObjectURL(file)),
-        location: {
-          state: userState,
-          lga: userLGA,
-          address: reportData.address
-        },
-        status: 'pending',
-        submitDate: new Date().toISOString()
-      };
-
-      // Store report (in real app, this would be sent to backend)
-      const existingReports = JSON.parse(localStorage.getItem('citizenReports') || '[]');
-      localStorage.setItem('citizenReports', JSON.stringify([...existingReports, newReport]));
-
-      alert('Report submitted successfully! You will receive notifications about the verification process and any follow-up actions.');
+      alert('Report submitted successfully and is now visible on the reports page!');
       onClose();
       
       // Reset form

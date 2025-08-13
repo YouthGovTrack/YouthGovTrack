@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bell } from 'react-feather';
+import OptimizedIcon from './OptimizedIcon';
 import AuthModal from './AuthModal';
 import ViewCivicAlertsModal from './ViewCivicAlertsModal';
 import { useNotifications } from '../contexts/NotificationContext';
@@ -140,7 +140,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                     aria-label="View civic alerts"
                     title="Civic Alerts & Notifications"
                   >
-                    <Bell size={20} className="transition-transform group-hover:scale-110" />
+                    <OptimizedIcon name="bell" size={20} className="transition-transform group-hover:scale-110" />
                     {/* Dynamic Notification Badge */}
                     {unreadCount > 0 && (
                       <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-[20px] h-5 rounded-full flex items-center justify-center font-medium animate-pulse">
@@ -211,7 +211,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                   className="relative p-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
                   aria-label="View civic alerts"
                 >
-                  <Bell size={18} />
+                  <OptimizedIcon name="bell" size={18} />
                   {unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-[16px] h-4 rounded-full flex items-center justify-center font-medium">
                       {unreadCount > 99 ? '99+' : unreadCount}

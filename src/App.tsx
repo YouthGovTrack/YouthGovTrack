@@ -14,7 +14,7 @@ import ProjectDetails from './contexts/ProjectDetails';
 import { ProjectProvider } from './contexts/ProjectContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { AuthProvider } from './contexts/AuthContext';
-import { Plus } from 'react-feather';
+import OptimizedIcon from './components/OptimizedIcon';
 import './styles/global.css';
 
 // Simple routing state management
@@ -149,7 +149,7 @@ const App: React.FC = () => {
               className="fixed bottom-6 right-6 bg-gradient-to-r from-green-500 to-blue-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 z-40 group"
               title="Submit Community Alert"
             >
-              <Plus size={24} className="transition-transform group-hover:rotate-180" />
+              <OptimizedIcon name="plus" size={24} className="transition-transform group-hover:rotate-180" />
             </button>
           )}
 
