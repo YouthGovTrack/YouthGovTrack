@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useNotifications } from '../contexts/NotificationContext';
 import { nigeriaStates } from '../data/nigeriaData';
 import { Plus, Send, AlertTriangle, MapPin } from 'react-feather';
+import AuthModal from './AuthModal';
 
 interface CommunityAlertFormProps {
   isOpen: boolean;
@@ -10,6 +11,8 @@ interface CommunityAlertFormProps {
 
 const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose }) => {
   const { addNotification } = useNotifications();
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const [pendingSubmission, setPendingSubmission] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     title: '',
     message: '',
@@ -34,27 +37,31 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
     }
   }, [isOpen]);
 
+  // Check for user login after auth modal closes and attempt auto-submission
+  React.useEffect(() => {
+    if (pendingSubmission && !showAuthModal) {
+      const currentUser = localStorage.getItem('currentUser');
+      if (currentUser) {
+        // User has logged in, now submit the form automatically
+        if (formData.title.trim() && formData.message.trim()) {
+          handleActualSubmit();
+        } else {
+          alert('Please fill in all required fields before submitting');
+        }
+      }
+      setPendingSubmission(false);
+    }
+  }, [showAuthModal, pendingSubmission, formData.title, formData.message]);
+
   // Get LGAs for the selected state
   const selectedStateLGAs = useMemo(() => {
     const selectedState = nigeriaStates.find(state => state.name === formData.state);
     return selectedState ? selectedState.lgas : [];
   }, [formData.state]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.title.trim() || !formData.message.trim()) {
-      alert('Please fill in all required fields');
-      return;
-    }
-
-    // Check if user is logged in
+  const handleActualSubmit = () => {
     const currentUser = localStorage.getItem('currentUser');
-    if (!currentUser) {
-      alert('⚠️ You must be logged in to submit community alerts.\n\nPlease sign in to continue.');
-      onClose(); // Close the modal so user can go to login
-      return;
-    }
+    if (!currentUser) return;
 
     // Get current user info
     const userData = JSON.parse(currentUser);
@@ -86,6 +93,28 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
     setTimeout(() => {
       alert('🎉 Community alert submitted successfully!\n\n🔔 Check the bell icon in the navigation bar to see your alert.');
     }, 100);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.title.trim() || !formData.message.trim()) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    // Check if user is logged in
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
+      // Mark that we want to submit after login
+      setPendingSubmission(true);
+      // Show the auth modal instead of just an alert
+      setShowAuthModal(true);
+      return;
+    }
+
+    // User is logged in, submit immediately
+    handleActualSubmit();
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -255,20 +284,30 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
             </button>
             <button
               type="submit"
-              disabled={!localStorage.getItem('currentUser')}
-              className={`px-6 py-3 rounded-lg transition-all duration-200 font-medium inline-flex items-center space-x-2 ${
-                localStorage.getItem('currentUser')
-                  ? 'bg-gradient-to-r from-green-600 to-blue-600 text-white hover:from-green-700 hover:to-blue-700'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
+              className="px-6 py-3 rounded-lg transition-all duration-200 font-medium inline-flex items-center space-x-2 bg-gradient-to-r from-green-600 to-blue-600 text-white hover:from-green-700 hover:to-blue-700"
             >
               <Send size={18} />
-              <span>{localStorage.getItem('currentUser') ? 'Submit Alert' : 'Login Required'}</span>
+              <span>Submit Alert</span>
             </button>
           </div>
         </form>
         </div>
       </div>
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => {
+            setShowAuthModal(false);
+            setPendingSubmission(false); // Reset pending submission if user cancels
+          }}
+          onSuccess={() => {
+            setShowAuthModal(false);
+            // Don't reset pendingSubmission here - let the useEffect handle it
+          }}
+        />
+      )}
     </div>
   );
 };
