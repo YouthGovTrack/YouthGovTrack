@@ -87,18 +87,29 @@ FileETag None
     Deny from all
 </FilesMatch>
 
-# Force HTTPS (uncomment if needed)
-# <IfModule mod_rewrite.c>
-#     RewriteEngine On
-#     RewriteCond %{HTTPS} off
-#     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-# </IfModule>
+# Force HTTPS for production security
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
 
 # Single Page Application routing
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    # Set RewriteBase to root for subdomain hosting
     RewriteBase /
+    
+    # Handle index.html directly
     RewriteRule ^index\.html$ - [L]
+    
+    # Handle service worker
+    RewriteRule ^sw\.js$ - [L]
+    
+    # Handle manifest and other PWA files
+    RewriteRule ^manifest\.json$ - [L]
+    
+    # Route all other requests to index.html for React Router
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule . /index.html [L]
