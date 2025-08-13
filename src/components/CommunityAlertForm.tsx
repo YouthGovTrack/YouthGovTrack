@@ -10,7 +10,7 @@ interface CommunityAlertFormProps {
 }
 
 const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose }) => {
-  const { addNotification } = useNotifications();
+  const { addNotification, addGlobalNotification } = useNotifications();
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [pendingSubmission, setPendingSubmission] = useState<boolean>(false);
   const [formData, setFormData] = useState({
@@ -67,7 +67,7 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
     const userData = JSON.parse(currentUser);
     const userName = userData.name || formData.source || 'Community Member';
 
-    // Add the notification to the bell icon
+    // Add the notification to the bell icon (personal)
     addNotification({
       type: 'community_alert',
       title: formData.title,
@@ -76,6 +76,19 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
       source: userName,
       state: formData.state,
       lga: formData.lga
+    });
+
+    // Add global community notification for all users in the area
+    addGlobalNotification({
+      type: 'community_alert',
+      title: `Community Alert: ${formData.title}`,
+      message: `${formData.message} - Reported by ${userName}`,
+      priority: formData.priority,
+      source: userName,
+      state: formData.state,
+      lga: formData.lga,
+      isGlobal: true,
+      targetAudience: formData.priority === 'urgent' ? 'state' : 'lga' // Urgent alerts go to entire state
     });
 
     // Reset form and close

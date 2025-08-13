@@ -7,7 +7,7 @@ interface SubmitReportModalProps {
 }
 
 const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }) => {
-  const { addNotification } = useNotifications();
+  const { addNotification, addGlobalNotification } = useNotifications();
   const [formData, setFormData] = useState({
     title: '',
     category: '',
@@ -31,7 +31,7 @@ const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }
     const state = locationParts.length >= 2 ? locationParts[locationParts.length - 1] : 'Unknown State';
     const lga = locationParts.length >= 2 ? locationParts[locationParts.length - 2] : 'Unknown LGA';
 
-    // Create notification for the report submission
+    // Create notification for the report submission (personal notification)
     addNotification({
       type: 'community_alert',
       title: `New Report: ${formData.title}`,
@@ -42,16 +42,33 @@ const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }
       lga: lga
     });
 
-    // If it's urgent priority, create an additional civic alert
+    // Create global community notification for all users in the area
+    addGlobalNotification({
+      type: 'community_alert',
+      title: `Community Report: ${formData.title}`,
+      message: `A community member reported ${formData.category.toLowerCase()} concerns in ${formData.location}. Priority: ${formData.priority.toUpperCase()}`,
+      priority: formData.priority as 'low' | 'medium' | 'high' | 'urgent',
+      source: `Community Report via ${userName}`,
+      state: state,
+      lga: lga,
+      isGlobal: true,
+      targetAudience: 'lga', // Share with all users in the same LGA
+      category: formData.category
+    });
+
+    // If it's urgent priority, create an additional global civic alert
     if (formData.priority === 'urgent') {
-      addNotification({
+      addGlobalNotification({
         type: 'civic_alert',
-        title: `🚨 Urgent: ${formData.title}`,
-        message: `URGENT REPORT: ${formData.description.substring(0, 150)}${formData.description.length > 150 ? '...' : ''} - Immediate attention required.`,
+        title: `🚨 URGENT: ${formData.title}`,
+        message: `URGENT COMMUNITY ALERT: ${formData.description.substring(0, 150)}${formData.description.length > 150 ? '...' : ''} - Immediate attention required in ${formData.location}.`,
         priority: 'urgent',
-        source: `Community Report via ${userName}`,
+        source: `Emergency Report via ${userName}`,
         state: state,
-        lga: lga
+        lga: lga,
+        isGlobal: true,
+        targetAudience: 'state', // Urgent alerts go to entire state
+        category: formData.category
       });
     }
 
@@ -66,6 +83,7 @@ const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }
       ];
       const randomChampion = champions[Math.floor(Math.random() * champions.length)];
       
+      // Personal status update
       addNotification({
         type: 'report_status',
         title: 'Report Under Review',
@@ -74,6 +92,20 @@ const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }
         source: randomChampion,
         state: state,
         lga: lga
+      });
+
+      // Community champion activity notification
+      addGlobalNotification({
+        type: 'champion_activity',
+        title: `Champion Activity: ${randomChampion}`,
+        message: `${randomChampion} is now reviewing a ${formData.category.toLowerCase()} report in ${formData.location}. Community verification in progress.`,
+        priority: 'low',
+        source: randomChampion,
+        state: state,
+        lga: lga,
+        isGlobal: true,
+        targetAudience: 'lga',
+        category: formData.category
       });
     }, Math.random() * 3000 + 2000); // 2-5 seconds delay
 
@@ -88,6 +120,7 @@ const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }
       ];
       const randomChampion = champions[Math.floor(Math.random() * champions.length)];
       
+      // Personal verification notification
       addNotification({
         type: 'report_status',
         title: 'Report Verified ✅',
@@ -96,6 +129,20 @@ const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }
         source: randomChampion,
         state: state,
         lga: lga
+      });
+
+      // Community update about verified report
+      addGlobalNotification({
+        type: 'champion_activity',
+        title: `Report Verified: ${formData.title}`,
+        message: `${randomChampion} has verified a ${formData.category.toLowerCase()} report in ${formData.location}. The issue has been escalated to authorities for resolution.`,
+        priority: 'medium',
+        source: randomChampion,
+        state: state,
+        lga: lga,
+        isGlobal: true,
+        targetAudience: 'lga',
+        category: formData.category
       });
     }, Math.random() * 10000 + 10000); // 10-20 seconds delay
 
