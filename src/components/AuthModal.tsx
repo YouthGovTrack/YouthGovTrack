@@ -1,13 +1,22 @@
 import React, { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
   onRegisterClick?: () => void;
+  redirectAfterLogin?: string;
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, onRegisterClick }) => {
+const AuthModal: React.FC<AuthModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  onSuccess, 
+  onRegisterClick,
+  redirectAfterLogin 
+}) => {
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -52,27 +61,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, onReg
     setIsLoading(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await login(formData.email, formData.password);
       
-      // Mock login - in real app, this would validate credentials
-      const mockUser = {
-        id: Date.now().toString(),
-        firstName: 'John',
-        lastName: 'Doe',
-        email: formData.email,
-        phone: '+234 801 234 5678',
-        state: 'Lagos',
-        lga: 'Lagos Island',
-        role: 'citizen' as const,
-        joinDate: new Date().toISOString(),
-        isVerified: true
-      };
+      // Handle success based on redirect requirement
+      if (redirectAfterLogin) {
+        // If redirectAfterLogin is specified, the parent component will handle navigation
+        onSuccess?.();
+      } else {
+        onSuccess?.();
+      }
       
-      localStorage.setItem('currentUser', JSON.stringify(mockUser));
-      alert('Login successful! Welcome back!');
-      
-      onSuccess?.(); // Call success callback if provided
       onClose();
     } catch (error) {
       alert('Login failed. Please check your credentials and try again.');

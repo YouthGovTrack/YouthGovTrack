@@ -1,62 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Bell } from 'react-feather';
 import AuthModal from './AuthModal';
 import ViewCivicAlertsModal from './ViewCivicAlertsModal';
 import { useNotifications } from '../contexts/NotificationContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface NavbarProps {
   currentPage: string;
-  onNavigate: (page: 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions' | 'register') => void;
-}
-
-interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  state: string;
-  lga: string;
-  role: 'citizen' | 'champion' | 'admin';
-  joinDate: string;
-  isVerified: boolean;
+  onNavigate: (page: 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions' | 'register' | 'community') => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCivicAlertsModalOpen, setIsCivicAlertsModalOpen] = useState(false);
-  const { unreadCount, getCivicAlertsCount } = useNotifications();
-
-  // Check for logged-in user on component mount and localStorage changes
-  useEffect(() => {
-    const checkAuthState = () => {
-      const userData = localStorage.getItem('currentUser');
-      if (userData) {
-        try {
-          setCurrentUser(JSON.parse(userData));
-        } catch (error) {
-          console.error('Error parsing user data:', error);
-          localStorage.removeItem('currentUser');
-        }
-      } else {
-        setCurrentUser(null);
-      }
-    };
-
-    checkAuthState();
-
-    // Listen for storage changes (when user logs in/out in another tab)
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'currentUser') {
-        checkAuthState();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  const { unreadCount } = useNotifications();
+  const { user, logout } = useAuth();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -80,23 +39,28 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
 
   const handleAuthSuccess = () => {
     setIsAuthModalOpen(false);
-    // Refresh user state
-    const userData = localStorage.getItem('currentUser');
-    if (userData) {
-      setCurrentUser(JSON.parse(userData));
-    }
+    // Navigate to browse-projects after successful login from "Track my LGA"
+    onNavigate('browse-projects');
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('currentUser');
-    setCurrentUser(null);
+    logout();
     // Redirect to home if on community pages
-    if (currentPage === 'reports' || currentPage === 'champions') {
+    if (currentPage === 'reports' || currentPage === 'champions' || currentPage === 'community') {
       onNavigate('home');
     }
   };
 
-  const isLoggedIn = !!currentUser;
+  // Handle Track my LGA button click - require sign-in for non-authenticated users
+  const handleTrackMyLGA = () => {
+    if (user) {
+      onNavigate('browse-projects');
+    } else {
+      openLoginModal();
+    }
+  };
+
+  const isLoggedIn = !!user;
 
   return (
     <>
@@ -126,14 +90,14 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 Home
               </button>
               <button 
-                onClick={() => onNavigate('browse-projects')}
+                onClick={handleTrackMyLGA}
                 className={`font-medium transition-colors text-sm xl:text-base ${
                   currentPage === 'browse-projects' 
                     ? 'text-blue-600 border-b-2 border-blue-600 pb-1' 
                     : 'text-gray-700 hover:text-blue-600'
                 }`}
               >
-                Projects
+                Track my LGA
               </button>
               
               {/* Community Features - Only show when logged in */}
@@ -168,26 +132,28 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               
               {/* Auth Buttons / User Menu */}
               <div className="flex items-center space-x-3 ml-4">
-                {/* Civic Alerts Bell Icon */}
-                <button
-                  onClick={openCivicAlertsModal}
-                  className="relative p-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
-                  aria-label="View civic alerts"
-                  title="Civic Alerts & Notifications"
-                >
-                  <Bell size={20} className="transition-transform group-hover:scale-110" />
-                  {/* Dynamic Notification Badge */}
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-[20px] h-5 rounded-full flex items-center justify-center font-medium animate-pulse">
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </span>
-                  )}
-                </button>
+                {/* Civic Alerts Bell Icon - Only show for authenticated users */}
+                {isLoggedIn && (
+                  <button
+                    onClick={openCivicAlertsModal}
+                    className="relative p-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
+                    aria-label="View civic alerts"
+                    title="Civic Alerts & Notifications"
+                  >
+                    <Bell size={20} className="transition-transform group-hover:scale-110" />
+                    {/* Dynamic Notification Badge */}
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-[20px] h-5 rounded-full flex items-center justify-center font-medium animate-pulse">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
+                  </button>
+                )}
 
                 {isLoggedIn ? (
                   <div className="flex items-center space-x-3">
                     <span className="text-sm text-gray-700">
-                      Welcome, <span className="font-medium text-blue-600">{currentUser.firstName}</span>
+                      Welcome, <span className="font-medium text-blue-600">{user.firstName}</span>
                     </span>
                     <button
                       onClick={handleLogout}
@@ -228,33 +194,35 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 Home
               </button>
               <button 
-                onClick={() => onNavigate('browse-projects')}
+                onClick={handleTrackMyLGA}
                 className={`font-medium transition-colors text-sm ${
                   currentPage === 'browse-projects' 
                     ? 'text-blue-600' 
                     : 'text-gray-700 hover:text-blue-600'
                 }`}
               >
-                Projects
+                Track my LGA
               </button>
 
-              {/* Civic Alerts Bell Icon for Tablet */}
-              <button
-                onClick={openCivicAlertsModal}
-                className="relative p-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
-                aria-label="View civic alerts"
-              >
-                <Bell size={18} />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-[16px] h-4 rounded-full flex items-center justify-center font-medium">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </span>
-                )}
-              </button>
+              {/* Civic Alerts Bell Icon for Tablet - Only show for authenticated users */}
+              {isLoggedIn && (
+                <button
+                  onClick={openCivicAlertsModal}
+                  className="relative p-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                  aria-label="View civic alerts"
+                >
+                  <Bell size={18} />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-[16px] h-4 rounded-full flex items-center justify-center font-medium">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+              )}
               
               {isLoggedIn ? (
                 <div className="flex items-center space-x-2">
-                  <span className="text-xs text-gray-600">{currentUser.firstName}</span>
+                  <span className="text-xs text-gray-600">{user.firstName}</span>
                   <button
                     onClick={handleLogout}
                     className="bg-red-600 text-white px-3 py-1.5 rounded-md hover:bg-red-700 transition-colors font-medium text-sm"
@@ -309,7 +277,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 </button>
                 <button 
                   onClick={() => {
-                    onNavigate('browse-projects');
+                    handleTrackMyLGA();
                     setIsMobileMenuOpen(false);
                   }}
                   className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${
@@ -318,7 +286,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                       : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                   }`}
                 >
-                  📊 Projects
+                  📊 Track my LGA
                 </button>
                 
                 {/* Community Features - Only show when logged in */}
@@ -357,30 +325,32 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                   ℹ️ About
                 </a>
 
-                {/* Civic Alerts in Mobile Menu */}
-                <button
-                  onClick={() => {
-                    openCivicAlertsModal();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="block w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 font-medium transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <span>🔔 Civic Alerts</span>
-                    {unreadCount > 0 && (
-                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full min-w-[24px] text-center">
-                        {unreadCount > 99 ? '99+' : unreadCount}
-                      </span>
-                    )}
-                  </div>
-                </button>
+                {/* Civic Alerts in Mobile Menu - Only show for authenticated users */}
+                {isLoggedIn && (
+                  <button
+                    onClick={() => {
+                      openCivicAlertsModal();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="block w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 font-medium transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span>🔔 Civic Alerts</span>
+                      {unreadCount > 0 && (
+                        <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full min-w-[24px] text-center">
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                )}
                 
                 {/* Mobile Auth Section */}
                 <div className="border-t border-gray-200 pt-3 mt-3 space-y-2">
                   {isLoggedIn ? (
                     <>
                       <div className="px-4 py-2 text-sm text-gray-600">
-                        Logged in as <span className="font-medium text-blue-600">{currentUser.firstName} {currentUser.lastName}</span>
+                        Logged in as <span className="font-medium text-blue-600">{user.firstName} {user.lastName}</span>
                       </div>
                       <button
                         onClick={() => {
@@ -427,6 +397,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
         onClose={closeAuthModal}
         onSuccess={handleAuthSuccess}
         onRegisterClick={() => onNavigate('register')}
+        redirectAfterLogin="browse-projects"
       />
 
       {/* Civic Alerts Modal */}

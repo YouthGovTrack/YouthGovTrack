@@ -15,6 +15,7 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { cn } from '../utils/cn';
 import ArrowLink from '../components/icons/ArrowLink';
+import { useAuth } from './AuthContext';
 
 interface Project {
   id: string;
@@ -71,6 +72,7 @@ const sidebarItems: SidebarItem[] = [
 ];
 
 const ChampionSidebar: React.FC<ChampionSidebarProps> = ({ projectId, onNavigate }) => {
+  const { user } = useAuth();
   const [isSubmitReportOpen, setIsSubmitReportOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -81,10 +83,10 @@ const ChampionSidebar: React.FC<ChampionSidebarProps> = ({ projectId, onNavigate
     setLoading(false);
     setProject({
       id: '1',
-      name: 'Adebayo Olamide',
-      location: 'Ikeja, Lagos State',
-      state: 'Lagos State',
-      lga: 'Ikeja',
+      name: user ? `${user.firstName} ${user.lastName}` : 'Community Champion',
+      location: user ? `${user.lga}, ${user.state}` : 'Set your location',
+      state: user?.state || 'Your State',
+      lga: user?.lga || 'Your LGA',
       category: 'Education',
       status: 'Ongoing',
       progress: 75,
@@ -94,9 +96,9 @@ const ChampionSidebar: React.FC<ChampionSidebarProps> = ({ projectId, onNavigate
       startDate: '2023-01-01',
       updatedAt: '2023-08-11',
       beneficiaries: 1500,
-      images: ['/citizen1.png']
+      images: [user?.profileImage || '/citizen1.png']
     });
-  }, [projectId]);
+  }, [projectId, user]);
 
   if (loading) return <Loader />;
   if (error) return <div className="p-4 text-red-600">{error}</div>;
@@ -115,7 +117,7 @@ const ChampionSidebar: React.FC<ChampionSidebarProps> = ({ projectId, onNavigate
             <div className="flex items-center space-x-3">
               <div className="relative flex-shrink-0">
                 <img 
-                  src="/citizen1.png"
+                  src={user?.profileImage || "/citizen1.png"}
                   alt="Profile"
                   className="w-12 h-12 rounded-full ring-2 ring-white shadow-md object-cover"
                 />

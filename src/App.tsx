@@ -8,21 +8,24 @@ import BrowseProjects from './pages/BrowseProjects';
 import Reports from './pages/Reports';
 import Champions from './pages/Champions';
 import Register from './pages/Register';
+import Community from './pages/Community';
 
 import ProjectDetails from './contexts/ProjectDetails';
 import { ProjectProvider } from './contexts/ProjectContext';
 import { NotificationProvider } from './contexts/NotificationContext';
+import { AuthProvider } from './contexts/AuthContext';
 import { Plus } from 'react-feather';
 import './styles/global.css';
 
 // Simple routing state management
-type Page = 'home' | 'browse-projects' | 'reports' | 'champions' | 'register' | 'project-details';
+type Page = 'home' | 'browse-projects' | 'reports' | 'champions' | 'register' | 'project-details' | 'community';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAlertFormOpen, setIsAlertFormOpen] = useState(false);
+  const [communityInitialTab, setCommunityInitialTab] = useState('dashboard');
 
   useEffect(() => {
     // Initialize app
@@ -51,8 +54,15 @@ const App: React.FC = () => {
       return;
     }
     
+    // Handle champions navigation - redirect to community with champions tab
+    if (targetPage === 'champions') {
+      setCommunityInitialTab('champions');
+      setCurrentPage('community');
+      return;
+    }
+    
     // Check if trying to access community features
-    if (targetPage === 'reports' || targetPage === 'champions') {
+    if (targetPage === 'reports' || targetPage === 'community') {
       const userData = localStorage.getItem('currentUser');
       if (!userData) {
         // Redirect to home if not logged in
@@ -62,8 +72,13 @@ const App: React.FC = () => {
       }
     }
     
+    // Reset community tab for other pages
+    if (targetPage !== 'community') {
+      setCommunityInitialTab('dashboard');
+    }
+    
     // Only navigate to valid pages
-    if (['home', 'browse-projects', 'reports', 'champions', 'register', 'project-details'].includes(targetPage)) {
+    if (['home', 'browse-projects', 'reports', 'champions', 'register', 'project-details', 'community'].includes(targetPage)) {
       setCurrentPage(targetPage);
       if (targetPage !== 'project-details') {
         setSelectedProjectId(null); // Clear project ID when navigating away
@@ -94,6 +109,8 @@ const App: React.FC = () => {
         return <Champions onNavigate={navigateTo} />;
       case 'register':
         return <Register onNavigate={navigateTo} />;
+      case 'community':
+        return <Community onNavigate={navigateTo} initialTab={communityInitialTab} />;
       case 'project-details':
         return <ProjectDetails projectId={selectedProjectId} onNavigate={navigateTo} />;
       default:
@@ -110,19 +127,20 @@ const App: React.FC = () => {
   );
 
   // Check if current page needs special layout
-  const isSpecialPage = currentPage === 'register' || currentPage === 'project-details';
+  const isSpecialPage = currentPage === 'register' || currentPage === 'project-details' || currentPage === 'community';
 
   return (
-    <NotificationProvider>
-      <ProjectProvider>
-        <div className="min-h-screen bg-gray-50 flex flex-col">
-          {!isSpecialPage && <NavbarWithNavigation />}
-          
-          <main className={`flex-1 ${!isSpecialPage ? 'pt-20' : ''}`}>
-            {renderPageContent()}
-          </main>
-          
-          {!isSpecialPage && <Footer />}
+    <AuthProvider>
+      <NotificationProvider>
+        <ProjectProvider>
+          <div className="min-h-screen bg-gray-50 flex flex-col">
+            {!isSpecialPage && <NavbarWithNavigation />}
+            
+            <main className={`flex-1 ${!isSpecialPage ? 'pt-20' : ''}`}>
+              {renderPageContent()}
+            </main>
+            
+            {!isSpecialPage && <Footer />}
 
           {/* Floating Action Button for Community Alerts */}
           {!isSpecialPage && (
@@ -143,6 +161,7 @@ const App: React.FC = () => {
         </div>
       </ProjectProvider>
     </NotificationProvider>
+    </AuthProvider>
   );
 };
 

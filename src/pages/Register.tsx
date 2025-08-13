@@ -1,25 +1,14 @@
 import React, { useState } from 'react';
 import { nigeriaStates } from '../data/nigeriaData';
 import ArrowLink from '../components/icons/ArrowLink';
+import { useAuth } from '../contexts/AuthContext';
 
 interface RegisterProps {
-  onNavigate: (page: 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions') => void;
-}
-
-interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  state: string;
-  lga: string;
-  role: 'citizen' | 'champion' | 'admin';
-  joinDate: string;
-  isVerified: boolean;
+  onNavigate: (page: 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions' | 'community') => void;
 }
 
 const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
+  const { register } = useAuth();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -29,7 +18,8 @@ const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
     lga: '',
     password: '',
     confirmPassword: '',
-    agreeToTerms: false
+    agreeToTerms: false,
+    profileImage: null as File | null
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -41,19 +31,28 @@ const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setFormData(prev => {
-      const updated = {
+    
+    if (type === 'file') {
+      const fileInput = e.target as HTMLInputElement;
+      setFormData(prev => ({
         ...prev,
-        [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-      };
-      
-      // Reset LGA when state changes
-      if (name === 'state') {
-        updated.lga = '';
-      }
-      
-      return updated;
-    });
+        [name]: fileInput.files?.[0] || null
+      }));
+    } else {
+      setFormData(prev => {
+        const updated = {
+          ...prev,
+          [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+        };
+        
+        // Reset LGA when state changes
+        if (name === 'state') {
+          updated.lga = '';
+        }
+        
+        return updated;
+      });
+    }
 
     // Clear error when user starts typing
     if (errors[name]) {
@@ -100,29 +99,31 @@ const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
     setIsLoading(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Convert profile image to data URL if exists
+      let profileImageUrl: string | undefined;
+      if (formData.profileImage) {
+        profileImageUrl = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(formData.profileImage!);
+        });
+      }
 
-      const newUser: User = {
-        id: Date.now().toString(),
+      await register({
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
         phone: formData.phone,
         state: formData.state,
         lga: formData.lga,
-        role: 'citizen',
-        joinDate: new Date().toISOString(),
-        isVerified: false
-      };
-
-      // Store user data
-      localStorage.setItem('currentUser', JSON.stringify(newUser));
+        password: formData.password,
+        profileImage: profileImageUrl
+      });
       
       alert(`Welcome to LocalGovTrack, ${formData.firstName}! Your account has been created successfully.`);
       
-      // Navigate to home page
-      onNavigate('home');
+      // Navigate to community page for new users
+      onNavigate('community');
       
     } catch (error) {
       alert('Registration failed. Please try again.');
@@ -241,6 +242,30 @@ const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
                     placeholder="Enter your phone number"
                   />
                   {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+                </div>
+
+                <div>
+                  <label htmlFor="profileImage" className="block text-sm font-medium text-gray-700 mb-2">
+                    Profile Image (Optional)
+                  </label>
+                  <input
+                    type="file"
+                    id="profileImage"
+                    name="profileImage"
+                    accept="image/*"
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Upload a profile picture (PNG, JPG, GIF)</p>
+                  {formData.profileImage && (
+                    <div className="mt-2">
+                      <img
+                        src={URL.createObjectURL(formData.profileImage)}
+                        alt="Profile preview"
+                        className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
