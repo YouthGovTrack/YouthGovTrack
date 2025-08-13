@@ -1,6 +1,3 @@
-// Shared Notification Service - Simulates Global Community Notifications
-// This service creates a shared notification system across all users in the same browser/device
-// In production, this would be replaced with WebSocket connections and backend database
 
 interface SharedNotification {
   id: string;
