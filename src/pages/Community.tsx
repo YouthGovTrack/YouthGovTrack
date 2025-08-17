@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { ChampionSidebar } from '../contexts/ChampionSidebar';
@@ -13,11 +14,11 @@ import { cn } from '../utils/cn';
 import ArrowLink from '../components/icons/ArrowLink';
 
 interface CommunityProps {
-  onNavigate: (page: string, projectId?: number) => void;
   initialTab?: string;
 }
 
-const Community: React.FC<CommunityProps> = ({ onNavigate, initialTab = 'dashboard' }) => {
+const Community: React.FC<CommunityProps> = ({ initialTab = 'dashboard' }) => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState(initialTab);
   const [searchQuery, setSearchQuery] = useState('');
@@ -78,7 +79,7 @@ const Community: React.FC<CommunityProps> = ({ onNavigate, initialTab = 'dashboa
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => onNavigate('browse-projects')}
+                onClick={() => navigate('/browse-projects')}
               >
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                   📊
@@ -90,7 +91,7 @@ const Community: React.FC<CommunityProps> = ({ onNavigate, initialTab = 'dashboa
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => onNavigate('reports')}
+                onClick={() => navigate('/reports')}
               >
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
                   📝
@@ -171,7 +172,7 @@ const Community: React.FC<CommunityProps> = ({ onNavigate, initialTab = 'dashboa
               <h2 className="text-2xl font-bold text-gray-900 mb-4">Projects in Your Area</h2>
               <p className="text-gray-600 mb-6">Explore and track government projects in {user?.lga}, {user?.state}</p>
               <ArrowLink
-                onClick={() => onNavigate('browse-projects')}
+                onClick={() => navigate('/browse-projects')}
                 className="bg-blue-600 text-white hover:bg-blue-700"
                 isLink={false}
               >
@@ -330,12 +331,12 @@ const Community: React.FC<CommunityProps> = ({ onNavigate, initialTab = 'dashboa
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation Header */}
-      <Navbar currentPage="community" onNavigate={onNavigate} />
+      <Navbar />
       
       <div className="flex pt-20">
         {/* Sidebar */}
         <div className="w-80 bg-white shadow-lg">
-          <ChampionSidebar projectId={1} onNavigate={onNavigate} />
+          <ChampionSidebar projectId={1} />
         </div>
 
         {/* Main Content */}

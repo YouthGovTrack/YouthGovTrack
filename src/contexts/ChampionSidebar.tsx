@@ -37,7 +37,6 @@ interface Project {
 
 interface ChampionSidebarProps {
   projectId: number;
-  onNavigate?: (page: string, projectId?: number) => void;
 }
 
 interface SidebarItem {
@@ -71,7 +70,7 @@ const sidebarItems: SidebarItem[] = [
   }
 ];
 
-const ChampionSidebar: React.FC<ChampionSidebarProps> = ({ projectId, onNavigate }) => {
+const ChampionSidebar: React.FC<ChampionSidebarProps> = ({ projectId }) => {
   const { user } = useAuth();
   const [isSubmitReportOpen, setIsSubmitReportOpen] = useState(false);
   const [loading, setLoading] = useState(true);

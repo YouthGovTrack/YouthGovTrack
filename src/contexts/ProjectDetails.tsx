@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useProjects } from './ProjectContext';
 import { Project } from '../services/mockApi';
 import Loader from '../components/Loader';
@@ -7,10 +8,10 @@ import Footer from '../components/Footer';
 
 interface ProjectDetailsProps {
   projectId: number | null;
-  onNavigate: (page: string) => void;
 }
 
-const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }) => {
+const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId }) => {
+  const navigate = useNavigate();
   const { projects, loading: projectsLoading } = useProjects();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
@@ -18,34 +19,22 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }
   const [relatedProjects, setRelatedProjects] = useState<Project[]>([]);
 
   useEffect(() => {
-    if (!projectId) return;
+    if (!projectId || projectsLoading) return;
 
-    const fetchData = async () => {
-      try {
-        if (!projectsLoading) {
-          const foundProject = projects.find(p => p.id === projectId);
-          if (foundProject) {
-            setProject(foundProject);
-            
-            // Get related projects (same category, different project)
-            const related = projects
-              .filter(p => p.id !== projectId && p.category === foundProject.category)
-              .slice(0, 3);
-            setRelatedProjects(related);
-          } else {
-            setError('Project not found');
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching project:', error);
-        setError('Failed to fetch project details');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [projectId, projects, projectsLoading]);
+    const foundProject = projects.find(p => p.id === projectId);
+    if (foundProject) {
+      setProject(foundProject);
+      // Get related projects (same category, different project)
+      const related = projects
+        .filter(p => p.id !== projectId && p.category === foundProject.category)
+        .slice(0, 3);
+      setRelatedProjects(related);
+      setLoading(false);
+    } else {
+      setError('Project not found');
+      setLoading(false);
+    }
+  }, [projectId, projectsLoading, projects]);
 
   // Format image URL function
   const formatImageUrl = (url: string) => {
@@ -86,7 +75,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Navbar */}
-      <Navbar currentPage="project-details" onNavigate={onNavigate} />
+      <Navbar />
 
       {/* Main Content */}
       <div className="flex-1 pt-16">
@@ -94,7 +83,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }
         <div className="bg-white shadow-sm border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <button
-              onClick={() => onNavigate('browse-projects')}
+              onClick={() => navigate('/browse-projects')}
               className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,7 +273,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId, onNavigate }
         <div className='flex justify-center mt-8 mb-8'>
           <button 
             className='bg-blue-600 text-white px-8 py-3 rounded-full font-medium hover:bg-blue-700 transition-colors duration-300'
-            onClick={() => onNavigate('reports')}
+            onClick={() => navigate('/reports')}
           >
             Submit Report
           </button>

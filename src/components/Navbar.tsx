@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation, NavLink } from 'react-router-dom';
 import OptimizedIcon from './OptimizedIcon';
 import AuthModal from './AuthModal';
 import ViewCivicAlertsModal from './ViewCivicAlertsModal';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useAuth } from '../contexts/AuthContext';
 
-interface NavbarProps {
-  currentPage: string;
-  onNavigate: (page: 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions' | 'register' | 'community') => void;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
+const Navbar: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCivicAlertsModalOpen, setIsCivicAlertsModalOpen] = useState(false);
@@ -39,22 +37,21 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
 
   const handleAuthSuccess = () => {
     setIsAuthModalOpen(false);
-    // Navigate to browse-projects after successful login from "Track my LGA"
-    onNavigate('browse-projects');
+    navigate('/browse-projects');
   };
 
   const handleLogout = () => {
     logout();
     // Redirect to home if on community pages
-    if (currentPage === 'reports' || currentPage === 'champions' || currentPage === 'community') {
-      onNavigate('home');
+    if (["/reports", "/champions", "/community"].includes(location.pathname)) {
+      navigate('/');
     }
   };
 
   // Handle Track my LGA button click - require sign-in for non-authenticated users
   const handleTrackMyLGA = () => {
     if (user) {
-      onNavigate('browse-projects');
+      navigate('/browse-projects');
     } else {
       openLoginModal();
     }
@@ -70,7 +67,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             {/* Logo */}
             <div className="flex items-center">
               <button 
-                onClick={() => onNavigate('home')}
+                onClick={() => navigate('/')}
                 className="text-xl sm:text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
               >
                 LocalGovTrack
@@ -79,23 +76,16 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
-              <button 
-                onClick={() => onNavigate('home')}
-                className={`font-medium transition-colors text-sm xl:text-base ${
-                  currentPage === 'home' 
-                    ? 'text-blue-600 border-b-2 border-blue-600 pb-1' 
-                    : 'text-gray-700 hover:text-blue-600'
-                }`}
+              <NavLink 
+                to="/"
+                className={({ isActive }) => `font-medium transition-colors text-sm xl:text-base ${isActive ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'}`}
+                end
               >
                 Home
-              </button>
+              </NavLink>
               <button 
                 onClick={handleTrackMyLGA}
-                className={`font-medium transition-colors text-sm xl:text-base ${
-                  currentPage === 'browse-projects' 
-                    ? 'text-blue-600 border-b-2 border-blue-600 pb-1' 
-                    : 'text-gray-700 hover:text-blue-600'
-                }`}
+                className={`font-medium transition-colors text-sm xl:text-base ${location.pathname === '/browse-projects' ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'}`}
               >
                 Track my LGA
               </button>
@@ -103,32 +93,24 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               {/* Community Features - Only show when logged in */}
               {isLoggedIn && (
                 <>
-                  <button 
-                    onClick={() => onNavigate('reports')}
-                    className={`font-medium transition-colors text-sm xl:text-base ${
-                      currentPage === 'reports' 
-                        ? 'text-blue-600 border-b-2 border-blue-600 pb-1' 
-                        : 'text-gray-700 hover:text-blue-600'
-                    }`}
+                  <NavLink 
+                    to="/reports"
+                    className={({ isActive }) => `font-medium transition-colors text-sm xl:text-base ${isActive ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'}`}
                   >
                     Reports
-                  </button>
-                  <button 
-                    onClick={() => onNavigate('champions')}
-                    className={`font-medium transition-colors text-sm xl:text-base ${
-                      currentPage === 'champions' 
-                        ? 'text-blue-600 border-b-2 border-blue-600 pb-1' 
-                        : 'text-gray-700 hover:text-blue-600'
-                    }`}
+                  </NavLink>
+                  <NavLink 
+                    to="/champions"
+                    className={({ isActive }) => `font-medium transition-colors text-sm xl:text-base ${isActive ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'}`}
                   >
                     Champions
-                  </button>
+                  </NavLink>
                 </>
               )}
               
-              <a href="#about" className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm xl:text-base">
+              <NavLink to="/about" className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm xl:text-base">
                 About
-              </a>
+              </NavLink>
               
               {/* Auth Buttons / User Menu */}
               <div className="flex items-center space-x-3 ml-4">
@@ -171,7 +153,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                       Sign In
                     </button>
                     <button
-                      onClick={() => onNavigate('register')}
+                      onClick={() => navigate('/register')}
                       className="px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
                     >
                       Join Community
@@ -184,9 +166,9 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
             {/* Tablet Navigation (md to lg) */}
             <nav className="hidden md:flex lg:hidden items-center space-x-4">
               <button 
-                onClick={() => onNavigate('home')}
+                onClick={() => navigate('/')}
                 className={`font-medium transition-colors text-sm ${
-                  currentPage === 'home' 
+                  location.pathname === '/' 
                     ? 'text-blue-600' 
                     : 'text-gray-700 hover:text-blue-600'
                 }`}
@@ -196,7 +178,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               <button 
                 onClick={handleTrackMyLGA}
                 className={`font-medium transition-colors text-sm ${
-                  currentPage === 'browse-projects' 
+                  location.pathname === '/browse-projects' 
                     ? 'text-blue-600' 
                     : 'text-gray-700 hover:text-blue-600'
                 }`}
@@ -232,7 +214,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                 </div>
               ) : (
                 <button
-                  onClick={() => onNavigate('register')}
+                      onClick={() => navigate('/register')}
                   className="bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700 transition-colors font-medium text-sm"
                 >
                   Join
@@ -264,11 +246,11 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
               <div className="px-2 pt-2 pb-4 space-y-1 bg-white border-t border-gray-200 shadow-lg">
                 <button 
                   onClick={() => {
-                    onNavigate('home');
+                    navigate('/');
                     setIsMobileMenuOpen(false);
                   }}
                   className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${
-                    currentPage === 'home' 
+                    location.pathname === '/' 
                       ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' 
                       : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                   }`}
@@ -281,7 +263,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                     setIsMobileMenuOpen(false);
                   }}
                   className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${
-                    currentPage === 'browse-projects' 
+                    location.pathname === '/browse-projects' 
                       ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' 
                       : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                   }`}
@@ -294,11 +276,11 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                   <>
                     <button 
                       onClick={() => {
-                        onNavigate('reports');
+                        navigate('/reports');
                         setIsMobileMenuOpen(false);
                       }}
                       className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${
-                        currentPage === 'reports' 
+                        location.pathname === '/reports' 
                           ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' 
                           : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                       }`}
@@ -307,11 +289,11 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                     </button>
                     <button 
                       onClick={() => {
-                        onNavigate('champions');
+                        navigate('/champions');
                         setIsMobileMenuOpen(false);
                       }}
                       className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${
-                        currentPage === 'champions' 
+                        location.pathname === '/champions' 
                           ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' 
                           : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                       }`}
@@ -375,7 +357,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
                       </button>
                       <button
                         onClick={() => {
-                          onNavigate('register');
+                          navigate('/register');
                           setIsMobileMenuOpen(false);
                         }}
                         className="block w-full text-left px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
@@ -396,7 +378,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate }) => {
         isOpen={isAuthModalOpen}
         onClose={closeAuthModal}
         onSuccess={handleAuthSuccess}
-        onRegisterClick={() => onNavigate('register')}
+        onRegisterClick={() => navigate('/register')}
         redirectAfterLogin="browse-projects"
       />
 

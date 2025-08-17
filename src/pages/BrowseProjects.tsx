@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useProjects } from '../contexts/ProjectContext';
 import { Project, ProjectFilters } from '../services/mockApi';
 import CitizenReportsModal from '../components/CitizenReportsModal';
@@ -16,11 +17,8 @@ interface Filters {
   searchQuery: string;
 }
 
-interface BrowseProjectsProps {
-  onNavigate: (page: string, projectId?: number) => void;
-}
-
-const BrowseProjects: React.FC<BrowseProjectsProps> = ({ onNavigate }) => {
+const BrowseProjects: React.FC = () => {
+  const navigate = useNavigate();
   const { projects, loading, error, stats, total, fetchProjects, clearError } = useProjects();
   
   const [filters, setFilters] = useState<Filters>({
@@ -392,7 +390,7 @@ const BrowseProjects: React.FC<BrowseProjectsProps> = ({ onNavigate }) => {
 
                       <div className="flex gap-3 mt-6">
                         <ArrowLink
-                          onClick={() => onNavigate('project-details', project.id)}
+                          onClick={() => navigate(`/project-details/${project.id}`)}
                           className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800"
                           isLink={false}
                         >
@@ -444,7 +442,7 @@ const BrowseProjects: React.FC<BrowseProjectsProps> = ({ onNavigate }) => {
                       </div>
                       <div className="flex gap-3 ml-6">
                         <ArrowLink
-                          onClick={() => onNavigate('project-details', project.id)}
+                          onClick={() => navigate(`/project-details/${project.id}`)}
                           className="bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800"
                           isLink={false}
                         >

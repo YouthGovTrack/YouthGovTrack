@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { nigeriaStates } from '../data/nigeriaData';
 import ArrowLink from '../components/icons/ArrowLink';
 import { useAuth } from '../contexts/AuthContext';
 
-interface RegisterProps {
-  onNavigate: (page: 'home' | 'projects' | 'browse-projects' | 'reports' | 'champions' | 'community') => void;
-}
-
-const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
+const Register: React.FC = () => {
+  const navigate = useNavigate();
   const { register } = useAuth();
   const [formData, setFormData] = useState({
     firstName: '',
@@ -123,7 +121,7 @@ const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
       alert(`Welcome to LocalGovTrack, ${formData.firstName}! Your account has been created successfully.`);
       
       // Navigate to community page for new users
-      onNavigate('community');
+      navigate('/community');
       
     } catch (error) {
       alert('Registration failed. Please try again.');
@@ -139,7 +137,7 @@ const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <ArrowLink 
-              onClick={() => onNavigate('home')}
+              onClick={() => navigate('/')}
               className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
               isLink={false}
             >
@@ -148,7 +146,7 @@ const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
             <div className="text-sm text-gray-600">
               Already have an account?{' '}
               <ArrowLink 
-                onClick={() => onNavigate('home')} // Will trigger login modal from navbar
+                onClick={() => navigate('/')} // Will trigger login modal from navbar
                 className="text-blue-600 hover:text-blue-700 font-medium"
                 isLink={false}
               >

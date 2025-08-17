@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import StateSelector from '../components/StateSelector';
 import LiveCivicAlerts from '../components/LiveCivicAlerts';
 import Sponsors from '../components/Sponsors';
@@ -9,11 +10,8 @@ import ArrowLink from '../components/icons/ArrowLink';
 import LazyImage from '../components/LazyImage';
 import { useProjects } from '../contexts/ProjectContext';
 
-interface HomeProps {
-  onNavigate: (page: string, projectId?: number) => void;
-}
-
-const Home: React.FC<HomeProps> = ({ onNavigate }) => {
+const Home: React.FC = () => {
+  const navigate = useNavigate();
   const [selectedState, setSelectedState] = useState<string>('');
   const [selectedLga, setSelectedLga] = useState<string>('');
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
@@ -56,6 +54,9 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
       alert('Please select both state and LGA');
     }
   };
+  // Replace all onNavigate calls with navigate
+  // Example: onNavigate('browse-projects') => navigate('/browse-projects')
+  // Example: onNavigate('project-details', id) => navigate(`/project-details/${id}`)
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -187,7 +188,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 <div 
                   key={project.id} 
                   className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer transform hover:scale-[1.02] transition-all duration-200"
-                  onClick={() => onNavigate('project-details', project.id)}
+                  onClick={() => navigate(`/project-details/${project.id}`)}
                 >
                   <div className="h-48 bg-gray-50 flex items-center justify-center p-6">
                     <img 
@@ -232,7 +233,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           <div className="text-center mt-8">
             <ArrowLink 
               className="bg-blue-600 text-white hover:bg-blue-700 transition shadow-lg"
-              onClick={() => onNavigate('browse-projects')}
+              onClick={() => navigate('/browse-projects')}
               isLink={false}
             >
               View All Projects
