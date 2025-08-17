@@ -18,6 +18,7 @@ const Home: React.FC = () => {
   const [showCommunityAlertForm, setShowCommunityAlertForm] = useState<boolean>(false);
   const { projects, loading } = useProjects();
   const [currentBackground, setCurrentBackground] = useState<1 | 2>(1);
+  console.log('[Home] Rendered. loading:', loading, 'projects:', projects);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -25,6 +26,9 @@ const Home: React.FC = () => {
     }, 3000);
     return () => clearInterval(interval);
   }, []);
+  useEffect(() => {
+    console.log('[Home] useEffect. loading:', loading, 'projects:', projects);
+  }, [loading, projects]);
 
   const handleStateChange = (state: string) => {
     setSelectedState(state);

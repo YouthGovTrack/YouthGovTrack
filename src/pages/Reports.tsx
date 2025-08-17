@@ -4,6 +4,7 @@ import CitizenReportsModal from '../components/CitizenReportsModal';
 import ArrowLink from '../components/icons/ArrowLink';
 
 const Reports: React.FC = () => {
+  console.log('[Reports] Rendered');
   const [showReportModal, setShowReportModal] = useState(false);
 
   return (

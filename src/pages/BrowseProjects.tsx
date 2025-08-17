@@ -18,6 +18,7 @@ interface Filters {
 }
 
 const BrowseProjects: React.FC = () => {
+  console.log('[BrowseProjects] Rendered');
   const navigate = useNavigate();
   const { projects, loading, error, stats, total, fetchProjects, clearError } = useProjects();
   

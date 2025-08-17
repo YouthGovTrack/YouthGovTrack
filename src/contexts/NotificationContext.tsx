@@ -44,6 +44,7 @@ interface NotificationProviderProps {
 
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({ children }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  console.log('[NotificationProvider] Mounted');
 
   // Get current user info for community notifications
   const getCurrentUser = () => {
@@ -59,17 +60,13 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
   const loadCommunityNotifications = () => {
     const currentUser = getCurrentUser();
     if (!currentUser) return;
-
     const userState = currentUser.state || 'Lagos';
     const userLga = currentUser.lga || 'Lagos Island';
     const userId = currentUser.id || 'anonymous';
-
     // Subscribe user to their location
     SharedNotificationService.subscribeUser(userId, userState, userLga);
-
     // Get community notifications for this user's location
     const communityNotifications = SharedNotificationService.getNotificationsForUser(userState, userLga, userId);
-    
     // Convert shared notifications to local notification format
     const convertedNotifications: Notification[] = communityNotifications.map(shared => ({
       id: shared.id,
@@ -84,12 +81,11 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       lga: shared.lga,
       isGlobal: shared.isGlobal
     }));
-
+    console.log('[NotificationProvider] Loaded community notifications:', convertedNotifications);
     // Merge with existing personal notifications
     setNotifications(prev => {
       const personalNotifications = prev.filter(n => !n.isGlobal);
       const allNotifications = [...convertedNotifications, ...personalNotifications];
-      
       // Sort by timestamp and keep only latest 50
       return allNotifications
         .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
@@ -152,16 +148,16 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       isRead: false,
       isGlobal: false // Personal notifications are not global
     };
-
     setNotifications(prev => [newNotification, ...prev].slice(0, 50));
+    console.log('[NotificationProvider] Added personal notification:', newNotification);
   };
 
   const addGlobalNotification = (notification: Omit<SharedNotification, 'id' | 'timestamp' | 'readBy'>) => {
     // Add to shared notification service for all community members
     SharedNotificationService.addGlobalNotification(notification);
-    
     // Refresh local notifications to include the new global one
     setTimeout(() => loadCommunityNotifications(), 100);
+    console.log('[NotificationProvider] Added global notification:', notification);
   };
 
   const markAsRead = (notificationId: string) => {

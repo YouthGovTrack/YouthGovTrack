@@ -11,6 +11,7 @@ interface ProjectDetailsProps {
 }
 
 const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId }) => {
+  console.log('[ProjectDetails] Rendered. projectId:', projectId);
   const navigate = useNavigate();
   const { projects, loading: projectsLoading } = useProjects();
   const [project, setProject] = useState<Project | null>(null);

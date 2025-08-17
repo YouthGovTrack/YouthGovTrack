@@ -15,12 +15,12 @@ const StateSelector: React.FC<StateSelectorProps> = ({
   const [selectedState, setSelectedState] = useState<string>('');
   const [selectedLga, setSelectedLga] = useState<string>('');
   const [availableLgas, setAvailableLgas] = useState<string[]>([]);
+  console.log('[StateSelector] Rendered. selectedState:', selectedState, 'selectedLga:', selectedLga);
 
   const handleStateChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const stateName = event.target.value;
     setSelectedState(stateName);
     setSelectedLga(''); // Reset LGA when state changes
-    
     // Find the selected state and get its LGAs
     const state = nigeriaStates.find(s => s.name === stateName);
     if (state) {
@@ -28,7 +28,7 @@ const StateSelector: React.FC<StateSelectorProps> = ({
     } else {
       setAvailableLgas([]);
     }
-    
+    console.log('[StateSelector] State changed:', stateName);
     // Call parent callback
     if (onStateChange) {
       onStateChange(stateName);
@@ -38,7 +38,7 @@ const StateSelector: React.FC<StateSelectorProps> = ({
   const handleLgaChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const lgaName = event.target.value;
     setSelectedLga(lgaName);
-    
+    console.log('[StateSelector] LGA changed:', lgaName);
     // Call parent callback
     if (onLgaChange) {
       onLgaChange(lgaName);

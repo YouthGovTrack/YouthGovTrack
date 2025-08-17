@@ -32,6 +32,7 @@ const App: React.FC = () => {
   // For special layout pages
   const location = useLocation();
   const isSpecialPage = ['/register', '/project-details', '/community'].includes(location.pathname);
+  console.log('[App] Rendered. location:', location.pathname, 'isSpecialPage:', isSpecialPage);
 
   return (
     <AuthProvider>

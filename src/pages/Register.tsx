@@ -5,6 +5,7 @@ import ArrowLink from '../components/icons/ArrowLink';
 import { useAuth } from '../contexts/AuthContext';
 
 const Register: React.FC = () => {
+  console.log('[Register] Rendered');
   const navigate = useNavigate();
   const { register } = useAuth();
   const [formData, setFormData] = useState({

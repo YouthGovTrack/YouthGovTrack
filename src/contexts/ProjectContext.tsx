@@ -47,22 +47,25 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
   });
   const [total, setTotal] = useState(0);
   const [currentFilters, setCurrentFilters] = useState<ProjectFilters>({});
+  console.log('[ProjectProvider] Mounted');
 
   const fetchProjects = useCallback(async (filters: ProjectFilters = {}) => {
     setLoading(true);
     setError(null);
-    
+    console.log('[ProjectProvider] fetchProjects called with filters:', filters);
     try {
       const data = await mockProjectAPI.getProjects(filters);
       setProjects(data.projects);
       setStats(data.stats);
       setTotal(data.total);
       setCurrentFilters(filters);
+      console.log('[ProjectProvider] Projects fetched:', data.projects);
     } catch (err: any) {
       setError(err.message || 'Failed to fetch projects');
-      console.error('Failed to fetch projects:', err);
+      console.error('[ProjectProvider] Failed to fetch projects:', err);
     } finally {
       setLoading(false);
+      console.log('[ProjectProvider] fetchProjects loading set to false');
     }
   }, []);
 

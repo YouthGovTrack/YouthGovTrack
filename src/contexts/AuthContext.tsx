@@ -38,6 +38,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  console.log('[AuthProvider] Mounted');
 
   useEffect(() => {
     // Check for existing user session on app load
@@ -45,6 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (userData) {
       try {
         setUser(JSON.parse(userData));
+        console.log('[AuthProvider] Loaded user from localStorage:', userData);
       } catch (error) {
         console.error('Error parsing user data:', error);
         localStorage.removeItem('currentUser');
@@ -55,7 +57,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string): Promise<void> => {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
     // Mock login - in real app, this would validate credentials
     const mockUser: User = {
       id: Date.now().toString(),
@@ -70,15 +71,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isVerified: true,
       profileImage: '/citizen1.png' // Default profile image
     };
-    
     localStorage.setItem('currentUser', JSON.stringify(mockUser));
     setUser(mockUser);
+    console.log('[AuthProvider] User logged in:', mockUser);
   };
 
   const register = async (userData: RegisterData): Promise<void> => {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
-
     const newUser: User = {
       id: Date.now().toString(),
       firstName: userData.firstName,
@@ -92,14 +92,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isVerified: false,
       profileImage: userData.profileImage || '/citizen1.png' // Use uploaded image or default
     };
-
     localStorage.setItem('currentUser', JSON.stringify(newUser));
     setUser(newUser);
+    console.log('[AuthProvider] User registered:', newUser);
   };
 
   const logout = (): void => {
     localStorage.removeItem('currentUser');
     setUser(null);
+    console.log('[AuthProvider] User logged out');
   };
 
   const updateProfile = (updates: Partial<User>): void => {
@@ -107,6 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const updatedUser = { ...user, ...updates };
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
       setUser(updatedUser);
+      console.log('[AuthProvider] User profile updated:', updatedUser);
     }
   };
 
