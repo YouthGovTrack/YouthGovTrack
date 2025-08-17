@@ -1,3 +1,4 @@
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
@@ -117,6 +118,11 @@ module.exports = (env, argv) => {
           minifyCSS: true,
           minifyURLs: true,
         } : false,
+      }),
+      new CopyWebpackPlugin({
+        patterns: [
+          { from: 'public', to: '.', globOptions: { ignore: ['**/index.html'] } },
+        ],
       }),
       ...(isProduction ? [
         new CompressionPlugin({

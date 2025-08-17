@@ -29,6 +29,7 @@
     "autoprefixer": "^10.4.14",
     "babel-loader": "^9.1.0",
     "compression-webpack-plugin": "^11.0.0",
+    "copy-webpack-plugin": "^13.0.1",
     "css-loader": "^6.8.0",
     "html-webpack-plugin": "^5.5.0",
     "imagemin": "^8.0.1",

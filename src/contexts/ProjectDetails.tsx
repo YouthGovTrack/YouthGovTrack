@@ -19,22 +19,34 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId }) => {
   const [relatedProjects, setRelatedProjects] = useState<Project[]>([]);
 
   useEffect(() => {
-    if (!projectId || projectsLoading) return;
+    if (!projectId) return;
 
-    const foundProject = projects.find(p => p.id === projectId);
-    if (foundProject) {
-      setProject(foundProject);
-      // Get related projects (same category, different project)
-      const related = projects
-        .filter(p => p.id !== projectId && p.category === foundProject.category)
-        .slice(0, 3);
-      setRelatedProjects(related);
-      setLoading(false);
-    } else {
-      setError('Project not found');
-      setLoading(false);
-    }
-  }, [projectId, projectsLoading, projects]);
+    const fetchData = async () => {
+      try {
+        if (!projectsLoading) {
+          const foundProject = projects.find(p => p.id === projectId);
+          if (foundProject) {
+            setProject(foundProject);
+            
+            // Get related projects (same category, different project)
+            const related = projects
+              .filter(p => p.id !== projectId && p.category === foundProject.category)
+              .slice(0, 3);
+            setRelatedProjects(related);
+          } else {
+            setError('Project not found');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching project:', error);
+        setError('Failed to fetch project details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [projectId, projects, projectsLoading]);
 
   // Format image URL function
   const formatImageUrl = (url: string) => {
