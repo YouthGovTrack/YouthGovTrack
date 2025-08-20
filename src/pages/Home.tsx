@@ -27,8 +27,8 @@ const Home: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
   useEffect(() => {
-    console.log('[Home] useEffect. loading:', loading, 'projects:', projects);
-  }, [loading, projects]);
+    console.log('[Home] useEffect. loading:', loading, 'projects count:', projects.length);
+  }, [loading, projects.length]);
 
   const handleStateChange = (state: string) => {
     setSelectedState(state);

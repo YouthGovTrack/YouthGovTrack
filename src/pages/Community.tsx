@@ -1,4 +1,3 @@
-  console.log('[Community] Rendered');
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,6 +18,7 @@ interface CommunityProps {
 }
 
 const Community: React.FC<CommunityProps> = ({ initialTab = 'dashboard' }) => {
+  console.log('[Community] Rendered');
   const navigate = useNavigate();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState(initialTab);

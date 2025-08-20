@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { mockProjectAPI, Project, ProjectFilters } from '../services/mockApi';
 
+/**
+ * Statistics interface for project data aggregation
+ */
 interface ProjectStats {
   totalProjects: number;
   completedProjects: number;
@@ -8,6 +11,9 @@ interface ProjectStats {
   totalBudget: number;
 }
 
+/**
+ * Context type definition for project management functionality
+ */
 interface ProjectContextType {
   projects: Project[];
   loading: boolean;
@@ -23,6 +29,11 @@ interface ProjectContextType {
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
+/**
+ * Custom hook to access project context
+ * @throws Error if used outside of ProjectProvider
+ * @returns ProjectContextType with all project management functions
+ */
 export const useProjects = () => {
   const context = useContext(ProjectContext);
   if (!context) {
@@ -31,10 +42,17 @@ export const useProjects = () => {
   return context;
 };
 
+/**
+ * Props interface for ProjectProvider component
+ */
 interface ProjectProviderProps {
   children: ReactNode;
 }
 
+/**
+ * Context provider component that manages project state and operations
+ * Provides project data, loading states, and CRUD operations to child components
+ */
 export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
@@ -47,28 +65,32 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
   });
   const [total, setTotal] = useState(0);
   const [currentFilters, setCurrentFilters] = useState<ProjectFilters>({});
-  console.log('[ProjectProvider] Mounted');
 
+  /**
+   * Fetches projects from the API with optional filtering
+   * @param filters - Optional filters to apply to the project query
+   */
   const fetchProjects = useCallback(async (filters: ProjectFilters = {}) => {
     setLoading(true);
     setError(null);
-    console.log('[ProjectProvider] fetchProjects called with filters:', filters);
     try {
       const data = await mockProjectAPI.getProjects(filters);
       setProjects(data.projects);
       setStats(data.stats);
       setTotal(data.total);
       setCurrentFilters(filters);
-      console.log('[ProjectProvider] Projects fetched:', data.projects);
     } catch (err: any) {
       setError(err.message || 'Failed to fetch projects');
       console.error('[ProjectProvider] Failed to fetch projects:', err);
     } finally {
       setLoading(false);
-      console.log('[ProjectProvider] fetchProjects loading set to false');
     }
   }, []);
 
+  /**
+   * Adds a new project to the local state and updates statistics
+   * @param newProject - The project to add
+   */
   const addProject = useCallback((newProject: Project) => {
     setProjects(prev => [newProject, ...prev]);
     setTotal(prev => prev + 1);
@@ -80,6 +102,11 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
     }));
   }, []);
 
+  /**
+   * Updates an existing project in the local state
+   * @param id - The ID of the project to update
+   * @param updatedProject - Partial project data to merge with existing project
+   */
   const updateProject = useCallback((id: number, updatedProject: Partial<Project>) => {
     setProjects(prev => 
       prev.map(project => 
@@ -88,15 +115,21 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({ children }) =>
     );
   }, []);
 
+  /**
+   * Refreshes the project list using the current filters
+   */
   const refreshProjects = useCallback(async () => {
     await fetchProjects(currentFilters);
   }, [fetchProjects, currentFilters]);
 
+  /**
+   * Clears any error state
+   */
   const clearError = useCallback(() => {
     setError(null);
   }, []);
 
-  // Load initial projects on mount
+  // Load initial projects on component mount
   useEffect(() => {
     fetchProjects();
   }, [fetchProjects]);

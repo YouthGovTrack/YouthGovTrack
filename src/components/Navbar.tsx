@@ -76,20 +76,21 @@ const Navbar: React.FC = () => {
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
-              <NavLink 
-                to="/"
-                className={({ isActive }) => `font-medium transition-colors text-sm xl:text-base ${isActive ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'}`}
-                end
-              >
-                Home
-              </NavLink>
+              {!isLoggedIn && (
+                <NavLink 
+                  to="/"
+                  className={({ isActive }) => `font-medium transition-colors text-sm xl:text-base ${isActive ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'}`}
+                  end
+                >
+                  Home
+                </NavLink>
+              )}
               <button 
                 onClick={handleTrackMyLGA}
                 className={`font-medium transition-colors text-sm xl:text-base ${location.pathname === '/browse-projects' ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'}`}
               >
                 Track my LGA
               </button>
-              
               {/* Community Features - Only show when logged in */}
               {isLoggedIn && (
                 <>
@@ -107,11 +108,9 @@ const Navbar: React.FC = () => {
                   </NavLink>
                 </>
               )}
-              
               <NavLink to="/about" className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm xl:text-base">
                 About
               </NavLink>
-              
               {/* Auth Buttons / User Menu */}
               <div className="flex items-center space-x-3 ml-4">
                 {/* Civic Alerts Bell Icon - Only show for authenticated users */}
@@ -131,7 +130,6 @@ const Navbar: React.FC = () => {
                     )}
                   </button>
                 )}
-
                 {isLoggedIn ? (
                   <div className="flex items-center space-x-3">
                     <span className="text-sm text-gray-700">
@@ -165,16 +163,18 @@ const Navbar: React.FC = () => {
 
             {/* Tablet Navigation (md to lg) */}
             <nav className="hidden md:flex lg:hidden items-center space-x-4">
-              <button 
-                onClick={() => navigate('/')}
-                className={`font-medium transition-colors text-sm ${
-                  location.pathname === '/' 
-                    ? 'text-blue-600' 
-                    : 'text-gray-700 hover:text-blue-600'
-                }`}
-              >
-                Home
-              </button>
+              {!isLoggedIn && (
+                <button 
+                  onClick={() => navigate('/')}
+                  className={`font-medium transition-colors text-sm ${
+                    location.pathname === '/' 
+                      ? 'text-blue-600' 
+                      : 'text-gray-700 hover:text-blue-600'
+                  }`}
+                >
+                  Home
+                </button>
+              )}
               <button 
                 onClick={handleTrackMyLGA}
                 className={`font-medium transition-colors text-sm ${
@@ -185,7 +185,6 @@ const Navbar: React.FC = () => {
               >
                 Track my LGA
               </button>
-
               {/* Civic Alerts Bell Icon for Tablet - Only show for authenticated users */}
               {isLoggedIn && (
                 <button
@@ -201,7 +200,6 @@ const Navbar: React.FC = () => {
                   )}
                 </button>
               )}
-              
               {isLoggedIn ? (
                 <div className="flex items-center space-x-2">
                   <span className="text-xs text-gray-600">{user.firstName}</span>
@@ -244,19 +242,21 @@ const Navbar: React.FC = () => {
           {isMobileMenuOpen && (
             <div className="md:hidden animate-fade-in">
               <div className="px-2 pt-2 pb-4 space-y-1 bg-white border-t border-gray-200 shadow-lg">
-                <button 
-                  onClick={() => {
-                    navigate('/');
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${
-                    location.pathname === '/' 
-                      ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' 
-                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                  }`}
-                >
-                  🏠 Home
-                </button>
+                {!isLoggedIn && (
+                  <button 
+                    onClick={() => {
+                      navigate('/');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${
+                      location.pathname === '/' 
+                        ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' 
+                        : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    🏠 Home
+                  </button>
+                )}
                 <button 
                   onClick={() => {
                     handleTrackMyLGA();
@@ -270,7 +270,6 @@ const Navbar: React.FC = () => {
                 >
                   📊 Track my LGA
                 </button>
-                
                 {/* Community Features - Only show when logged in */}
                 {isLoggedIn && (
                   <>
@@ -302,11 +301,9 @@ const Navbar: React.FC = () => {
                     </button>
                   </>
                 )}
-                
                 <a href="#about" className="block px-4 py-3 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 font-medium transition-colors">
                   ℹ️ About
                 </a>
-
                 {/* Civic Alerts in Mobile Menu - Only show for authenticated users */}
                 {isLoggedIn && (
                   <button
@@ -326,7 +323,6 @@ const Navbar: React.FC = () => {
                     </div>
                   </button>
                 )}
-                
                 {/* Mobile Auth Section */}
                 <div className="border-t border-gray-200 pt-3 mt-3 space-y-2">
                   {isLoggedIn ? (

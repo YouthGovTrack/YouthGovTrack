@@ -1,17 +1,7 @@
-
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, useParams } from 'react-router-dom';
-
-// Wrapper to extract projectId from URL and pass as prop
-function ProjectDetailsWrapper() {
-  const params = useParams();
-  const id = params.id;
-  const projectId = id ? Number(id) : null;
-  return <ProjectDetails projectId={projectId} />;
-}
+import React, { useState, ErrorInfo, Component, ReactNode } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation, useParams } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import Loader from './components/Loader';
 import CommunityAlertForm from './components/CommunityAlertForm';
 import Home from './pages/Home';
 import BrowseProjects from './pages/BrowseProjects';
@@ -26,57 +16,143 @@ import { AuthProvider } from './contexts/AuthContext';
 import OptimizedIcon from './components/OptimizedIcon';
 import './styles/global.css';
 
+/**
+ * State interface for the ErrorBoundary component
+ */
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error?: Error;
+}
 
+/**
+ * Error boundary component that catches JavaScript errors anywhere in the child component tree
+ * and displays a fallback UI instead of crashing the entire application.
+ */
+class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryState> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  /**
+   * Updates state to render fallback UI when an error occurs
+   * @param error - The error that was thrown
+   * @returns Updated state with error flag
+   */
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  /**
+   * Logs error details for debugging purposes
+   * @param error - The error that was thrown
+   * @param errorInfo - Additional error information
+   */
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('Error caught by boundary:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center p-8">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Something went wrong</h1>
+            <p className="text-gray-600 mb-4">We're sorry, but something unexpected happened.</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+/**
+ * Wrapper component that extracts project ID from URL parameters and validates it
+ * before passing to the ProjectDetails component.
+ * @returns ProjectDetails component with validated projectId prop
+ */
+function ProjectDetailsWrapper() {
+  const params = useParams();
+  const id = params.id;
+  
+  // Validate and convert projectId to ensure it's a positive integer
+  let projectId: number | null = null;
+  if (id) {
+    const parsedId = parseInt(id, 10);
+    if (!isNaN(parsedId) && parsedId > 0) {
+      projectId = parsedId;
+    }
+  }
+  
+  return <ProjectDetails projectId={projectId} />;
+}
+
+/**
+ * Main application component that handles routing and layout logic.
+ * Determines which pages should have special layouts (no navbar/footer).
+ */
 const App: React.FC = () => {
   const [isAlertFormOpen, setIsAlertFormOpen] = useState(false);
-  // For special layout pages
   const location = useLocation();
-  const isSpecialPage = ['/register', '/project-details', '/community'].includes(location.pathname);
-  console.log('[App] Rendered. location:', location.pathname, 'isSpecialPage:', isSpecialPage);
+  
+  // Determine if current page should use special layout (no navbar/footer)
+  const isSpecialPage = location.pathname === '/register' || 
+                       location.pathname === '/community' || 
+                       location.pathname.startsWith('/project-details/');
 
   return (
-    <AuthProvider>
-      <NotificationProvider>
-        <ProjectProvider>
-          <div className="min-h-screen bg-gray-50 flex flex-col">
-            {!isSpecialPage && <Navbar />}
-            <main className={`flex-1 ${!isSpecialPage ? 'pt-20' : ''}`}>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/browse-projects" element={<BrowseProjects />} />
-                <Route path="/reports" element={<Reports />} />
-                <Route path="/champions" element={<Champions />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/community" element={<Community />} />
-                <Route path="/project-details/:id" element={<ProjectDetailsWrapper />} />
-
-                {/* Add more routes as needed */}
-                <Route path="*" element={<Home />} />
-              </Routes>
-            </main>
-            {!isSpecialPage && <Footer />}
-            {/* Floating Action Button for Community Alerts */}
-            {!isSpecialPage && (
-              <button
-                onClick={() => setIsAlertFormOpen(true)}
-                className="fixed bottom-6 right-6 bg-gradient-to-r from-green-500 to-blue-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 z-40 group"
-                title="Submit Community Alert"
-              >
-                <OptimizedIcon name="plus" size={24} className="transition-transform group-hover:rotate-180" />
-              </button>
-            )}
-            {/* Community Alert Form Modal */}
-            <CommunityAlertForm
-              isOpen={isAlertFormOpen}
-              onClose={() => setIsAlertFormOpen(false)}
-            />
-          </div>
-        </ProjectProvider>
-      </NotificationProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <NotificationProvider>
+          <ProjectProvider>
+            <div className="min-h-screen bg-gray-50 flex flex-col">
+              {!isSpecialPage && <Navbar />}
+              <main className={`flex-1 ${!isSpecialPage ? 'pt-20' : ''}`}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/browse-projects" element={<BrowseProjects />} />
+                  <Route path="/reports" element={<Reports />} />
+                  <Route path="/champions" element={<Champions />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/community" element={<Community />} />
+                  <Route path="/project-details/:id" element={<ProjectDetailsWrapper />} />
+                  <Route path="*" element={<Home />} />
+                </Routes>
+              </main>
+              {!isSpecialPage && <Footer />}
+              {!isSpecialPage && (
+                <button
+                  onClick={() => setIsAlertFormOpen(true)}
+                  className="fixed bottom-6 right-6 bg-gradient-to-r from-green-500 to-blue-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 z-40 group"
+                  title="Submit Community Alert"
+                  aria-label="Submit Community Alert"
+                >
+                  <OptimizedIcon name="plus" size={24} className="transition-transform group-hover:rotate-180" />
+                </button>
+              )}
+              <CommunityAlertForm
+                isOpen={isAlertFormOpen}
+                onClose={() => setIsAlertFormOpen(false)}
+              />
+            </div>
+          </ProjectProvider>
+        </NotificationProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 };
 
+/**
+ * Root component that wraps the App with React Router for client-side routing
+ */
 const AppWithRouter: React.FC = () => (
   <Router>
     <App />

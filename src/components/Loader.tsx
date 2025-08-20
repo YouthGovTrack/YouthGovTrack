@@ -1,5 +1,9 @@
 import React from 'react';
 
+/**
+ * Loading spinner component that displays a centered spinning animation
+ * Used to indicate loading states throughout the application
+ */
 const Loader: React.FC = () => {
   return (
     <div className="flex items-center justify-center min-h-screen">

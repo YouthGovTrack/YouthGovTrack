@@ -1,7 +1,9 @@
-  console.log('[Champions] Rendered');
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
-const Champions: React.FC = () => <Navigate to="/community" replace />;
+const Champions: React.FC = () => {
+  console.log('[Champions] Rendered');
+  return <Navigate to="/community" replace />;
+};
 
 export default Champions;

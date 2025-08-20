@@ -306,7 +306,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId }) => {
                   className='flex flex-col items-center m-2 cursor-pointer hover:transform hover:scale-105 transition-all duration-300'
                   onClick={() => {
                     // Navigate to related project details
-                    window.location.reload(); // Simple reload for now
+                    navigate(`/project-details/${relatedProject.id}`);
                   }}
                 >
                   <img 
