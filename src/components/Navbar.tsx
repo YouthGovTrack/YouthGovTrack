@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, NavLink } from 'react-router-dom';
 import OptimizedIcon from './OptimizedIcon';
 import AuthModal from './AuthModal';
@@ -47,6 +47,21 @@ const Navbar: React.FC = () => {
       navigate('/');
     }
   };
+
+  // Add event listener for opening login modal from other components
+  useEffect(() => {
+    const handleOpenLoginModal = () => {
+      setIsAuthModalOpen(true);
+    };
+    
+    // Use a named event to avoid potential memory leaks
+    window.addEventListener('openLoginModal', handleOpenLoginModal);
+    
+    // Cleanup function to remove the event listener
+    return () => {
+      window.removeEventListener('openLoginModal', handleOpenLoginModal);
+    };
+  }, []); // Empty dependency array ensures this only runs once
 
   // Handle Track my LGA button click - require sign-in for non-authenticated users
   const handleTrackMyLGA = () => {

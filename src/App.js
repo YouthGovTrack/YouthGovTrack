@@ -1,9 +1,9 @@
-import React from 'react';
+/** import React from 'react';
 
 function App() {
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      {/* 
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
@@ -21,7 +21,7 @@ function App() {
         </div>
       </header>
 
-      {/* Hero Section */}
+      {/* Hero Section 
       <section className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -38,7 +38,7 @@ function App() {
               </button>
             </div>
             
-            {/* Quick Report Form */}
+            {/* Quick Report Form 
             <div className="bg-blue-600 rounded-xl p-8 text-white">
               <h3 className="text-2xl font-bold mb-6">Quick Report</h3>
               <div className="space-y-4">
@@ -64,7 +64,7 @@ function App() {
         </div>
       </section>
 
-      {/* Statistics */}
+      {/* Statistics 
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -87,7 +87,7 @@ function App() {
         </div>
       </section>
 
-      {/* Featured Projects */}
+      {/* Featured Projects 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -168,7 +168,7 @@ function App() {
         </div>
       </section>
 
-      {/* Live Civic Alerts */}
+      {/* Live Civic Alerts 
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-8">
@@ -230,7 +230,7 @@ function App() {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Testimonials 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -264,7 +264,7 @@ function App() {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Footer 
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -307,4 +307,4 @@ function App() {
   );
 }
 
-export default App;
+export default App; */

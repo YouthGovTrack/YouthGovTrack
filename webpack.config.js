@@ -169,8 +169,13 @@ module.exports = (env, argv) => {
       hot: true,
       open: true,
       compress: true,
+      historyApiFallback: true, // Handle SPA routing
       headers: {
-        'Cache-Control': 'max-age=31536000', // 1 year for static assets
+        'Cache-Control': 'no-cache, no-store, must-revalidate', // Prevent caching during development
+      },
+      client: {
+        overlay: true, // Show errors as overlay
+        progress: true, // Show compilation progress
       },
     },
   };

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 interface AuthModalProps {
@@ -17,6 +18,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
   redirectAfterLogin 
 }) => {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -160,7 +162,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   type="button"
                   onClick={() => {
                     onClose();
-                    onRegisterClick?.();
+                    navigate('/register');
                   }}
                   className="text-blue-600 hover:underline font-medium"
                 >
