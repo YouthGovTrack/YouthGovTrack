@@ -148,7 +148,7 @@ const Register: React.FC = () => {
               Already have an account?{' '}
               <ArrowLink 
                 onClick={() => {
-                  // Dispatch a custom event to trigger AuthModal (AuthContext)
+                  
                   window.dispatchEvent(new CustomEvent('open-auth-modal'));
                 }}
                 className="text-blue-600 hover:text-blue-700 font-medium"

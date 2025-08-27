@@ -160,11 +160,13 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 Don't have an account?{' '}
                 <button
                   type="button"
+                  disabled={isLoading}
                   onClick={() => {
                     onClose();
                     navigate('/register');
                   }}
-                  className="text-blue-600 hover:underline font-medium"
+                  className="text-blue-600 hover:underline font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                 
                 >
                   Create a new account
                 </button>
