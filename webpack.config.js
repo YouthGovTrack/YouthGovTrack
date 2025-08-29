@@ -40,7 +40,7 @@ module.exports = (env, argv) => {
           },
         },
       },
-      runtimeChunk: 'single',
+      runtimeChunk: isProduction ? 'single' : false,
       usedExports: true,
       sideEffects: false,
     },
