@@ -1,11 +1,16 @@
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
-const ImageminPlugin = require('imagemin-webpack-plugin').default;
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
+  const isDevelopment = !isProduction;
   
   return {
     entry: './src/index.tsx',
@@ -15,61 +20,93 @@ module.exports = (env, argv) => {
       chunkFilename: isProduction ? '[name].[contenthash].chunk.js' : '[name].chunk.js',
       assetModuleFilename: 'assets/[name].[contenthash][ext]',
       clean: true,
-      // Enable caching
       publicPath: '/',
     },
     resolve: {
       extensions: ['.tsx', '.ts', '.js', '.jsx'],
     },
-    // Enable caching
     cache: {
       type: 'filesystem',
       buildDependencies: {
         config: [__filename],
       },
     },
-    // Optimization settings
     optimization: {
+      minimize: isProduction,
+      minimizer: [
+        new TerserPlugin({
+          parallel: true,
+          terserOptions: {
+            compress: {
+              drop_console: isProduction,
+            },
+          },
+        }),
+        new CssMinimizerPlugin(),
+      ],
       splitChunks: {
         chunks: 'all',
+        minSize: 20000,
+        maxSize: 244000,
+        minChunks: 1,
+        maxAsyncRequests: 30,
+        maxInitialRequests: 30,
+        automaticNameDelimiter: '~',
         cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
+          defaultVendors: {
+            test: /[\/]node_modules[\/]/,
+            priority: -10,
+            reuseExistingChunk: true,
+          },
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
           },
         },
       },
       runtimeChunk: 'single',
       usedExports: true,
-      sideEffects: false,
+      sideEffects: true,
+      moduleIds: isProduction ? 'deterministic' : 'named',
+      chunkIds: isProduction ? 'deterministic' : 'named',
     },
     module: {
       rules: [
         {
           test: /\.(ts|tsx|js|jsx)$/,
           exclude: /node_modules/,
-          use: {
-            loader: 'babel-loader',
-            options: {
-              presets: [
-                '@babel/preset-env', 
-                '@babel/preset-react',
-                '@babel/preset-typescript'
-              ],
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                cacheDirectory: true,
+                presets: [
+                  '@babel/preset-env',
+                  '@babel/preset-react',
+                  '@babel/preset-typescript'
+                ],
+                plugins: [
+                  isDevelopment && 'react-refresh/babel'
+                ].filter(Boolean),
+              },
             },
-          },
+          ],
         },
         {
-          test: /\.css$/i,
-          use: ['style-loader', 'css-loader', 'postcss-loader'],
+          test: /\.css$/,
+          use: [
+            isProduction ? MiniCssExtractPlugin.loader : 'style-loader',
+            'css-loader',
+            'postcss-loader',
+          ],
         },
         {
-          test: /\.(png|jpe?g|gif)$/i,
+          test: /\.(png|jpe?g|gif|webp|avif)$/i,
           type: 'asset',
           parser: {
             dataUrlCondition: {
-              maxSize: 8 * 1024, // 8kb - inline small images
+              maxSize: 8 * 1024,
             },
           },
           generator: {
@@ -101,9 +138,21 @@ module.exports = (env, argv) => {
             },
           ],
         },
+        {
+          test: /\.(woff|woff2|eot|ttf|otf)$/i,
+          type: 'asset/resource',
+          generator: {
+            filename: 'fonts/[name][ext]',
+          },
+        },
       ],
     },
     plugins: [
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(
+          isProduction ? 'production' : 'development'
+        ),
+      }),
       new HtmlWebpackPlugin({
         template: './public/index.html',
         minify: isProduction ? {
@@ -119,42 +168,23 @@ module.exports = (env, argv) => {
           minifyURLs: true,
         } : false,
       }),
-      new CopyWebpackPlugin({
-        patterns: [
-          { from: 'public', to: '.', globOptions: { ignore: ['**/index.html'] } },
-        ],
+      isDevelopment && new webpack.HotModuleReplacementPlugin(),
+      isDevelopment && new ReactRefreshWebpackPlugin(),
+      isProduction && new MiniCssExtractPlugin({
+        filename: 'css/[name].[contenthash].css',
+        chunkFilename: 'css/[id].[contenthash].css',
       }),
-      ...(isProduction ? [
-        new CompressionPlugin({
-          algorithm: 'gzip',
-          test: /\.(js|css|html|svg)$/,
-          threshold: 8192,
-          minRatio: 0.8,
-        }),
-        new ImageminPlugin({
-          test: /\.(jpe?g|png|gif|svg)$/i,
-          pngquant: {
-            quality: '65-90',
-          },
-          mozjpeg: {
-            progressive: true,
-            quality: 75,
-          },
-          svgo: {
-            plugins: [
-              {
-                name: 'preset-default',
-                params: {
-                  overrides: {
-                    removeViewBox: false,
-                  },
-                },
-              },
-            ],
-          },
-        }),
-      ] : []),
-    ],
+      isProduction && new CompressionPlugin({
+        algorithm: 'gzip',
+        test: /\.(js|css|html|svg)$/,
+        threshold: 10240,
+        minRatio: 0.8,
+      }),
+      isProduction && new BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        openAnalyzer: false,
+      }),
+    ].filter(Boolean),
     devServer: {
       static: [
         {
@@ -169,13 +199,13 @@ module.exports = (env, argv) => {
       hot: true,
       open: true,
       compress: true,
-      historyApiFallback: true, // Handle SPA routing
+      historyApiFallback: true,
       headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate', // Prevent caching during development
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
       },
       client: {
-        overlay: true, // Show errors as overlay
-        progress: true, // Show compilation progress
+        overlay: true,
+        progress: true,
       },
     },
   };
