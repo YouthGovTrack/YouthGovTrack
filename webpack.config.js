@@ -3,6 +3,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 const ImageminPlugin = require('imagemin-webpack-plugin').default;
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
@@ -57,6 +58,9 @@ module.exports = (env, argv) => {
                 '@babel/preset-react',
                 '@babel/preset-typescript'
               ],
+              plugins: [
+                !isProduction && require.resolve('react-refresh/babel')
+              ].filter(Boolean),
             },
           },
         },
@@ -104,6 +108,7 @@ module.exports = (env, argv) => {
       ],
     },
     plugins: [
+      !isProduction && new ReactRefreshWebpackPlugin(),
       new HtmlWebpackPlugin({
         template: './public/index.html',
         minify: isProduction ? {
@@ -154,7 +159,7 @@ module.exports = (env, argv) => {
           },
         }),
       ] : []),
-    ],
+    ].filter(Boolean),
     devServer: {
       static: {
         directory: path.join(__dirname, 'dist'),
