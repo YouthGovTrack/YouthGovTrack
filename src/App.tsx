@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import CommunityAlertForm from './components/CommunityAlertForm';
 import Home from './pages/Home';
+import About from './pages/About';
 import BrowseProjects from './pages/BrowseProjects';
 import Reports from './pages/Reports';
 import Champions from './pages/Champions';
@@ -118,6 +119,7 @@ const App: React.FC = () => {
               <main className={`flex-1 ${!isSpecialPage ? 'pt-20' : ''}`}>
                 <Routes>
                   <Route path="/" element={<Home />} />
+                  <Route path="/about" element={<About />} />
                   <Route path="/browse-projects" element={<BrowseProjects />} />
                   <Route path="/reports" element={<Reports />} />
                   <Route path="/champions" element={<Champions />} />

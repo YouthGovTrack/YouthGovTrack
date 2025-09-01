@@ -123,7 +123,10 @@ const Navbar: React.FC = () => {
                   </NavLink>
                 </>
               )}
-              <NavLink to="/about" className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm xl:text-base">
+              <NavLink 
+                to="/about" 
+                className={({ isActive }) => `font-medium transition-colors text-sm xl:text-base ${isActive ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'}`}
+              >
                 About
               </NavLink>
               {/* Auth Buttons / User Menu */}
@@ -316,9 +319,19 @@ const Navbar: React.FC = () => {
                     </button>
                   </>
                 )}
-                <a href="#about" className="block px-4 py-3 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 font-medium transition-colors">
+                <button 
+                  onClick={() => {
+                    navigate('/about');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${
+                    location.pathname === '/about' 
+                      ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' 
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                  }`}
+                >
                   ℹ️ About
-                </a>
+                </button>
                 {/* Civic Alerts in Mobile Menu - Only show for authenticated users */}
                 {isLoggedIn && (
                   <button

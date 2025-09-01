@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { nigeriaStates } from '../data/nigeriaData';
 import ArrowLink from '../components/icons/ArrowLink';
 import { useAuth } from '../contexts/AuthContext';
+import AuthModal from '../components/AuthModal';
 
 const Register: React.FC = () => {
   console.log('[Register] Rendered');
@@ -23,6 +24,7 @@ const Register: React.FC = () => {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Get LGAs for selected state
   const selectedStateData = nigeriaStates.find(state => state.name === formData.state);
@@ -148,8 +150,7 @@ const Register: React.FC = () => {
               Already have an account?{' '}
               <ArrowLink 
                 onClick={() => {
-                  
-                  window.dispatchEvent(new CustomEvent('open-auth-modal'));
+                  setShowAuthModal(true);
                 }}
                 className="text-blue-600 hover:text-blue-700 font-medium"
                 isLink={false}
@@ -485,6 +486,18 @@ const Register: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* AuthModal */}
+      {showAuthModal && (
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={() => {
+            setShowAuthModal(false);
+            navigate('/'); // or wherever you want to redirect after login
+          }}
+        />
+      )}
     </div>
   );
 };
