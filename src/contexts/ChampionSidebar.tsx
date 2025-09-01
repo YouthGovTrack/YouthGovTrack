@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   BellIcon, 
   Cog6ToothIcon,
   MapIcon,
   HomeIcon,
   FolderOpenIcon,
-  ChatBubbleLeftRightIcon,
   Squares2X2Icon
 } from '@heroicons/react/24/outline';
 import SubmitReportModal from '../components/SubmitReportModal';
@@ -16,6 +16,7 @@ import { Badge } from '../components/ui/Badge';
 import { cn } from '../utils/cn';
 import ArrowLink from '../components/icons/ArrowLink';
 import { useAuth } from './AuthContext';
+import { useProjects } from './ProjectContext';
 
 interface Project {
   id: string;
@@ -37,6 +38,7 @@ interface Project {
 
 interface ChampionSidebarProps {
   projectId: number;
+  onShowProjects?: () => void;
 }
 
 interface SidebarItem {
@@ -44,33 +46,52 @@ interface SidebarItem {
   icon: React.ReactNode;
   count?: number;
   href?: string;
+  onClick?: () => void;
 }
 
-const sidebarItems: SidebarItem[] = [
-  { 
-    label: 'Your feed', 
-    icon: <HomeIcon className="w-5 h-5" />,
-    href: '#feed'
-  },
-  { 
-    label: 'All projects', 
-    icon: <FolderOpenIcon className="w-5 h-5" />,
-    href: '#projects'
-  },
- 
-  { 
-    label: 'Categories', 
-    icon: <Squares2X2Icon className="w-5 h-5" />,
-    href: '#categories'
-  }
-];
-
-const ChampionSidebar: React.FC<ChampionSidebarProps> = ({ projectId }) => {
+const ChampionSidebar: React.FC<ChampionSidebarProps> = ({ projectId, onShowProjects }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { fetchProjects } = useProjects();
   const [isSubmitReportOpen, setIsSubmitReportOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [project, setProject] = useState<Project | null>(null);
+  const [userStateProjectCount, setUserStateProjectCount] = useState<number>(0);
+
+  const handleViewAllProjects = () => {
+    if (onShowProjects) {
+      // Call the callback to show projects in the Community page
+      onShowProjects();
+    } else {
+      // Fallback to navigation if no callback is provided
+      if (user && user.state) {
+        navigate(`/browse-projects?state=${encodeURIComponent(user.state)}&lga=${encodeURIComponent(user.lga || '')}`);
+      } else {
+        navigate('/browse-projects');
+      }
+    }
+  };
+
+  const sidebarItems: SidebarItem[] = [
+    { 
+      label: 'Your feed', 
+      icon: <HomeIcon className="w-5 h-5" />,
+      href: '#feed'
+    },
+    { 
+      label: user?.state ? `${user.state} projects` : 'All projects', 
+      icon: <FolderOpenIcon className="w-5 h-5" />,
+      onClick: handleViewAllProjects,
+      count: user?.state && userStateProjectCount > 0 ? userStateProjectCount : undefined
+    },
+   
+    { 
+      label: 'Categories', 
+      icon: <Squares2X2Icon className="w-5 h-5" />,
+      href: '#categories'
+    }
+  ];
 
   useEffect(() => {
     // Simulated data loading
@@ -93,6 +114,29 @@ const ChampionSidebar: React.FC<ChampionSidebarProps> = ({ projectId }) => {
       images: [user?.profileImage || '/citizen1.png']
     });
   }, [projectId, user]);
+
+  // Get project count for user's state
+  useEffect(() => {
+    const getStateProjectCount = async () => {
+      if (user?.state) {
+        try {
+          // This would normally fetch from API, but for now we'll simulate
+          // In a real implementation, you would call an API endpoint that returns count
+          // const response = await fetch(`/api/projects/count?state=${user.state}`);
+          // const { count } = await response.json();
+          
+          // For now, we'll simulate a count
+          const mockCount = Math.floor(Math.random() * 50) + 10; // Random count between 10-60
+          setUserStateProjectCount(mockCount);
+        } catch (error) {
+          console.error('Error fetching state project count:', error);
+          setUserStateProjectCount(0);
+        }
+      }
+    };
+
+    getStateProjectCount();
+  }, [user?.state]);
 
   if (loading) return <Loader />;
   if (error) return <div className="p-4 text-red-600">{error}</div>;
@@ -167,25 +211,47 @@ const ChampionSidebar: React.FC<ChampionSidebarProps> = ({ projectId }) => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: 0.1 * index }}
               >
-                <a 
-                  href={item.href || '#'} 
-                  className={cn(
-                    "flex items-center justify-between w-full p-3 text-sm font-medium rounded-lg transition-all duration-200",
-                    "text-gray-700 hover:bg-primary-50 hover:text-primary-700 group"
-                  )}
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="text-gray-500 group-hover:text-primary-600 transition-colors">
-                      {item.icon}
+                {item.onClick ? (
+                  <button
+                    onClick={item.onClick}
+                    className={cn(
+                      "flex items-center justify-between w-full p-3 text-sm font-medium rounded-lg transition-all duration-200",
+                      "text-gray-700 hover:bg-primary-50 hover:text-primary-700 group"
+                    )}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="text-gray-500 group-hover:text-primary-600 transition-colors">
+                        {item.icon}
+                      </div>
+                      <span>{item.label}</span>
                     </div>
-                    <span>{item.label}</span>
-                  </div>
-                  {item.count !== undefined && (
-                    <Badge variant="default" className="text-xs">
-                      {item.count}
-                    </Badge>
-                  )}
-                </a>
+                    {item.count !== undefined && (
+                      <Badge variant="default" className="text-xs">
+                        {item.count}
+                      </Badge>
+                    )}
+                  </button>
+                ) : (
+                  <a 
+                    href={item.href || '#'} 
+                    className={cn(
+                      "flex items-center justify-between w-full p-3 text-sm font-medium rounded-lg transition-all duration-200",
+                      "text-gray-700 hover:bg-primary-50 hover:text-primary-700 group"
+                    )}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="text-gray-500 group-hover:text-primary-600 transition-colors">
+                        {item.icon}
+                      </div>
+                      <span>{item.label}</span>
+                    </div>
+                    {item.count !== undefined && (
+                      <Badge variant="default" className="text-xs">
+                        {item.count}
+                      </Badge>
+                    )}
+                  </a>
+                )}
               </motion.li>
             ))}
           </ul>

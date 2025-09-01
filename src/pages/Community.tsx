@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { ChampionSidebar } from '../contexts/ChampionSidebar';
 import CommunityChampions from '../components/CommunityChampions';
+import CommunityProjects from '../components/CommunityProjects';
 import LiveCivicAlerts from '../components/LiveCivicAlerts';
 import CitizenTestimonials from '../components/CitizenTestimonials';
 import Navbar from '../components/Navbar';
@@ -40,6 +41,11 @@ const Community: React.FC<CommunityProps> = ({ initialTab = 'dashboard' }) => {
 
   const championTabOptions = ['All', 'Projects', 'Community Posts'] as const;
   const [activeChampionTab, setActiveChampionTab] = useState<'All' | 'Projects' | 'Community Posts'>('All');
+
+  // Handle showing projects from sidebar
+  const handleShowProjects = () => {
+    setActiveTab('projects');
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -164,23 +170,7 @@ const Community: React.FC<CommunityProps> = ({ initialTab = 'dashboard' }) => {
       
       case 'projects':
         return (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Projects in Your Area</h2>
-              <p className="text-gray-600 mb-6">Explore and track government projects in {user?.lga}, {user?.state}</p>
-              <ArrowLink
-                onClick={() => navigate('/browse-projects')}
-                className="bg-blue-600 text-white hover:bg-blue-700"
-                isLink={false}
-              >
-                Browse All Projects
-              </ArrowLink>
-            </div>
-          </motion.div>
+          <CommunityProjects filterByUserLocation={true} />
         );
       
       case 'alerts':
@@ -326,7 +316,7 @@ const Community: React.FC<CommunityProps> = ({ initialTab = 'dashboard' }) => {
       <div className="flex flex-col lg:flex-row pt-20">
         {/* Sidebar - Hidden on mobile, shown on desktop */}
         <div className="hidden lg:block w-80 bg-white shadow-lg">
-          <ChampionSidebar projectId={1} />
+          <ChampionSidebar projectId={1} onShowProjects={handleShowProjects} />
         </div>
 
         {/* Mobile Menu Button */}
@@ -359,7 +349,7 @@ const Community: React.FC<CommunityProps> = ({ initialTab = 'dashboard' }) => {
                   </button>
                 </div>
               </div>
-              <ChampionSidebar projectId={1} />
+              <ChampionSidebar projectId={1} onShowProjects={handleShowProjects} />
             </div>
           </div>
         )}

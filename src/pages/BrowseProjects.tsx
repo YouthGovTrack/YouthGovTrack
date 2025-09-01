@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useProjects } from '../contexts/ProjectContext';
 import { Project, ProjectFilters } from '../services/mockApi';
 import CitizenReportsModal from '../components/CitizenReportsModal';
@@ -20,6 +20,7 @@ interface Filters {
 const BrowseProjects: React.FC = () => {
   console.log('[BrowseProjects] Rendered');
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { projects, loading, error, stats, total, fetchProjects, clearError } = useProjects();
   
   const [filters, setFilters] = useState<Filters>({
@@ -37,6 +38,21 @@ const BrowseProjects: React.FC = () => {
   const [showReportModal, setShowReportModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  // Initialize filters from URL parameters
+  useEffect(() => {
+    const stateParam = searchParams.get('state');
+    const lgaParam = searchParams.get('lga');
+    
+    if (stateParam) {
+      setSelectedState(stateParam);
+      setFilters(prev => ({
+        ...prev,
+        state: stateParam,
+        lga: lgaParam || ''
+      }));
+    }
+  }, [searchParams]);
 
 
 
@@ -149,7 +165,12 @@ const BrowseProjects: React.FC = () => {
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Browse Projects</h1>
-              <p className="mt-2 text-gray-600">Explore government projects across all states and sectors</p>
+              <p className="mt-2 text-gray-600">
+                {filters.state 
+                  ? `Explore government projects in ${filters.state}${filters.lga ? `, ${filters.lga}` : ''}`
+                  : 'Explore government projects across all states and sectors'
+                }
+              </p>
               {stats && (
                 <div className="mt-2 flex flex-wrap gap-4 text-sm text-gray-500">
                   <span>Total: {stats.totalProjects}</span>
