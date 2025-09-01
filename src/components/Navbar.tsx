@@ -41,11 +41,10 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogout = () => {
-    logout();
-    // Redirect to home if on community pages
-    if (["/reports", "/champions", "/community"].includes(location.pathname)) {
+    logout(() => {
+      // Always navigate to home after logout
       navigate('/');
-    }
+    });
   };
 
   // Add event listener for opening login modal from other components

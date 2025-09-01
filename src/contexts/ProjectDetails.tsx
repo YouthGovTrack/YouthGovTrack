@@ -18,6 +18,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [relatedProjects, setRelatedProjects] = useState<Project[]>([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     if (!projectId) return;
@@ -28,6 +29,7 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId }) => {
           const foundProject = projects.find(p => p.id === projectId);
           if (foundProject) {
             setProject(foundProject);
+            setCurrentImageIndex(0); // Reset image index when project changes
             
             // Get related projects (same category, different project)
             const related = projects
@@ -48,6 +50,26 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId }) => {
 
     fetchData();
   }, [projectId, projects, projectsLoading]);
+
+  // Keyboard navigation for image gallery
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (!project?.images || project.images.length <= 1) return;
+
+      if (event.key === 'ArrowLeft') {
+        setCurrentImageIndex(prev => 
+          prev === 0 ? project.images!.length - 1 : prev - 1
+        );
+      } else if (event.key === 'ArrowRight') {
+        setCurrentImageIndex(prev => 
+          prev === project.images!.length - 1 ? 0 : prev + 1
+        );
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [project?.images]);
 
   // Format image URL function
   const formatImageUrl = (url: string) => {
@@ -121,17 +143,75 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId }) => {
             </div>
           </div>
           
-          {/* Project Image */}
+          {/* Project Image Gallery */}
           <div className="relative h-[280px]">
+            {/* Main Image */}
             <img
-              src={formatImageUrl(project.images && project.images.length > 0 ? project.images[0] : '')}
-              alt={`${project.name} visualization`}
+              src={formatImageUrl(project.images && project.images.length > 0 ? project.images[currentImageIndex] : '')}
+              alt={`${project.name} visualization ${currentImageIndex + 1}`}
               className="w-full h-full object-cover"
               onError={(e) => {
                 console.error('Error loading project image:', (e.target as HTMLImageElement).src);
                 (e.target as HTMLImageElement).src = '/citizen1.png';
               }}
             />
+
+            {/* Navigation Arrows - Only show if there are multiple images */}
+            {project.images && project.images.length > 1 && (
+              <>
+                {/* Previous Arrow */}
+                <button
+                  onClick={() => setCurrentImageIndex(prev => 
+                    prev === 0 ? project.images!.length - 1 : prev - 1
+                  )}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-all duration-200"
+                  aria-label="Previous image"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+
+                {/* Next Arrow */}
+                <button
+                  onClick={() => setCurrentImageIndex(prev => 
+                    prev === project.images!.length - 1 ? 0 : prev + 1
+                  )}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-all duration-200"
+                  aria-label="Next image"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </>
+            )}
+
+            {/* Image Counter */}
+            {project.images && project.images.length > 1 && (
+              <div className="absolute top-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                {currentImageIndex + 1} / {project.images.length}
+              </div>
+            )}
+
+            {/* Image Dots Indicator */}
+            {project.images && project.images.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                {project.images.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                      index === currentImageIndex 
+                        ? 'bg-white scale-125' 
+                        : 'bg-white/50 hover:bg-white/75'
+                    }`}
+                    aria-label={`Go to image ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+
             {/* Category Badge */}
             <div className="absolute bottom-4 right-4">
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/90 text-gray-700 shadow-sm">
@@ -139,6 +219,34 @@ const ProjectDetails: React.FC<ProjectDetailsProps> = ({ projectId }) => {
               </span>
             </div>
           </div>
+
+          {/* Thumbnail Gallery - Only show if there are multiple images */}
+          {project.images && project.images.length > 1 && (
+            <div className="px-6 py-4 border-t border-gray-100">
+              <div className="flex space-x-3 overflow-x-auto scrollbar-hide">
+                {project.images.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                      index === currentImageIndex 
+                        ? 'border-blue-500 scale-105' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <img
+                      src={formatImageUrl(image)}
+                      alt={`${project.name} thumbnail ${index + 1}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/citizen1.png';
+                      }}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Quick Stats */}
           <div className="grid grid-cols-3 divide-x divide-gray-100 border-t border-gray-100">

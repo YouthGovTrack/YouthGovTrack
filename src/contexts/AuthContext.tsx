@@ -19,7 +19,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (userData: RegisterData) => Promise<void>;
-  logout: () => void;
+  logout: (onLogout?: () => void) => void;
   updateProfile: (updates: Partial<User>) => void;
 }
 
@@ -97,10 +97,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('[AuthProvider] User registered:', newUser);
   };
 
-  const logout = (): void => {
+  const logout = (onLogout?: () => void): void => {
     localStorage.removeItem('currentUser');
     setUser(null);
     console.log('[AuthProvider] User logged out');
+    // Execute callback if provided
+    if (onLogout) {
+      onLogout();
+    }
   };
 
   const updateProfile = (updates: Partial<User>): void => {
