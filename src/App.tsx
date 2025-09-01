@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import CommunityAlertForm from './components/CommunityAlertForm';
 import Home from './pages/Home';
 import About from './pages/About';
+import Budget from './pages/Budget';
 import BrowseProjects from './pages/BrowseProjects';
 import Reports from './pages/Reports';
 import Champions from './pages/Champions';
@@ -120,6 +121,7 @@ const App: React.FC = () => {
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/about" element={<About />} />
+                  <Route path="/budget" element={<Budget />} />
                   <Route path="/browse-projects" element={<BrowseProjects />} />
                   <Route path="/reports" element={<Reports />} />
                   <Route path="/champions" element={<Champions />} />

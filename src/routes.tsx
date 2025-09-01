@@ -45,6 +45,11 @@ export const routes: Route[] = [
     title: 'About - LocalGovTrack',
   },
   {
+    path: '/budget',
+    component: 'Budget',
+    title: 'Budget Dashboard - LocalGovTrack',
+  },
+  {
     path: '/contact',
     component: 'Contact',
     title: 'Contact - LocalGovTrack',
@@ -68,6 +73,11 @@ export const navItems: NavItem[] = [
     label: 'Projects',
     path: '/projects',
     icon: '🏗️',
+  },
+  {
+    label: 'Budget',
+    path: '/budget',
+    icon: '💰',
   },
   {
     label: 'Reports',

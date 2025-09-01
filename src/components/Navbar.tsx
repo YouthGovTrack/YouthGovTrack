@@ -105,6 +105,12 @@ const Navbar: React.FC = () => {
               >
                 Track my LGA
               </button>
+              <NavLink 
+                to="/budget" 
+                className={({ isActive }) => `font-medium transition-colors text-sm xl:text-base ${isActive ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'}`}
+              >
+                Budget
+              </NavLink>
               {/* Community Features - Only show when logged in */}
               {isLoggedIn && (
                 <>
@@ -286,6 +292,19 @@ const Navbar: React.FC = () => {
                   }`}
                 >
                   📊 Track my LGA
+                </button>
+                <button 
+                  onClick={() => {
+                    navigate('/budget');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${
+                    location.pathname === '/budget' 
+                      ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' 
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                  }`}
+                >
+                  💰 Budget
                 </button>
                 {/* Community Features - Only show when logged in */}
                 {isLoggedIn && (
