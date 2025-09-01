@@ -381,7 +381,6 @@ const LiveCivicAlerts: React.FC = () => {
                   );
                 })}
               </div>
-              <span className="text-xs">Auto-rotating • Hover to pause</span>
             </div>
           )}
         </div>
@@ -453,14 +452,6 @@ const LiveCivicAlerts: React.FC = () => {
           </div>
         )}
 
-        <div className="text-center mt-8">
-          <ArrowLink 
-            className="bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
-            isLink={false}
-          >
-            View All Alerts
-          </ArrowLink>
-        </div>
       </div>
 
       {/* Popup Notifications for Registered Users */}

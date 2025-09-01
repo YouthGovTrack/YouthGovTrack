@@ -57,12 +57,7 @@ const sidebarItems: SidebarItem[] = [
     icon: <FolderOpenIcon className="w-5 h-5" />,
     href: '#projects'
   },
-  { 
-    label: 'Messages', 
-    icon: <ChatBubbleLeftRightIcon className="w-5 h-5" />,
-    count: 3,
-    href: '#messages'
-  },
+ 
   { 
     label: 'Categories', 
     icon: <Squares2X2Icon className="w-5 h-5" />,
