@@ -5,15 +5,20 @@ import LiveCivicAlerts from '../components/LiveCivicAlerts';
 import Sponsors from '../components/Sponsors';
 import CitizenTestimonials from '../components/CitizenTestimonials';
 import CommunityAlertForm from '../components/CommunityAlertForm';
+import AuthModal from '../components/AuthModal';
 import ArrowLink from '../components/icons/ArrowLink';
 import LazyImage from '../components/LazyImage';
 import { useProjects } from '../contexts/ProjectContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [selectedState, setSelectedState] = useState<string>('');
   const [selectedLga, setSelectedLga] = useState<string>('');
   const [showCommunityAlertForm, setShowCommunityAlertForm] = useState<boolean>(false);
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const [pendingProjectId, setPendingProjectId] = useState<number | null>(null);
   const { projects, loading } = useProjects();
   const [currentBackground, setCurrentBackground] = useState<number>(0);
   const backgroundImages = ['background1.jpeg', 'background2.jpeg', 'background3.jpeg'];
@@ -56,6 +61,30 @@ const Home: React.FC = () => {
     } else {
       alert('Please select both state and LGA');
     }
+  };
+
+  const handleProjectClick = (projectId: number) => {
+    if (user) {
+      // User is logged in, navigate to project details
+      navigate(`/project-details/${projectId}`);
+    } else {
+      // User is not logged in, show auth modal
+      setPendingProjectId(projectId);
+      setShowAuthModal(true);
+    }
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false);
+    if (pendingProjectId) {
+      navigate(`/project-details/${pendingProjectId}`);
+      setPendingProjectId(null);
+    }
+  };
+
+  const handleAuthModalClose = () => {
+    setShowAuthModal(false);
+    setPendingProjectId(null);
   };
   // Replace all onNavigate calls with navigate
   // Example: onNavigate('browse-projects') => navigate('/browse-projects')
@@ -183,9 +212,19 @@ const Home: React.FC = () => {
               projects.slice(0, 3).map((project) => (
                 <div 
                   key={project.id} 
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer transform hover:scale-[1.02] transition-all duration-200"
-                  onClick={() => navigate(`/project-details/${project.id}`)}
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer transform hover:scale-[1.02] transition-all duration-200 relative"
+                  onClick={() => handleProjectClick(project.id)}
                 >
+                  {!user && (
+                    <div className="absolute top-2 right-2 z-10">
+                      <div className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full flex items-center shadow-sm">
+                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        Login to View
+                      </div>
+                    </div>
+                  )}
                   <div className="h-48 bg-gray-50 flex items-center justify-center p-6">
                     <img 
                       src={project.images[0] || '/Healthcare.png'} 
@@ -229,7 +268,13 @@ const Home: React.FC = () => {
           <div className="text-center mt-8">
             <ArrowLink 
               className="bg-blue-600 text-white hover:bg-blue-700 transition shadow-lg"
-              onClick={() => navigate('/browse-projects')}
+              onClick={() => {
+                if (user) {
+                  navigate('/browse-projects');
+                } else {
+                  setShowAuthModal(true);
+                }
+              }}
               isLink={false}
             >
               View All Projects
@@ -315,6 +360,13 @@ const Home: React.FC = () => {
       <CommunityAlertForm
         isOpen={showCommunityAlertForm}
         onClose={() => setShowCommunityAlertForm(false)}
+      />
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={handleAuthModalClose}
+        onSuccess={handleAuthSuccess}
       />
     </div>
   );
