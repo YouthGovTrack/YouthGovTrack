@@ -4,7 +4,6 @@ import StateSelector from '../components/StateSelector';
 import LiveCivicAlerts from '../components/LiveCivicAlerts';
 import Sponsors from '../components/Sponsors';
 import CitizenTestimonials from '../components/CitizenTestimonials';
-import AuthModal from '../components/AuthModal';
 import CommunityAlertForm from '../components/CommunityAlertForm';
 import ArrowLink from '../components/icons/ArrowLink';
 import LazyImage from '../components/LazyImage';
@@ -16,15 +15,16 @@ const Home: React.FC = () => {
   const [selectedLga, setSelectedLga] = useState<string>('');
   const [showCommunityAlertForm, setShowCommunityAlertForm] = useState<boolean>(false);
   const { projects, loading } = useProjects();
-  const [currentBackground, setCurrentBackground] = useState<1 | 2>(1);
+  const [currentBackground, setCurrentBackground] = useState<number>(0);
+  const backgroundImages = ['background1.jpeg', 'background2.jpeg', 'background3.jpeg'];
   console.log('[Home] Rendered. loading:', loading, 'projects:', projects);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentBackground(prev => prev === 1 ? 2 : 1);
+      setCurrentBackground(prev => (prev + 1) % backgroundImages.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [backgroundImages.length]);
   useEffect(() => {
     console.log('[Home] useEffect. loading:', loading, 'projects count:', projects.length);
   }, [loading, projects.length]);
@@ -66,7 +66,7 @@ const Home: React.FC = () => {
       <section 
         className="relative py-16 bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-in-out"
         style={{
-          backgroundImage: `url(/background${currentBackground}.jpeg)`,
+          backgroundImage: `url(/${backgroundImages[currentBackground]})`,
           minHeight: '80vh'
         }}
       >
