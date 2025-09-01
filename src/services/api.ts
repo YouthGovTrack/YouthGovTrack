@@ -22,13 +22,11 @@ const api: AxiosInstance = axios.create({
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
-  (config: AxiosRequestConfig) => {
+  (config) => {
     const token = localStorage.getItem('authToken');
     if (token) {
-      if (!config.headers) {
-        config.headers = {};
-      }
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers = config.headers || {};
+      (config.headers as any).Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -41,8 +39,8 @@ api.interceptors.request.use(
 
 // Response interceptor to handle errors
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
+  (response: AxiosResponse) => response,
+  (error: AxiosError) => {
     if (error.response?.status === 401) {
       // Handle unauthorized access
       localStorage.removeItem('authToken');

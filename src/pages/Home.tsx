@@ -14,7 +14,6 @@ const Home: React.FC = () => {
   const navigate = useNavigate();
   const [selectedState, setSelectedState] = useState<string>('');
   const [selectedLga, setSelectedLga] = useState<string>('');
-  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [showCommunityAlertForm, setShowCommunityAlertForm] = useState<boolean>(false);
   const { projects, loading } = useProjects();
   const [currentBackground, setCurrentBackground] = useState<1 | 2>(1);
@@ -83,7 +82,7 @@ const Home: React.FC = () => {
               </p>
               <ArrowLink 
                 className="bg-green-500 text-white hover:bg-green-600 transition shadow-lg"
-                onClick={() => setShowAuthModal(true)}
+                onClick={() => navigate('/register')}
                 isLink={false}
               >
                 <LazyImage 
@@ -96,13 +95,6 @@ const Home: React.FC = () => {
                 />
                 Track My LGA
               </ArrowLink>
-              
-              {showAuthModal && (
-                <AuthModal
-                  isOpen={showAuthModal}
-                  onClose={() => setShowAuthModal(false)}
-                />
-              )}
             </div>
             
             {/* Quick Report Form */}
