@@ -1,7 +1,7 @@
 
 interface SharedNotification {
   id: string;
-  type: 'community_alert' | 'civic_alert' | 'report_status' | 'champion_activity' | 'system_notification';
+  type: 'community_alert' | 'civic_alert' | 'report_status' | 'system_notification';
   title: string;
   message: string;
   priority: 'low' | 'medium' | 'high' | 'urgent';
@@ -9,11 +9,10 @@ interface SharedNotification {
   state: string;
   lga: string;
   timestamp: string;
-  isGlobal: boolean; // Whether this notification should be visible to all community members
+  isGlobal: boolean; // Whether this notification should be visible to all users
   targetAudience: 'all' | 'state' | 'lga' | 'specific'; // Who should see this notification
   category?: string;
   userId?: string; // ID of the user who created the notification
-  readBy: string[]; // Array of user IDs who have read this notification
 }
 
 class SharedNotificationService {
@@ -21,12 +20,11 @@ class SharedNotificationService {
   private static readonly USER_SUBSCRIPTIONS_KEY = 'youthgovtrack_user_subscriptions';
 
   // Add a notification to the global shared pool
-  static addGlobalNotification(notification: Omit<SharedNotification, 'id' | 'timestamp' | 'readBy'>): string {
+  static addGlobalNotification(notification: Omit<SharedNotification, 'id' | 'timestamp'>): string {
     const newNotification: SharedNotification = {
       ...notification,
       id: this.generateId(),
-      timestamp: new Date().toISOString(),
-      readBy: []
+      timestamp: new Date().toISOString()
     };
 
     const globalNotifications = this.getGlobalNotifications();
@@ -74,23 +72,6 @@ class SharedNotificationService {
     });
   }
 
-  // Mark notification as read by a user
-  static markAsRead(notificationId: string, userId: string): void {
-    const globalNotifications = this.getGlobalNotifications();
-    const notification = globalNotifications.find(n => n.id === notificationId);
-    
-    if (notification && !notification.readBy.includes(userId)) {
-      notification.readBy.push(userId);
-      localStorage.setItem(this.GLOBAL_NOTIFICATIONS_KEY, JSON.stringify(globalNotifications));
-    }
-  }
-
-  // Get unread count for a user
-  static getUnreadCount(userState: string, userLga: string, userId?: string): number {
-    const userNotifications = this.getNotificationsForUser(userState, userLga, userId);
-    return userNotifications.filter(n => userId && !n.readBy.includes(userId)).length;
-  }
-
   // Subscribe user to receive notifications for their area
   static subscribeUser(userId: string, userState: string, userLga: string): void {
     const subscriptions = this.getUserSubscriptions();
@@ -114,21 +95,6 @@ class SharedNotificationService {
       lga: 'All',
       isGlobal: true,
       targetAudience: 'all'
-    });
-  }
-
-  // Create champion activity notifications
-  static createChampionActivity(championName: string, activity: string, state: string, lga: string): void {
-    this.addGlobalNotification({
-      type: 'champion_activity',
-      title: `Champion Activity: ${championName}`,
-      message: activity,
-      priority: 'medium',
-      source: championName,
-      state,
-      lga,
-      isGlobal: true,
-      targetAudience: 'lga'
     });
   }
 
@@ -161,7 +127,7 @@ class SharedNotificationService {
         message: "Construction of new primary school in Wuse 2 is 70% complete. Expected opening next semester.",
         state: "FCT",
         lga: "Wuse",
-        source: "Champion Amina Suleiman"
+        source: "FCT Education Department"
       }
     ];
 
@@ -218,18 +184,18 @@ class SharedNotificationService {
           title: 'Community Meeting Scheduled',
           message: 'Town hall meeting scheduled for Saturday 2 PM at Lagos Island Community Center. Discussion on local infrastructure projects.',
           priority: 'medium' as const,
-          source: 'Champion Adebayo Ogundimu',
+          source: 'Lagos Island Community Center',
           state: 'Lagos',
           lga: 'Lagos Island',
           isGlobal: true,
           targetAudience: 'lga' as const
         },
         {
-          type: 'champion_activity' as const,
-          title: 'New Champion Verified',
-          message: 'Champion Sarah Abubakar has been verified and is now monitoring healthcare projects in Garki area.',
+          type: 'report_status' as const,
+          title: 'Project Update',
+          message: 'Healthcare facility construction in Garki area is now 85% complete. Expected completion next month.',
           priority: 'low' as const,
-          source: 'Champion Sarah Abubakar',
+          source: 'YouthGovTrack System',
           state: 'FCT',
           lga: 'Garki',
           isGlobal: true,

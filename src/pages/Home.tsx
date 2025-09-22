@@ -5,7 +5,6 @@ import LiveCivicAlerts from '../components/LiveCivicAlerts';
 import Sponsors from '../components/Sponsors';
 import CitizenTestimonials from '../components/CitizenTestimonials';
 import CommunityAlertForm from '../components/CommunityAlertForm';
-import AuthModal from '../components/AuthModal';
 import FeaturedProjects from '../components/FeaturedProjects';
 import ArrowLink from '../components/icons/ArrowLink';
 import LazyImage from '../components/LazyImage';
@@ -18,8 +17,6 @@ const Home: React.FC = () => {
   const [selectedState, setSelectedState] = useState<string>('');
   const [selectedLga, setSelectedLga] = useState<string>('');
   const [showCommunityAlertForm, setShowCommunityAlertForm] = useState<boolean>(false);
-  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
-  const [pendingProjectId, setPendingProjectId] = useState<number | null>(null);
   const { projects, loading } = useProjects();
   const [currentBackground, setCurrentBackground] = useState<number>(0);
   const backgroundImages = ['background1.jpeg', 'background2.jpeg', 'background3.jpeg'];
@@ -65,35 +62,12 @@ const Home: React.FC = () => {
   };
 
   const handleProjectClick = (projectId: number) => {
-    if (user) {
-      // User is logged in, navigate to project details
-      navigate(`/project-details/${projectId}`);
-    } else {
-      // User is not logged in, show auth modal
-      setPendingProjectId(projectId);
-      setShowAuthModal(true);
-    }
-  };
-
-  const handleAuthSuccess = () => {
-    setShowAuthModal(false);
-    if (pendingProjectId) {
-      navigate(`/project-details/${pendingProjectId}`);
-      setPendingProjectId(null);
-    }
+    // Direct navigation since no authentication is required
+    navigate(`/project-details/${projectId}`);
   };
 
   const handleViewAllProjects = () => {
-    if (user) {
-      navigate('/browse-projects');
-    } else {
-      setShowAuthModal(true);
-    }
-  };
-
-  const handleAuthModalClose = () => {
-    setShowAuthModal(false);
-    setPendingProjectId(null);
+    navigate('/browse-projects');
   };
   // Replace all onNavigate calls with navigate
   // Example: onNavigate('browse-projects') => navigate('/browse-projects')
@@ -120,7 +94,7 @@ const Home: React.FC = () => {
               </p>
               <ArrowLink 
                 className="bg-green-500 text-white hover:bg-green-600 transition shadow-lg"
-                onClick={() => navigate('/register')}
+                onClick={() => navigate('/browse-projects')}
                 isLink={false}
               >
                 <LazyImage 
@@ -286,13 +260,6 @@ const Home: React.FC = () => {
       <CommunityAlertForm
         isOpen={showCommunityAlertForm}
         onClose={() => setShowCommunityAlertForm(false)}
-      />
-
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={handleAuthModalClose}
-        onSuccess={handleAuthSuccess}
       />
     </div>
   );

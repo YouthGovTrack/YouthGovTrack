@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { useNotifications } from '../contexts/NotificationContext';
 import { nigeriaStates } from '../data/nigeriaData';
 import OptimizedIcon from './OptimizedIcon';
-import AuthModal from './AuthModal';
 
 interface CommunityAlertFormProps {
   isOpen: boolean;
@@ -11,8 +10,6 @@ interface CommunityAlertFormProps {
 
 const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose }) => {
   const { addNotification, addGlobalNotification } = useNotifications();
-  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
-  const [pendingSubmission, setPendingSubmission] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     title: '',
     message: '',
@@ -36,22 +33,6 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
       }
     }
   }, [isOpen]);
-
-  // Check for user login after auth modal closes and attempt auto-submission
-  React.useEffect(() => {
-    if (pendingSubmission && !showAuthModal) {
-      const currentUser = localStorage.getItem('currentUser');
-      if (currentUser) {
-        // User has logged in, now submit the form automatically
-        if (formData.title.trim() && formData.message.trim()) {
-          handleActualSubmit();
-        } else {
-          alert('Please fill in all required fields before submitting');
-        }
-      }
-      setPendingSubmission(false);
-    }
-  }, [showAuthModal, pendingSubmission, formData.title, formData.message]);
 
   // Get LGAs for the selected state
   const selectedStateLGAs = useMemo(() => {
@@ -116,17 +97,7 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
       return;
     }
 
-    // Check if user is logged in
-    const currentUser = localStorage.getItem('currentUser');
-    if (!currentUser) {
-      // Mark that we want to submit after login
-      setPendingSubmission(true);
-      // Show the auth modal instead of just an alert
-      setShowAuthModal(true);
-      return;
-    }
-
-    // User is logged in, submit immediately
+    // Submit immediately since no authentication is required
     handleActualSubmit();
   };
 
@@ -237,7 +208,7 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
                 name="source"
                 value={formData.source}
                 onChange={handleInputChange}
-                placeholder="e.g., Community Champion John"
+                placeholder="e.g., Community Leader John"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -307,20 +278,6 @@ const CommunityAlertForm: React.FC<CommunityAlertFormProps> = ({ isOpen, onClose
         </div>
       </div>
 
-      {/* Auth Modal */}
-      {showAuthModal && (
-        <AuthModal
-          isOpen={showAuthModal}
-          onClose={() => {
-            setShowAuthModal(false);
-            setPendingSubmission(false); // Reset pending submission if user cancels
-          }}
-          onSuccess={() => {
-            setShowAuthModal(false);
-            // Don't reset pendingSubmission here - let the useEffect handle it
-          }}
-        />
-      )}
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNotifications } from '../contexts/NotificationContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface SubmitReportModalProps {
   isOpen: boolean;
@@ -8,6 +9,7 @@ interface SubmitReportModalProps {
 
 const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }) => {
   const { addNotification, addGlobalNotification } = useNotifications();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     category: '',
@@ -20,16 +22,15 @@ const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Get current user info
-    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    const userName = currentUser.firstName && currentUser.lastName 
-      ? `${currentUser.firstName} ${currentUser.lastName}` 
+    // Get current user info from Auth context
+    const userName = user?.firstName && user?.lastName 
+      ? `${user.firstName} ${user.lastName}` 
       : 'Anonymous Citizen';
 
     // Extract state and LGA from location
     const locationParts = formData.location.split(',').map(part => part.trim());
-    const state = locationParts.length >= 2 ? locationParts[locationParts.length - 1] : currentUser.state || 'Unknown State';
-    const lga = locationParts.length >= 2 ? locationParts[locationParts.length - 2] : currentUser.lga || 'Unknown LGA';
+    const state = locationParts.length >= 2 ? locationParts[locationParts.length - 1] : user?.state || 'Unknown State';
+    const lga = locationParts.length >= 2 ? locationParts[locationParts.length - 2] : user?.lga || 'Unknown LGA';
 
     // Create new report object for instant display
     const newReport = {
@@ -37,7 +38,7 @@ const SubmitReportModal: React.FC<SubmitReportModalProps> = ({ isOpen, onClose }
       projectId: '',
       projectTitle: formData.title,
       reporterName: userName,
-      reporterEmail: currentUser.email || 'unknown@email.com',
+      reporterEmail: user?.email || 'unknown@email.com',
       reportType: 'issue' as const,
       description: formData.description,
       images: formData.images.map(file => URL.createObjectURL(file)),

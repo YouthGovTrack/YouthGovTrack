@@ -19,12 +19,12 @@ const About: React.FC = () => {
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
                 Tracking state governors' promises. Amplifying youth voices and strengthening accountability in Nigerian state governance.
               </p>
-              <ArrowLink 
-                onClick={() => navigate('/register')}
+              <ArrowLink
+                onClick={() => navigate('/browse-projects')}
                 className="bg-red-600 text-white hover:bg-red-700 transition-colors px-8 py-3 text-lg font-semibold"
                 isLink={false}
               >
-                Join the Club
+                Explore Projects
               </ArrowLink>
             </div>
             <div className="flex justify-center">
@@ -330,7 +330,7 @@ const About: React.FC = () => {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Supported by Champions of Democracy</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Supported by Active Citizens</h2>
             <p className="text-gray-600 max-w-3xl mx-auto">
               We are supported by organizations committed to governance accountability and youth empowerment across Nigeria.
             </p>
@@ -371,20 +371,13 @@ const About: React.FC = () => {
             Be part of the civic movement transforming governance across Nigeria. Your voice matters in building the Nigeria we all desire.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex justify-center">
             <ArrowLink 
-              onClick={() => navigate('/register')}
+              onClick={() => navigate('/browse-projects')}
               className="bg-red-600 text-white hover:bg-red-700 transition-colors px-8 py-3 text-lg font-semibold"
               isLink={false}
             >
-              Become a Civic Champion
-            </ArrowLink>
-            <ArrowLink 
-              onClick={() => navigate('/browse-projects')}
-              className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-green-600 transition-colors px-8 py-3 text-lg font-semibold"
-              isLink={false}
-            >
-              Explore Projects
+              Browse Government Projects
             </ArrowLink>
           </div>
         </div>

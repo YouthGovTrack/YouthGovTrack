@@ -15,7 +15,7 @@ export interface CitizenReport {
   status: 'pending' | 'verified' | 'investigating' | 'resolved';
   submitDate: string;
   verifiedBy?: string;
-  championNotes?: string;
+  adminNotes?: string;
 }
 
 export interface QuickReport {
@@ -31,5 +31,5 @@ export interface QuickReport {
   submitDate: string;
   status: 'verified';
   verifiedBy: string;
-  championNotes?: string;
+  adminNotes?: string;
 }

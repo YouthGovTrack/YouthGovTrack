@@ -1,30 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation, NavLink } from 'react-router-dom';
 import OptimizedIcon from './OptimizedIcon';
-import AuthModal from './AuthModal';
 import ViewCivicAlertsModal from './ViewCivicAlertsModal';
-import { useNotifications } from '../contexts/NotificationContext';
-import { useAuth } from '../contexts/AuthContext';
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCivicAlertsModalOpen, setIsCivicAlertsModalOpen] = useState(false);
-  const { unreadCount } = useNotifications();
-  const { user, logout } = useAuth();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const openLoginModal = () => {
-    setIsAuthModalOpen(true);
-  };
-
-  const closeAuthModal = () => {
-    setIsAuthModalOpen(false);
   };
 
   const openCivicAlertsModal = () => {
@@ -35,43 +21,10 @@ const Navbar: React.FC = () => {
     setIsCivicAlertsModalOpen(false);
   };
 
-  const handleAuthSuccess = () => {
-    setIsAuthModalOpen(false);
+  // Handle Track my LGA button click - direct navigation since no auth needed
+  const handleTrackMyLGA = () => {
     navigate('/browse-projects');
   };
-
-  const handleLogout = () => {
-    logout(() => {
-      // Always navigate to home after logout
-      navigate('/');
-    });
-  };
-
-  // Add event listener for opening login modal from other components
-  useEffect(() => {
-    const handleOpenLoginModal = () => {
-      setIsAuthModalOpen(true);
-    };
-    
-    // Use a named event to avoid potential memory leaks
-    window.addEventListener('openLoginModal', handleOpenLoginModal);
-    
-    // Cleanup function to remove the event listener
-    return () => {
-      window.removeEventListener('openLoginModal', handleOpenLoginModal);
-    };
-  }, []); // Empty dependency array ensures this only runs once
-
-  // Handle Track my LGA button click - require sign-in for non-authenticated users
-  const handleTrackMyLGA = () => {
-    if (user) {
-      navigate('/browse-projects');
-    } else {
-      openLoginModal();
-    }
-  };
-
-  const isLoggedIn = !!user;
 
   return (
     <>
@@ -84,21 +37,19 @@ const Navbar: React.FC = () => {
                 onClick={() => navigate('/')}
                 className="text-xl sm:text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
               >
-                LocalGovTrack
+              LocalGovTrack
               </button>
             </div>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
-              {!isLoggedIn && (
-                <NavLink 
-                  to="/"
-                  className={({ isActive }) => `font-medium transition-colors text-sm xl:text-base ${isActive ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'}`}
-                  end
-                >
-                  Home
-                </NavLink>
-              )}
+              <NavLink 
+                to="/"
+                className={({ isActive }) => `font-medium transition-colors text-sm xl:text-base ${isActive ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'}`}
+                end
+              >
+                Home
+              </NavLink>
               <button 
                 onClick={handleTrackMyLGA}
                 className={`font-medium transition-colors text-sm xl:text-base ${location.pathname === '/browse-projects' ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'}`}
@@ -111,93 +62,47 @@ const Navbar: React.FC = () => {
               >
                 Budget
               </NavLink>
-              {/* Community Features - Only show when logged in */}
-              {isLoggedIn && (
-                <>
-                  <NavLink 
-                    to="/reports"
-                    className={({ isActive }) => `font-medium transition-colors text-sm xl:text-base ${isActive ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'}`}
-                  >
-                    Reports
-                  </NavLink>
-                  <NavLink 
-                    to="/champions"
-                    className={({ isActive }) => `font-medium transition-colors text-sm xl:text-base ${isActive ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'}`}
-                  >
-                    Champions
-                  </NavLink>
-                </>
-              )}
+              <NavLink 
+                to="/reports"
+                className={({ isActive }) => `font-medium transition-colors text-sm xl:text-base ${isActive ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'}`}
+              >
+                Reports
+              </NavLink>
               <NavLink 
                 to="/about" 
                 className={({ isActive }) => `font-medium transition-colors text-sm xl:text-base ${isActive ? 'text-blue-600 border-b-2 border-blue-600 pb-1' : 'text-gray-700 hover:text-blue-600'}`}
               >
                 About
               </NavLink>
-              {/* Auth Buttons / User Menu */}
+              {/* User Menu and Civic Alerts */}
               <div className="flex items-center space-x-3 ml-4">
-                {/* Civic Alerts Bell Icon - Only show for authenticated users */}
-                {isLoggedIn && (
-                  <button
-                    onClick={openCivicAlertsModal}
-                    className="relative p-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
-                    aria-label="View civic alerts"
-                    title="Civic Alerts & Notifications"
-                  >
-                    <OptimizedIcon name="bell" size={20} className="transition-transform group-hover:scale-110" />
-                    {/* Dynamic Notification Badge */}
-                    {unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-[20px] h-5 rounded-full flex items-center justify-center font-medium animate-pulse">
-                        {unreadCount > 99 ? '99+' : unreadCount}
-                      </span>
-                    )}
-                  </button>
-                )}
-                {isLoggedIn ? (
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm text-gray-700">
-                      Welcome, <span className="font-medium text-blue-600">{user.firstName}</span>
-                    </span>
-                    <button
-                      onClick={handleLogout}
-                      className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-red-600 transition-colors duration-200"
-                    >
-                      Sign Out
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <button
-                      onClick={openLoginModal}
-                      className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200"
-                    >
-                      Sign In
-                    </button>
-                    <button
-                      onClick={() => navigate('/register')}
-                      className="px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                    >
-                      Join Community
-                    </button>
-                  </>
-                )}
+                {/* Civic Alerts Bell Icon */}
+                <button
+                  onClick={openCivicAlertsModal}
+                  className="relative p-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
+                  aria-label="View civic alerts"
+                  title="Civic Alerts & Notifications"
+                >
+                  <OptimizedIcon name="bell" size={20} className="transition-transform group-hover:scale-110" />
+                </button>
+                
+                <div className="flex items-center space-x-3">
+                </div>
               </div>
             </nav>
 
             {/* Tablet Navigation (md to lg) */}
             <nav className="hidden md:flex lg:hidden items-center space-x-4">
-              {!isLoggedIn && (
-                <button 
-                  onClick={() => navigate('/')}
-                  className={`font-medium transition-colors text-sm ${
-                    location.pathname === '/' 
-                      ? 'text-blue-600' 
-                      : 'text-gray-700 hover:text-blue-600'
-                  }`}
-                >
-                  Home
-                </button>
-              )}
+              <button 
+                onClick={() => navigate('/')}
+                className={`font-medium transition-colors text-sm ${
+                  location.pathname === '/' 
+                    ? 'text-blue-600' 
+                    : 'text-gray-700 hover:text-blue-600'
+                }`}
+              >
+                Home
+              </button>
               <button 
                 onClick={handleTrackMyLGA}
                 className={`font-medium transition-colors text-sm ${
@@ -208,39 +113,14 @@ const Navbar: React.FC = () => {
               >
                 Track my LGA
               </button>
-              {/* Civic Alerts Bell Icon for Tablet - Only show for authenticated users */}
-              {isLoggedIn && (
-                <button
-                  onClick={openCivicAlertsModal}
-                  className="relative p-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
-                  aria-label="View civic alerts"
-                >
-                  <OptimizedIcon name="bell" size={18} />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-[16px] h-4 rounded-full flex items-center justify-center font-medium">
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </span>
-                  )}
-                </button>
-              )}
-              {isLoggedIn ? (
-                <div className="flex items-center space-x-2">
-                  <span className="text-xs text-gray-600">{user.firstName}</span>
-                  <button
-                    onClick={handleLogout}
-                    className="bg-red-600 text-white px-3 py-1.5 rounded-md hover:bg-red-700 transition-colors font-medium text-sm"
-                  >
-                    Logout
-                  </button>
-                </div>
-              ) : (
-                <button
-                      onClick={() => navigate('/register')}
-                  className="bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700 transition-colors font-medium text-sm"
-                >
-                  Join
-                </button>
-              )}
+              {/* Civic Alerts Bell Icon for Tablet */}
+              <button
+                onClick={openCivicAlertsModal}
+                className="relative p-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                aria-label="View civic alerts"
+              >
+                <OptimizedIcon name="bell" size={18} />
+              </button>
             </nav>
 
             {/* Mobile Menu Button */}
@@ -265,21 +145,19 @@ const Navbar: React.FC = () => {
           {isMobileMenuOpen && (
             <div className="md:hidden animate-fade-in">
               <div className="px-2 pt-2 pb-4 space-y-1 bg-white border-t border-gray-200 shadow-lg">
-                {!isLoggedIn && (
-                  <button 
-                    onClick={() => {
-                      navigate('/');
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${
-                      location.pathname === '/' 
-                        ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' 
-                        : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                    }`}
-                  >
-                    🏠 Home
-                  </button>
-                )}
+                <button 
+                  onClick={() => {
+                    navigate('/');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${
+                    location.pathname === '/' 
+                      ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' 
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                  }`}
+                >
+                  🏠 Home
+                </button>
                 <button 
                   onClick={() => {
                     handleTrackMyLGA();
@@ -306,37 +184,19 @@ const Navbar: React.FC = () => {
                 >
                   💰 Budget
                 </button>
-                {/* Community Features - Only show when logged in */}
-                {isLoggedIn && (
-                  <>
-                    <button 
-                      onClick={() => {
-                        navigate('/reports');
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${
-                        location.pathname === '/reports' 
-                          ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' 
-                          : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                      }`}
-                    >
-                      📋 Reports
-                    </button>
-                    <button 
-                      onClick={() => {
-                        navigate('/champions');
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${
-                        location.pathname === '/champions' 
-                          ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' 
-                          : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                      }`}
-                    >
-                      🏆 Champions
-                    </button>
-                  </>
-                )}
+                <button 
+                  onClick={() => {
+                    navigate('/reports');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`block w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${
+                    location.pathname === '/reports' 
+                      ? 'text-blue-600 bg-blue-50 border-l-4 border-blue-600' 
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                  }`}
+                >
+                  📋 Reports
+                </button>
                 <button 
                   onClick={() => {
                     navigate('/about');
@@ -350,79 +210,21 @@ const Navbar: React.FC = () => {
                 >
                   ℹ️ About
                 </button>
-                {/* Civic Alerts in Mobile Menu - Only show for authenticated users */}
-                {isLoggedIn && (
-                  <button
-                    onClick={() => {
-                      openCivicAlertsModal();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="block w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 font-medium transition-colors"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span>🔔 Civic Alerts</span>
-                      {unreadCount > 0 && (
-                        <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full min-w-[24px] text-center">
-                          {unreadCount > 99 ? '99+' : unreadCount}
-                        </span>
-                      )}
-                    </div>
-                  </button>
-                )}
-                {/* Mobile Auth Section */}
-                <div className="border-t border-gray-200 pt-3 mt-3 space-y-2">
-                  {isLoggedIn ? (
-                    <>
-                      <div className="px-4 py-2 text-sm text-gray-600">
-                        Logged in as <span className="font-medium text-blue-600">{user.firstName} {user.lastName}</span>
-                      </div>
-                      <button
-                        onClick={() => {
-                          handleLogout();
-                          setIsMobileMenuOpen(false);
-                        }}
-                        className="block w-full text-left px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors"
-                      >
-                        🔓 Sign Out
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => {
-                          openLoginModal();
-                          setIsMobileMenuOpen(false);
-                        }}
-                        className="block w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 font-medium transition-colors"
-                      >
-                        🔑 Sign In
-                      </button>
-                      <button
-                        onClick={() => {
-                          navigate('/register');
-                          setIsMobileMenuOpen(false);
-                        }}
-                        className="block w-full text-left px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
-                      >
-                        🤝 Join Community
-                      </button>
-                    </>
-                  )}
-                </div>
+                {/* Civic Alerts in Mobile Menu */}
+                <button
+                  onClick={() => {
+                    openCivicAlertsModal();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 font-medium transition-colors"
+                >
+                  🔔 Civic Alerts
+                </button>
               </div>
             </div>
           )}
         </div>
       </header>
-      
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={closeAuthModal}
-        onSuccess={handleAuthSuccess}
-        onRegisterClick={() => navigate('/register')}
-        redirectAfterLogin="browse-projects"
-      />
 
       {/* Civic Alerts Modal */}
       <ViewCivicAlertsModal

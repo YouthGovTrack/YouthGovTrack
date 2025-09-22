@@ -8,9 +8,6 @@ import About from './pages/About';
 import Budget from './pages/Budget';
 import BrowseProjects from './pages/BrowseProjects';
 import Reports from './pages/Reports';
-import Champions from './pages/Champions';
-import Register from './pages/Register';
-import Community from './pages/Community';
 import ProjectDetails from './contexts/ProjectDetails';
 import { ProjectProvider } from './contexts/ProjectContext';
 import { NotificationProvider } from './contexts/NotificationContext';
@@ -106,9 +103,7 @@ const App: React.FC = () => {
   const location = useLocation();
   
   // Determine if current page should use special layout (no navbar/footer)
-  const isSpecialPage = location.pathname === '/register' || 
-                       location.pathname === '/community' || 
-                       location.pathname.startsWith('/project-details/');
+  const isSpecialPage = location.pathname.startsWith('/project-details/');
 
   return (
     <ErrorBoundary>
@@ -124,9 +119,6 @@ const App: React.FC = () => {
                   <Route path="/budget" element={<Budget />} />
                   <Route path="/browse-projects" element={<BrowseProjects />} />
                   <Route path="/reports" element={<Reports />} />
-                  <Route path="/champions" element={<Champions />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/community" element={<Community />} />
                   <Route path="/project-details/:id" element={<ProjectDetailsWrapper />} />
                   <Route path="*" element={<Home />} />
                 </Routes>

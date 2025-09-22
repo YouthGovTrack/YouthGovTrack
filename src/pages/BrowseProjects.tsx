@@ -146,13 +146,7 @@ const BrowseProjects: React.FC = () => {
   };
 
   const handleReportProject = (project: Project) => {
-    // Check if user is logged in
-    const userData = localStorage.getItem('currentUser');
-    if (!userData) {
-      alert('Please sign in to submit project reports. Join our community to help track government projects!');
-      return;
-    }
-    
+    // No authentication check needed - everyone can submit reports
     setSelectedProject(project);
     setShowReportModal(true);
   };

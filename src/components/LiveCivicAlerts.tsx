@@ -22,7 +22,6 @@ const LiveCivicAlerts: React.FC = () => {
   const [allAlerts, setAllAlerts] = useState<Alert[]>([]);
   const [transitionStage, setTransitionStage] = useState<'idle' | 'fadeOut' | 'fadeIn'>('idle');
   const [popupNotifications, setPopupNotifications] = useState<Alert[]>([]);
-  const [isUserRegistered] = useState(true); // Mock registered user status
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const animationRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -57,8 +56,6 @@ const LiveCivicAlerts: React.FC = () => {
         return priority === 'urgent' || priority === 'high' ? 'Alert' : 'Ongoing';
       case 'report_status':
         return 'Ongoing';
-      case 'champion_activity':
-        return 'Health';
       case 'system_notification':
         return 'Resolved';
       case 'community_alert':
@@ -102,7 +99,7 @@ const LiveCivicAlerts: React.FC = () => {
     const convertedAlerts = sortedNotifications.map(convertNotificationToAlert);
 
     // Check for new alerts to show popup notifications
-    if (isUserRegistered && allAlerts.length > 0) {
+    if (allAlerts.length > 0) {
       const newAlerts = convertedAlerts.filter(alert => 
         !allAlerts.some(existingAlert => existingAlert.id === alert.id)
       );
@@ -124,10 +121,8 @@ const LiveCivicAlerts: React.FC = () => {
     }
   };
 
-  // Show popup notification for registered users
+  // Show popup notification for all users
   const showPopupNotification = (alert: Alert) => {
-    if (!isUserRegistered) return;
-
     setPopupNotifications(prev => [...prev, alert]);
     
     // Auto-remove popup after duration
@@ -206,8 +201,8 @@ const LiveCivicAlerts: React.FC = () => {
     const handleNewNotification = (event: any) => {
       const newNotification = event.detail;
       
-      // Show popup for registered users for certain types
-      if (isUserRegistered && newNotification) {
+      // Show popup for all users for certain types
+      if (newNotification) {
         const newAlert = convertNotificationToAlert(newNotification);
         if (newAlert.priority === 'high' || newAlert.type === 'civic_alert' || newAlert.type === 'community_alert') {
           showPopupNotification(newAlert);
@@ -454,8 +449,8 @@ const LiveCivicAlerts: React.FC = () => {
 
       </div>
 
-      {/* Popup Notifications for Registered Users */}
-      {isUserRegistered && popupNotifications.length > 0 && (
+      {/* Popup Notifications for All Users */}
+      {popupNotifications.length > 0 && (
         <div className="fixed top-4 right-4 z-50 space-y-3 max-w-sm">
           {popupNotifications.map((notification, index) => (
             <div
