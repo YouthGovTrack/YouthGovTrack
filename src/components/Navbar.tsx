@@ -35,9 +35,16 @@ const Navbar: React.FC = () => {
             <div className="flex items-center">
               <button 
                 onClick={() => navigate('/')}
-                className="text-xl sm:text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
+                className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
               >
-              LocalGovTrack
+                <img 
+                  src="/logo.jpeg" 
+                  alt="LocalGovTrack Logo" 
+                  className="h-8 w-8 sm:h-10 sm:w-10 object-contain"
+                />
+                <span className="text-xl sm:text-2xl font-bold text-blue-600">
+                  LocalGovTrack
+                </span>
               </button>
             </div>
 

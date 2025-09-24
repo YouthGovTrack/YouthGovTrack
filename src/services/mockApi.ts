@@ -14,6 +14,7 @@ export interface Project {
   status: 'Planned' | 'Ongoing' | 'Completed' | 'Abandoned' | 'Suspended';
   progress: number;
   images: string[];
+  videos: string[];
   tags: string[];
   beneficiaries: number;
   reports: any[];
@@ -59,6 +60,7 @@ const mockProjects: Project[] = [
     status: "Ongoing",
     progress: 75,
     images: ["/infracture.png", "/citizen1.png", "/citizen2.png", "/citizen3.png", "/Healthcare.png"],
+    videos: [],
     tags: ["infrastructure", "expressway", "lagos", "transportation"],
     beneficiaries: 2500000,
     reports: [],
@@ -81,6 +83,7 @@ const mockProjects: Project[] = [
     status: "Completed",
     progress: 100,
     images: ["/Healthcare.png", "/Education.png", "/citizen1.png"],
+    videos: [],
     tags: ["healthcare", "kano", "primary-care", "rural"],
     beneficiaries: 450000,
     reports: [],
@@ -102,6 +105,7 @@ const mockProjects: Project[] = [
     status: "Ongoing",
     progress: 45,
     images: ["/infracture.png"],
+    videos: [],
     tags: ["water", "rivers", "infrastructure", "clean-water"],
     beneficiaries: 800000,
     reports: [],
@@ -165,6 +169,7 @@ export const mockProjectAPI = {
       status: 'Planned',
       progress: 0,
       images: [],
+      videos: [],
       tags: [projectData.category.toLowerCase(), projectData.state.toLowerCase()],
       beneficiaries: 0,
       reports: [],

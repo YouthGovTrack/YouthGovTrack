@@ -11,7 +11,14 @@ const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">LocalGovTrack</h3>
+            <div className="flex items-center space-x-2 mb-4">
+              <img 
+                src="/logo.jpeg" 
+                alt="LocalGovTrack Logo" 
+                className="h-8 w-8 object-contain"
+              />
+              <h3 className="text-xl font-bold">LocalGovTrack</h3>
+            </div>
             <p className="text-gray-400">Empowering citizens to track government projects and engage in civic activities.</p>
           </div>
           <div>

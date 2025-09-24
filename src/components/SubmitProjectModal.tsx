@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useProjects } from '../contexts/ProjectContext';
 import { Project } from '../services/mockApi';
 import { nigeriaStates } from '../data/nigeriaData';
@@ -26,8 +26,17 @@ const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({ isOpen, onClose
 
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+  const [selectedVideos, setSelectedVideos] = useState<File[]>([]);
+  const [videoPreviewUrls, setVideoPreviewUrls] = useState<string[]>([]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Cleanup video URLs on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      videoPreviewUrls.forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [videoPreviewUrls]);
 
   const categories = [
     'Infrastructure', 'Healthcare', 'Education', 'Transportation', 
@@ -86,6 +95,53 @@ const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({ isOpen, onClose
     setImagePreviewUrls(prev => prev.filter((_, i) => i !== index));
   };
 
+  // Handle video file selection
+  const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const maxVideos = 3; // Limit to 3 videos
+    
+    if (selectedVideos.length + files.length > maxVideos) {
+      alert(`You can only upload up to ${maxVideos} videos`);
+      return;
+    }
+
+    // Validate file types and sizes
+    const validFiles = files.filter(file => {
+      const isValidType = file.type.startsWith('video/');
+      const isValidSize = file.size <= 100 * 1024 * 1024; // 100MB max for videos
+      
+      if (!isValidType) {
+        alert(`${file.name} is not a valid video file`);
+        return false;
+      }
+      if (!isValidSize) {
+        alert(`${file.name} is too large. Maximum size is 100MB`);
+        return false;
+      }
+      return true;
+    });
+
+    if (validFiles.length > 0) {
+      setSelectedVideos(prev => [...prev, ...validFiles]);
+      
+      // Create preview URLs for videos
+      validFiles.forEach(file => {
+        const url = URL.createObjectURL(file);
+        setVideoPreviewUrls(prev => [...prev, url]);
+      });
+    }
+  };
+
+  // Remove a video
+  const removeVideo = (index: number) => {
+    // Clean up object URLs to prevent memory leaks
+    if (videoPreviewUrls[index]) {
+      URL.revokeObjectURL(videoPreviewUrls[index]);
+    }
+    setSelectedVideos(prev => prev.filter((_, i) => i !== index));
+    setVideoPreviewUrls(prev => prev.filter((_, i) => i !== index));
+  };
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
@@ -122,6 +178,11 @@ const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({ isOpen, onClose
         localImages[index % localImages.length] // Cycle through available local images
       );
 
+      // Create mock video URLs for demo purposes
+      const videoUrls = selectedVideos.map((_, index) => 
+        `/demo-video-${index + 1}.mp4` // Placeholder video URLs
+      );
+
       const newProject: Project = {
         id: Date.now(), // Simple ID generation for mock
         name: formData.name,
@@ -140,6 +201,7 @@ const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({ isOpen, onClose
         beneficiaries: 0,
         reports: [],
         images: imageUrls,
+        videos: videoUrls,
         tags: [formData.category.toLowerCase(), formData.state.toLowerCase()],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -164,6 +226,11 @@ const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({ isOpen, onClose
       // Reset images
       setSelectedImages([]);
       setImagePreviewUrls([]);
+      
+      // Reset videos and clean up URLs
+      videoPreviewUrls.forEach(url => URL.revokeObjectURL(url));
+      setSelectedVideos([]);
+      setVideoPreviewUrls([]);
       
       // Close modal
       onClose();
@@ -470,6 +537,72 @@ const SubmitProjectModal: React.FC<SubmitProjectModalProps> = ({ isOpen, onClose
                         <div className="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded">
                           {selectedImages[index]?.name.slice(0, 8)}...
                         </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Project Videos */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Project Videos (Optional)
+              </label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                <div className="text-center">
+                  <input
+                    type="file"
+                    id="videos"
+                    multiple
+                    accept="video/*"
+                    onChange={handleVideoSelect}
+                    className="hidden"
+                    disabled={loading}
+                  />
+                  <label
+                    htmlFor="videos"
+                    className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Add Videos
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">MP4, AVI, MOV up to 100MB each (max 3 videos)</p>
+                </div>
+
+                {/* Video Previews */}
+                {videoPreviewUrls.length > 0 && (
+                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {videoPreviewUrls.map((url, index) => (
+                      <div key={index} className="relative group">
+                        <div className="relative bg-gray-100 rounded-lg overflow-hidden">
+                          <video
+                            src={url}
+                            className="w-full h-32 object-cover"
+                            controls
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeVideo(index)}
+                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                            disabled={loading}
+                          >
+                            ×
+                          </button>
+                          <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                            <div className="flex items-center space-x-1">
+                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M8 5v10l8-5-8-5z"/>
+                              </svg>
+                              <span>{selectedVideos[index]?.name.slice(0, 12)}...</span>
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1 text-center">
+                          {(selectedVideos[index]?.size / (1024 * 1024)).toFixed(1)} MB
+                        </p>
                       </div>
                     ))}
                   </div>
